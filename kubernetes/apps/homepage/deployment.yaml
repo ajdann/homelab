@@ -63,4 +63,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: homepage 
+    app.kubernetes.io/name: homepage

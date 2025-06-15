@@ -4,4 +4,4 @@ namespace: kured
 resources:
   - namespace.yaml
   - helm-repository.yaml
-  - helm-release.yaml 
+  - helm-release.yaml

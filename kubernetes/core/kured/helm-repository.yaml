@@ -5,4 +5,4 @@ metadata:
   namespace: kured
 spec:
   interval: 1h
-  url: https://kubereboot.github.io/charts 
+  url: https://kubereboot.github.io/charts

@@ -1,7 +1,22 @@
+extends: default
+
 rules:
-  quoted-strings:
-    required: only-when-needed
-    extra-allowed: ["{|}"]
-  key-duplicates: {}
-  octal-values:
-    forbid-implicit-octal: true
+  line-length:
+    max: 120
+    level: warning
+  trailing-spaces: enable
+  truthy:
+    allowed-values: ["true", "false", "on"]
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+  document-start:
+    present: true
+  comments:
+    min-spaces-from-content: 1
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 0

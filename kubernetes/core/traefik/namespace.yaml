@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   name: traefik
   labels:
-    app.kubernetes.io/name: traefik 
+    app.kubernetes.io/name: traefik

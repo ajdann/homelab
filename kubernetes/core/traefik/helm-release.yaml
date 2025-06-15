@@ -28,4 +28,4 @@ spec:
       dashboard:
         enabled: true
     dashboard:
-      enabled: true 
+      enabled: true

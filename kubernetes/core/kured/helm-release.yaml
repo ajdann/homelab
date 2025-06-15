@@ -19,4 +19,4 @@ spec:
       endTime: "5:00"
       timeZone: "UTC"
       rebootCommand: "/usr/bin/systemctl reboot"
-      period: "1h" 
+      period: "1h"
