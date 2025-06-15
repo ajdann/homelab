@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-tailscale-auth
+  namespace: traefik
+type: Opaque
+stringData:
+  # You'll need to replace this with your Tailscale auth key
+  authkey: "YOUR_TAILSCALE_AUTH_KEY"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik-tailscale
+  namespace: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik-tailscale
+  template:
+    metadata:
+      labels:
+        app: traefik-tailscale
+    spec:
+      containers:
+      - name: tailscale
+        image: tailscale/tailscale:v1.44.0
+        env:
+        - name: TS_KUBE_SECRET
+          value: "traefik-tailscale-auth"
+        - name: TS_USERSPACE
+          value: "true"
+        - name: TS_AUTH_ONCE
+          value: "true"
+        - name: TS_HOSTNAME
+          value: "k8s-traefik"  # This will be your main ingress hostname in Tailscale
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-tailscale
+  namespace: traefik
+spec:
+  selector:
+    app: traefik-tailscale
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443 

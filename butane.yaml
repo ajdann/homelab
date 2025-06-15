@@ -1,0 +1,153 @@
+---
+version: 1.0.0
+variant: flatcar
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDVl+CeKTpzwQeVjjiOxwptoyE+8wPscAoiWKZ4QW0C0 user@DESKTOP-ID7NEB3
+
+storage:
+  links:
+    - target: /opt/extensions/kubernetes/kubernetes-v1.33.1-x86-64.raw
+      path: /etc/extensions/kubernetes.raw
+      hard: false
+  files:
+    - path: /etc/sysupdate.kubernetes.d/kubernetes-v1.33.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/kubernetes/kubernetes-v1.33.conf
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+    - path: /opt/extensions/kubernetes/kubernetes-v1.33.1-x86-64.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/kubernetes-v1.33.1/kubernetes-v1.33.1-x86-64.raw
+
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: true
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: kubernetes.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/kubernetes /tmp/kubernetes-new; then touch /run/reboot-required; fi"
+    - name: locksmithd.service
+      # NOTE: To coordinate the node reboot in this context, we recommend to use Kured.
+      mask: true
+    - name: kubeadm.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Initialize Kubernetes Control Plane
+        Requires=containerd.service
+        After=containerd.service
+        Before=calico.service flux-operator.service
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        Environment="KUBECONFIG=/etc/kubernetes/admin.conf"
+        # Only run kubeadm init if not already initialized
+        ExecStartPre=/bin/sh -c 'if [ ! -f "/etc/kubernetes/admin.conf" ]; then /usr/bin/kubeadm init; fi'
+        ExecStartPre=/usr/bin/mkdir -p /home/core/.kube
+        ExecStartPre=/usr/bin/cp /etc/kubernetes/admin.conf /home/core/.kube/config
+        ExecStartPre=/usr/bin/chown -R core:core /home/core/.kube
+        # Wait for API server to be ready and responding
+        ExecStart=/bin/sh -c 'until kubectl get --raw="/readyz" 2>/dev/null; do echo "Waiting for API server to be ready..."; sleep 5; done'
+        ExecStart=/bin/sh -c 'kubectl taint nodes localhost node-role.kubernetes.io/control-plane- || true'
+        Restart=on-failure
+        RestartSec=10s
+        TimeoutStartSec=10m
+        [Install]
+        WantedBy=multi-user.target
+    - name: calico.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Install Calico CNI
+        Requires=kubeadm.service
+        After=kubeadm.service
+        Before=flux-operator.service
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        Environment="KUBECONFIG=/etc/kubernetes/admin.conf"
+        # Verify API server is accessible
+        ExecStartPre=/bin/sh -c 'until kubectl get --raw="/readyz" 2>/dev/null; do echo "Waiting for API server..."; sleep 5; done'
+        # Install Calico CNI
+        ExecStartPre=/bin/sh -c '/usr/bin/kubectl apply --validate=false -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml'
+        # Give time for pods to be created
+        ExecStartPre=/bin/sh -c 'echo "Waiting for Calico pods to be created..." && sleep 10'
+        # Wait for Calico pods to be ready
+        ExecStart=/bin/sh -c 'while true; do \
+          PODS=$(kubectl -n kube-system get pods -l k8s-app=calico-node --no-headers 2>/dev/null || true); \
+          if [ -z "$PODS" ]; then \
+            echo "No Calico pods found yet..."; \
+            sleep 5; \
+            continue; \
+          fi; \
+          if echo "$PODS" | grep -q "Running"; then \
+            echo "Calico pods are running:"; \
+            echo "$PODS"; \
+            # Additional wait for BIRD to be ready \
+            sleep 10; \
+            break; \
+          else \
+            echo "Waiting for Calico pods to be ready:"; \
+            echo "$PODS"; \
+            sleep 5; \
+          fi; \
+        done'
+        Restart=on-failure
+        RestartSec=10s
+        TimeoutStartSec=10m
+        [Install]
+        WantedBy=multi-user.target
+    - name: flux-operator.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Install Flux Operator and Bootstrap GitOps
+        Requires=calico.service
+        After=calico.service
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        Environment="KUBECONFIG=/etc/kubernetes/admin.conf"
+        # Verify API server and CNI are working
+        ExecStartPre=/bin/sh -c 'until kubectl get nodes -o wide | grep -q "Ready"; do echo "Waiting for node to be ready..."; sleep 5; done'
+        # Verify Calico is working by checking for a running pod
+        ExecStartPre=/bin/sh -c 'until kubectl -n kube-system get pods -l k8s-app=calico-node --field-selector=status.phase=Running | grep -q Running; do echo "Waiting for Calico to be ready..."; sleep 5; done'
+        # Create flux-system namespace
+        ExecStartPre=/bin/sh -c '/usr/bin/kubectl create namespace flux-system --dry-run=client -o yaml | /usr/bin/kubectl apply -f -'
+        # Install Flux Operator with control-plane toleration
+        ExecStartPre=/bin/sh -c 'curl -sL https://github.com/controlplaneio-fluxcd/flux-operator/releases/latest/download/install.yaml | sed "/spec:/a\      tolerations:\n      - key: node-role.kubernetes.io/control-plane\n        operator: Exists\n        effect: NoSchedule" | /usr/bin/kubectl apply -f -'
+        # Wait for Flux Operator to be ready with more detailed status
+        ExecStartPre=/bin/sh -c 'while true; do \
+          PODS=$(kubectl -n flux-system get pods -l app.kubernetes.io/name=flux-operator --no-headers 2>/dev/null || true); \
+          if [ -z "$PODS" ]; then \
+            echo "No Flux operator pods found yet..."; \
+            sleep 5; \
+            continue; \
+          fi; \
+          if echo "$PODS" | grep -q "Running"; then \
+            echo "Flux operator is running:"; \
+            echo "$PODS"; \
+            break; \
+          else \
+            echo "Waiting for Flux operator to be ready:"; \
+            echo "$PODS"; \
+            sleep 5; \
+          fi; \
+        done'
+        # Create FluxInstance
+        ExecStart=/bin/sh -c 'echo "apiVersion: fluxcd.controlplane.io/v1\nkind: FluxInstance\nmetadata:\n  name: flux\n  namespace: flux-system\n  annotations:\n    fluxcd.controlplane.io/reconcileEvery: \"1h\"\nspec:\n  distribution:\n    version: \"2.x\"\n    registry: \"ghcr.io/fluxcd\"\n  components:\n    - source-controller\n    - kustomize-controller\n    - helm-controller\n    - notification-controller\n    - image-reflector-controller\n    - image-automation-controller\n  cluster:\n    type: kubernetes\n    multitenant: false\n    networkPolicy: true\n  sync:\n    kind: GitRepository\n    url: \"https://github.com/ajdann/homelab.git\"\n    ref: \"refs/heads/main\"\n    path: \"kubernetes\"" | /usr/bin/kubectl apply -f -'
+        Restart=on-failure
+        RestartSec=10s
+        TimeoutStartSec=15m
+        [Install]
+        WantedBy=multi-user.target

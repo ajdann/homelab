@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: homepage
+  namespace: homepage
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`home.k8s-traefik`)
+      kind: Rule
+      services:
+        - name: homepage
+          port: 80 
