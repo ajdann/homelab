@@ -1,4 +1,3 @@
----
 version: 1.0.0
 variant: flatcar
 passwd:
@@ -6,7 +5,6 @@ passwd:
     - name: core
       ssh_authorized_keys:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDVl+CeKTpzwQeVjjiOxwptoyE+8wPscAoiWKZ4QW0C0 user@DESKTOP-ID7NEB3
-
 storage:
   links:
     - target: /opt/extensions/kubernetes/kubernetes-v1.33.1-x86-64.raw
@@ -22,7 +20,6 @@ storage:
     - path: /opt/extensions/kubernetes/kubernetes-v1.33.1-x86-64.raw
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/kubernetes-v1.33.1/kubernetes-v1.33.1-x86-64.raw
-
 systemd:
   units:
     - name: systemd-sysupdate.timer
