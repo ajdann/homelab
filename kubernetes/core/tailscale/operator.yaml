@@ -7,7 +7,7 @@ metadata:
 type: Opaque
 stringData:
   # You'll need to replace this with your Tailscale auth key
-  authkey: "YOUR_TAILSCALE_AUTH_KEY"
+  authkey: 'YOUR_TAILSCALE_AUTH_KEY'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -24,37 +24,77 @@ spec:
       labels:
         app: tailscale-operator
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       serviceAccountName: tailscale-operator
       containers:
         - name: operator
-          image: tailscale/k8s-operator:v1.44.0
+          image: tailscale/k8s-operator:v1.44.0@sha256:1234567890abcdef # TODO: Replace with actual digest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '128Mi'
+            limits:
+              cpu: '500m'
+              memory: '256Mi'
           env:
             - name: OPERATOR_HOSTNAME
-              value: "k8s-operator"
+              value: 'k8s-operator'
             - name: AUTH_SECRET
               value: tailscale-auth
             - name: AUTH_SECRET_NAMESPACE
               value: tailscale
             - name: PROXY_IMAGE
-              value: "tailscale/tailscale:v1.44.0"
+              value: 'tailscale/tailscale:v1.44.0'
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: tailscale-operator
   namespace: tailscale
+  automountServiceAccountToken: false
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: tailscale-operator
 rules:
-  - apiGroups: [""]
-    resources: ["secrets", "services", "pods"]
-    verbs: ["get", "list", "watch", "create", "update", "delete"]
-  - apiGroups: ["apps"]
-    resources: ["deployments"]
-    verbs: ["get", "list", "watch", "create", "update", "delete"]
+  - apiGroups: ['']
+    resources: ['secrets', 'services', 'pods']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'delete']
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'delete']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

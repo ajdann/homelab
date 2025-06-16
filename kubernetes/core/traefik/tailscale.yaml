@@ -7,7 +7,7 @@ metadata:
 type: Opaque
 stringData:
   # You'll need to replace this with your Tailscale auth key
-  authkey: "YOUR_TAILSCALE_AUTH_KEY"
+  authkey: 'YOUR_TAILSCALE_AUTH_KEY'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -24,21 +24,67 @@ spec:
       labels:
         app: traefik-tailscale
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      serviceAccountName: traefik-tailscale
       containers:
         - name: tailscale
-          image: tailscale/tailscale:v1.44.0
+          image: tailscale/tailscale:v1.44.0@sha256:1234567890abcdef # TODO: Replace with actual digest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '128Mi'
+            limits:
+              cpu: '500m'
+              memory: '256Mi'
           env:
             - name: TS_KUBE_SECRET
-              value: "traefik-tailscale-auth"
+              value: 'traefik-tailscale-auth'
             - name: TS_USERSPACE
-              value: "true"
+              value: 'true'
             - name: TS_AUTH_ONCE
-              value: "true"
+              value: 'true'
             - name: TS_HOSTNAME
-              value: "k8s-traefik" # This will be your main ingress hostname in Tailscale
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
+              value: 'k8s-traefik' # This will be your main ingress hostname in Tailscale
+          livenessProbe:
+            exec:
+              command:
+                - tailscale
+                - status
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - tailscale
+                - status
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik-tailscale
+  namespace: traefik
+  automountServiceAccountToken: false
 ---
 apiVersion: v1
 kind: Service

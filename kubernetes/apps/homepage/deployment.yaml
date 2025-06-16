@@ -16,38 +16,80 @@ spec:
       labels:
         app.kubernetes.io/name: homepage
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       serviceAccountName: homepage
+      automountServiceAccountToken: false
       containers:
         - name: homepage
-          image: ghcr.io/gethomepage/homepage:latest
+          image: ghcr.io/gethomepage/homepage:v0.12.0@sha256:1234567890abcdef # TODO: Replace with actual digest
           imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '128Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'
           ports:
             - name: http
               containerPort: 3000
               protocol: TCP
           env:
             - name: HOMEPAGE_ALLOWED_HOSTS
-              value: "*"
+              value: '*'
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
           volumeMounts:
             - mountPath: /app/config/kubernetes.yaml
               name: homepage-config
               subPath: kubernetes.yaml
+              readOnly: true
             - mountPath: /app/config/settings.yaml
               name: homepage-config
               subPath: settings.yaml
+              readOnly: true
             - mountPath: /app/config/bookmarks.yaml
               name: homepage-config
               subPath: bookmarks.yaml
+              readOnly: true
             - mountPath: /app/config/services.yaml
               name: homepage-config
               subPath: services.yaml
+              readOnly: true
             - mountPath: /app/config/widgets.yaml
               name: homepage-config
               subPath: widgets.yaml
+              readOnly: true
+            - mountPath: /tmp
+              name: tmp
       volumes:
         - name: homepage-config
           configMap:
             name: homepage
+        - name: tmp
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
