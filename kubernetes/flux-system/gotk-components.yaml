@@ -83,7 +83,7 @@ metadata:
   namespace: flux-system
 spec:
   hard:
-    pods: '1000'
+    pods: "1000"
   scopeSelector:
     matchExpressions:
       - operator: In
@@ -104,35 +104,35 @@ rules:
   - apiGroups:
       - source.toolkit.fluxcd.io
     resources:
-      - '*'
+      - "*"
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - kustomize.toolkit.fluxcd.io
     resources:
-      - '*'
+      - "*"
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - helm.toolkit.fluxcd.io
     resources:
-      - '*'
+      - "*"
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - notification.toolkit.fluxcd.io
     resources:
-      - '*'
+      - "*"
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - image.toolkit.fluxcd.io
     resources:
-      - '*'
+      - "*"
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
-      - ''
+      - ""
     resources:
       - namespaces
       - secrets
@@ -143,14 +143,14 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - events
     verbs:
       - create
       - patch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - configmaps
     verbs:
@@ -162,7 +162,7 @@ rules:
       - patch
       - delete
   - apiGroups:
-      - ''
+      - ""
     resources:
       - configmaps/status
     verbs:
@@ -182,7 +182,7 @@ rules:
       - patch
       - delete
   - apiGroups:
-      - ''
+      - ""
     resources:
       - serviceaccounts/token
     verbs:
@@ -199,8 +199,8 @@ metadata:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/part-of: flux
     app.kubernetes.io/version: v2.6.1
-    rbac.authorization.k8s.io/aggregate-to-admin: 'true'
-    rbac.authorization.k8s.io/aggregate-to-edit: 'true'
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
   name: flux-edit-flux-system
 rules:
   - apiGroups:
@@ -210,7 +210,7 @@ rules:
       - image.toolkit.fluxcd.io
       - kustomize.toolkit.fluxcd.io
     resources:
-      - '*'
+      - "*"
     verbs:
       - create
       - delete
@@ -225,9 +225,9 @@ metadata:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/part-of: flux
     app.kubernetes.io/version: v2.6.1
-    rbac.authorization.k8s.io/aggregate-to-admin: 'true'
-    rbac.authorization.k8s.io/aggregate-to-edit: 'true'
-    rbac.authorization.k8s.io/aggregate-to-view: 'true'
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
   name: flux-view-flux-system
 rules:
   - apiGroups:
@@ -237,7 +237,7 @@ rules:
       - image.toolkit.fluxcd.io
       - kustomize.toolkit.fluxcd.io
     resources:
-      - '*'
+      - "*"
     verbs:
       - get
       - list
@@ -614,8 +614,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -848,8 +848,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -1213,8 +1213,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -1584,8 +1584,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -1978,8 +1978,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -2354,8 +2354,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -2697,7 +2697,7 @@ spec:
                     - provider
                   type: object
                 version:
-                  default: '*'
+                  default: "*"
                   description: |-
                     Version is the chart version semver expression, ignored for charts from
                     GitRepository and Bucket sources. Defaults to latest when omitted.
@@ -2796,8 +2796,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -2988,7 +2988,7 @@ spec:
                     type: string
                   type: array
                 version:
-                  default: '*'
+                  default: "*"
                   description: |-
                     The chart version semver expression, ignored for charts from GitRepository
                     and Bucket sources. Defaults to latest when omitted.
@@ -3071,8 +3071,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -3314,7 +3314,7 @@ spec:
                     - provider
                   type: object
                 version:
-                  default: '*'
+                  default: "*"
                   description: |-
                     Version is the chart version semver expression, ignored for charts from
                     GitRepository and Bucket sources. Defaults to latest when omitted.
@@ -3413,8 +3413,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -3754,8 +3754,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -3974,8 +3974,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -4271,8 +4271,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -4656,8 +4656,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -5045,8 +5045,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -5176,8 +5176,8 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: '8080'
-        prometheus.io/scrape: 'true'
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
       labels:
         app: source-controller
     spec:
@@ -5777,8 +5777,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -6333,8 +6333,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -6869,7 +6869,7 @@ spec:
                   pattern: ^([0-9]+(\.[0-9]+)?(ms|s|m|h))+$
                   type: string
                 validation:
-                  description: 'Deprecated: Not used in v1beta2.'
+                  description: "Deprecated: Not used in v1beta2."
                   enum:
                     - none
                     - client
@@ -6928,8 +6928,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -7024,8 +7024,8 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: '8080'
-        prometheus.io/scrape: 'true'
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
       labels:
         app: kustomize-controller
     spec:
@@ -7277,7 +7277,7 @@ spec:
                             - provider
                           type: object
                         version:
-                          default: '*'
+                          default: "*"
                           description: |-
                             Version semver expression, ignored for charts from v1.GitRepository and
                             v1beta2.Bucket sources. Defaults to latest when omitted.
@@ -8029,8 +8029,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -8405,7 +8405,7 @@ spec:
                             - provider
                           type: object
                         version:
-                          default: '*'
+                          default: "*"
                           description: |-
                             Version semver expression, ignored for charts from v1beta2.GitRepository and
                             v1beta2.Bucket sources. Defaults to latest when omitted.
@@ -9223,8 +9223,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -9614,7 +9614,7 @@ spec:
                             - provider
                           type: object
                         version:
-                          default: '*'
+                          default: "*"
                           description: |-
                             Version semver expression, ignored for charts from v1beta2.GitRepository and
                             v1beta2.Bucket sources. Defaults to latest when omitted.
@@ -10449,8 +10449,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -10704,8 +10704,8 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: '8080'
-        prometheus.io/scrape: 'true'
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
       labels:
         app: helm-controller
     spec:
@@ -10961,8 +10961,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -11176,8 +11176,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -11525,8 +11525,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -11725,8 +11725,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -12115,8 +12115,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -12325,8 +12325,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -12537,8 +12537,8 @@ spec:
                       status:
                         description: status of the condition, one of True, False, Unknown.
                         enum:
-                          - 'True'
-                          - 'False'
+                          - "True"
+                          - "False"
                           - Unknown
                         type: string
                       type:
@@ -12654,8 +12654,8 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: '8080'
-        prometheus.io/scrape: 'true'
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
       labels:
         app: notification-controller
     spec:

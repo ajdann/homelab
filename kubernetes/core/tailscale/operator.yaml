@@ -7,7 +7,7 @@ metadata:
 type: Opaque
 stringData:
   # You'll need to replace this with your Tailscale auth key
-  authkey: 'YOUR_TAILSCALE_AUTH_KEY'
+  authkey: "YOUR_TAILSCALE_AUTH_KEY"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -44,20 +44,20 @@ spec:
               type: RuntimeDefault
           resources:
             requests:
-              cpu: '100m'
-              memory: '128Mi'
+              cpu: "100m"
+              memory: "128Mi"
             limits:
-              cpu: '500m'
-              memory: '256Mi'
+              cpu: "500m"
+              memory: "256Mi"
           env:
             - name: OPERATOR_HOSTNAME
-              value: 'k8s-operator'
+              value: "k8s-operator"
             - name: AUTH_SECRET
               value: tailscale-auth
             - name: AUTH_SECRET_NAMESPACE
               value: tailscale
             - name: PROXY_IMAGE
-              value: 'tailscale/tailscale:v1.44.0'
+              value: "tailscale/tailscale:v1.44.0"
           livenessProbe:
             httpGet:
               path: /healthz
@@ -89,12 +89,12 @@ kind: ClusterRole
 metadata:
   name: tailscale-operator
 rules:
-  - apiGroups: ['']
-    resources: ['secrets', 'services', 'pods']
-    verbs: ['get', 'list', 'watch', 'create', 'update', 'delete']
-  - apiGroups: ['apps']
-    resources: ['deployments']
-    verbs: ['get', 'list', 'watch', 'create', 'update', 'delete']
+  - apiGroups: [""]
+    resources: ["secrets", "services", "pods"]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
