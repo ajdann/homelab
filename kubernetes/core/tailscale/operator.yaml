@@ -26,56 +26,56 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: $(security.runAsUser)
+        runAsGroup: $(security.runAsGroup)
+        fsGroup: $(security.fsGroup)
       serviceAccountName: tailscale-operator
       containers:
-        - name: operator
-          image: tailscale/k8s-operator:v1.44.0@sha256:1234567890abcdef # TODO: Replace with actual digest
-          imagePullPolicy: Always
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-                - ALL
-            seccompProfile:
-              type: RuntimeDefault
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "500m"
-              memory: "256Mi"
-          env:
-            - name: OPERATOR_HOSTNAME
-              value: "k8s-operator"
-            - name: AUTH_SECRET
-              value: tailscale-auth
-            - name: AUTH_SECRET_NAMESPACE
-              value: tailscale
-            - name: PROXY_IMAGE
-              value: "tailscale/tailscale:v1.44.0"
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          volumeMounts:
-            - name: tmp
-              mountPath: /tmp
-      volumes:
+      - name: operator
+        image: $(versions.traefik.tailscale.operator.image):$(versions.traefik.tailscale.operator.version)
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        resources:
+          requests:
+            cpu: $(resources.small.requests.cpu)
+            memory: $(resources.small.requests.memory)
+          limits:
+            cpu: $(resources.small.limits.cpu)
+            memory: $(resources.small.limits.memory)
+        env:
+        - name: OPERATOR_HOSTNAME
+          value: "k8s-operator"
+        - name: AUTH_SECRET
+          value: tailscale-auth
+        - name: AUTH_SECRET_NAMESPACE
+          value: tailscale
+        - name: PROXY_IMAGE
+          value: "tailscale/tailscale:v1.44.0"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
         - name: tmp
-          emptyDir: {}
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -89,21 +89,21 @@ kind: ClusterRole
 metadata:
   name: tailscale-operator
 rules:
-  - apiGroups: [""]
-    resources: ["secrets", "services", "pods"]
-    verbs: ["get", "list", "watch", "create", "update", "delete"]
-  - apiGroups: ["apps"]
-    resources: ["deployments"]
-    verbs: ["get", "list", "watch", "create", "update", "delete"]
+- apiGroups: [ "" ]
+  resources: [ "secrets", "services", "pods" ]
+  verbs: [ "get", "list", "watch", "create", "update", "delete" ]
+- apiGroups: [ "apps" ]
+  resources: [ "deployments" ]
+  verbs: [ "get", "list", "watch", "create", "update", "delete" ]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: tailscale-operator
 subjects:
-  - kind: ServiceAccount
-    name: tailscale-operator
-    namespace: tailscale
+- kind: ServiceAccount
+  name: tailscale-operator
+  namespace: tailscale
 roleRef:
   kind: ClusterRole
   name: tailscale-operator
