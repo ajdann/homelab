@@ -6,4 +6,4 @@ metadata:
   namespace: tailscale
 spec:
   interval: 1h
-  url: https://tailscale.github.io/k8s-operator
+  url: https://pkgs.tailscale.com/stable/helm
