@@ -6,3 +6,4 @@ resources:
 - nginx-ingress
 - tailscale
 - dashboard
+- reloader
