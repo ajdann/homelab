@@ -14,7 +14,7 @@ The Tailscale operator requires OAuth credentials to function. These credentials
 
 2. Create the Kubernetes secret:
    ```bash
-   kubectl create secret generic tailscale-oauth \
+   kubectl create secret generic operator-oauth \
      --namespace tailscale \
      --from-literal=clientId=your-client-id \
      --from-literal=clientSecret=your-client-secret
