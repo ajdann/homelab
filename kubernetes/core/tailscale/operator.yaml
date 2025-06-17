@@ -26,13 +26,13 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
-        runAsUser: $(security.runAsUser)
-        runAsGroup: $(security.runAsGroup)
-        fsGroup: $(security.fsGroup)
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       serviceAccountName: tailscale-operator
       containers:
       - name: operator
-        image: $(versions.traefik.tailscale.operator.image):$(versions.traefik.tailscale.operator.version)
+        image: tailscale/k8s-operator:latest
         imagePullPolicy: Always
         securityContext:
           allowPrivilegeEscalation: false
@@ -44,11 +44,11 @@ spec:
             type: RuntimeDefault
         resources:
           requests:
-            cpu: $(resources.small.requests.cpu)
-            memory: $(resources.small.requests.memory)
+            cpu: 100m
+            memory: 128Mi
           limits:
-            cpu: $(resources.small.limits.cpu)
-            memory: $(resources.small.limits.memory)
+            cpu: 500m
+            memory: 512Mi
         env:
         - name: OPERATOR_HOSTNAME
           value: "k8s-operator"
