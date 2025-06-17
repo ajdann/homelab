@@ -1,0 +1,10 @@
+---
+apiVersion: tailscale.com/v1alpha1
+kind: Proxy
+metadata:
+  name: nginx-ingress
+  namespace: nginx-ingress
+spec:
+  hostname: k8s
+  service: ingress-nginx-controller
+  port: 80
