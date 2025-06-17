@@ -6,6 +6,6 @@ resources:
 - namespace.yaml
 - deployment.yaml
 - service.yaml
-# - ingress.yaml  # Temporarily commented out until Traefik is installed
+- ingress.yaml
 - rbac.yaml
 - configmap.yaml
