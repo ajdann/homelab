@@ -1,16 +1,21 @@
 ﻿---
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: homepage
   namespace: homepage
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
-  entryPoints:
-    - web
-    - websecure
-  routes:
-    - match: Host(`home.k8s-traefik`)
-      kind: Rule
-      services:
-        - name: homepage
-          port: 80
+  rules:
+  - host: home.k8s-traefik
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: homepage
+            port:
+              number: 80

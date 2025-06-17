@@ -20,21 +20,15 @@ spec:
       enabled: true
     service:
       type: ClusterIP
+      port: 80
+      targetPort: 9090
     ingress:
-      enabled: true
-      className: traefik
-      hosts:
-      - host: dashboard.k8s-traefik
-        paths:
-        - path: /
-          pathType: Prefix
-      tls:
-      - secretName: kubernetes-dashboard-tls
-        hosts:
-        - dashboard.k8s-traefik
+      enabled: false
     extraArgs:
     - --enable-skip-login
     - --enable-insecure-login
+    - --insecure-bind-address=0.0.0.0
+    - --insecure-port=9090
     resources:
       limits:
         cpu: 200m
