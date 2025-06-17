@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: tailscale-operator
+  namespace: tailscale
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: tailscale-operator
+      version: "1.44.0"
+      sourceRef:
+        kind: HelmRepository
+        name: tailscale
+        namespace: tailscale
+      interval: 1m
+  values:
+    oauth:
+      clientId: "YOUR_OAUTH_CLIENT_ID" # Replace with your OAuth client ID
+      clientSecret: "YOUR_OAUTH_CLIENT_SECRET" # Replace with your OAuth client secret 
