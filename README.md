@@ -16,8 +16,8 @@ The Tailscale operator requires OAuth credentials to function. These credentials
    ```bash
    kubectl create secret generic operator-oauth \
      --namespace tailscale \
-     --from-literal=clientId=your-client-id \
-     --from-literal=clientSecret=your-client-secret
+     --from-literal=client_id=your-client-id \
+     --from-literal=client_secret=your-client-secret
    ```
 
 3. Verify the secret was created:
@@ -26,3 +26,22 @@ The Tailscale operator requires OAuth credentials to function. These credentials
    ```
 
 Note: This secret needs to be created before deploying the Tailscale operator. The operator will use these credentials to authenticate with Tailscale.
+
+### Tailscale Tag
+Add a 
+
+### Tailscale
+- Tailscale operator for Kubernetes integration
+- OAuth-based authentication
+- Automatic node management
+- **Important**: Requires `tag:k8s-operator` to be configured in Tailscale admin console
+  - Go to https://login.tailscale.com/admin/acls/file
+  - Add tag `k8s-operator`
+  ```json
+	"tagOwners": {
+		"tag:homelab": ["autogroup:admin"],
+		"tag:k8s-operator": ["autogroup:admin"],
+	},
+   ```
+
+
