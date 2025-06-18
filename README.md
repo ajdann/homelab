@@ -39,7 +39,6 @@ Add a
   - Add tag `k8s-operator`
   ```json
 	"tagOwners": {
-		"tag:homelab": ["autogroup:admin"],
 		"tag:k8s-operator": ["autogroup:admin"],
 	},
    ```
