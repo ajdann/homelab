@@ -43,6 +43,14 @@ spec:
       className: tailscale
       annotations:
         tailscale.com/tags: tag:k8s-operator
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: "Gitea"
+        gethomepage.dev/description: "Git repository management"
+        gethomepage.dev/group: "Homelab Services"
+        gethomepage.dev/icon: "gitea.png"
+        gethomepage.dev/widget.type: "gitea"
+        gethomepage.dev/widget.url: "http://gitea.tail1345c.ts.net"
+        gethomepage.dev/pod-selector: "app.kubernetes.io/name=gitea"
       hosts:
       - host: gitea
         paths:

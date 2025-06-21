@@ -9,6 +9,7 @@ metadata:
 data:
   kubernetes.yaml: |
     mode: cluster
+    ingress: true
   settings.yaml: |
     title: Homelab Dashboard
     theme: dark
@@ -43,28 +44,8 @@ data:
             - abbr: DH
               href: https://hub.docker.com/
   services.yaml: |
-    - Homelab Services:
-        - Kubernetes Dashboard:
-            href: http://dashboard.homelab.local
-            description: Kubernetes cluster management interface
-            icon: kubernetes.png
-            widget:
-              type: kubernetes
-              url: http://dashboard.homelab.local
-        - Gitea:
-            href: http://gitea.homelab.local
-            description: Git repository management
-            icon: gitea.png
-            widget:
-              type: gitea
-              url: http://gitea.homelab.local
-        - Homepage:
-            href: http://homepage.homelab.local
-            description: This dashboard
-            icon: homepage.png
-            widget:
-              type: homepage
-              url: http://homepage.homelab.local
+    # Services will be auto-discovered through ingress annotations
+    # Manual services can be added here if needed
   widgets.yaml: |
     - kubernetes:
         cluster:

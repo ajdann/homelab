@@ -6,6 +6,13 @@ metadata:
   namespace: homepage
   annotations:
     tailscale.com/tags: tag:k8s-operator
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Homepage"
+    gethomepage.dev/description: "This dashboard"
+    gethomepage.dev/group: "Homelab Services"
+    gethomepage.dev/icon: "homepage.png"
+    gethomepage.dev/widget.type: "homepage"
+    gethomepage.dev/widget.url: "http://homepage.tail1345c.ts.net"
 spec:
   ingressClassName: tailscale
   rules:

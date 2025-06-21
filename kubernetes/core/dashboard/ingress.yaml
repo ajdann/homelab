@@ -6,6 +6,14 @@ metadata:
   namespace: kubernetes-dashboard
   annotations:
     tailscale.com/tags: tag:k8s-operator
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Kubernetes Dashboard"
+    gethomepage.dev/description: "Kubernetes cluster management interface"
+    gethomepage.dev/group: "Homelab Services"
+    gethomepage.dev/icon: "kubernetes.png"
+    gethomepage.dev/widget.type: "kubernetes"
+    gethomepage.dev/widget.url: "http://kubernetes-dashboard.tail1345c.ts.net"
+    gethomepage.dev/pod-selector: "app.kubernetes.io/name=kubernetes-dashboard"
 spec:
   ingressClassName: tailscale
   rules:
