@@ -19,7 +19,7 @@ spec:
       config:
         server:
           DOMAIN: gitea
-          ROOT_URL: http://gitea/
+          ROOT_URL: https://gitea/
           DISABLE_SSH: true
         database:
           DB_TYPE: sqlite3
@@ -40,9 +40,13 @@ spec:
     ingress:
       enabled: true
       className: tailscale
+      annotations:
+        tailscale.com/tags: tag:k8s-operator
       hosts:
-      - host: gitea.local
+      - host: gitea
         paths:
         - path: /
           pathType: Prefix
-      tls: []
+      tls:
+      - hosts:
+        - gitea
