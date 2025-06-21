@@ -4,13 +4,21 @@ kind: Ingress
 metadata:
   name: kubernetes-dashboard
   namespace: kubernetes-dashboard
+  annotations:
+    tailscale.com/tags: tag:k8s-operator
 spec:
-  defaultBackend:
-    service:
-      name: kubernetes-dashboard
-      port:
-        number: 443
   ingressClassName: tailscale
+  rules:
+  - host: kubernetes-dashboard
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kubernetes-dashboard
+            port:
+              number: 443
   tls:
   - hosts:
     - kubernetes-dashboard
