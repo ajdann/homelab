@@ -10,26 +10,61 @@ data:
   kubernetes.yaml: |
     mode: cluster
   settings.yaml: |
-    title: My Homelab Dashboard
+    title: Homelab Dashboard
     theme: dark
+    color: slate
+    language: en
+    headerStyle: clean
+    disableAutocomplete: true
+    disableKBShortcuts: false
+    hideVersion: false
+    defaultSearchProvider: duckduckgo
+    searchSameTab: false
+    dockerHost: unix:///var/run/docker.sock
+    kubernetes:
+      enabled: true
+      config: inCluster
   bookmarks.yaml: |
     - Infrastructure:
         - GitHub Repository:
             - abbr: GH
               href: https://github.com/ajdann/homelab
+        - Kubernetes Documentation:
+            - abbr: K8S
+              href: https://kubernetes.io/docs/
+        - Flux Documentation:
+            - abbr: Flux
+              href: https://fluxcd.io/docs/
+    - Tools:
+        - Tailscale Admin:
+            - abbr: TS
+              href: https://login.tailscale.com/admin
+        - Docker Hub:
+            - abbr: DH
+              href: https://hub.docker.com/
   services.yaml: |
-    - Core Services:
+    - Homelab Services:
         - Kubernetes Dashboard:
-            href: http://localhost/
-            description: Kubernetes cluster management
-        - Kured:
-            href: http://localhost/
-            description: Kubernetes Node Reboot Daemon
-
-    - Applications:
+            href: http://dashboard.homelab.local
+            description: Kubernetes cluster management interface
+            icon: kubernetes.png
+            widget:
+              type: kubernetes
+              url: http://dashboard.homelab.local
+        - Gitea:
+            href: http://gitea.homelab.local
+            description: Git repository management
+            icon: gitea.png
+            widget:
+              type: gitea
+              url: http://gitea.homelab.local
         - Homepage:
-            href: http://localhost/
+            href: http://homepage.homelab.local
             description: This dashboard
+            icon: homepage.png
+            widget:
+              type: homepage
+              url: http://homepage.homelab.local
   widgets.yaml: |
     - kubernetes:
         cluster:
@@ -43,12 +78,34 @@ data:
           cpu: true
           memory: true
           showLabel: true
+        pods:
+          show: true
+          showLabel: true
+        deployments:
+          show: true
+          showLabel: true
     - resources:
         backend: resources
         expanded: true
         cpu: true
         memory: true
         network: default
+        showLabel: true
+        label: "System Resources"
     - search:
         provider: duckduckgo
         target: _blank
+        showLabel: true
+        label: "Search"
+    - docker:
+        url: unix:///var/run/docker.sock
+        showLabel: true
+        label: "Docker Containers"
+    - system:
+        showLabel: true
+        label: "System Info"
+        expanded: true
+        cpu: true
+        memory: true
+        disk: true
+        network: true
