@@ -37,6 +37,7 @@ spec:
       http:
         type: ClusterIP
         port: 3000
+        clusterIP: ""
     ingress:
       enabled: true
       className: tailscale
