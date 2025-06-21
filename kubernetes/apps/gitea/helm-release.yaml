@@ -18,8 +18,8 @@ spec:
     gitea:
       config:
         server:
-          DOMAIN: gitea.local
-          ROOT_URL: http://gitea.local/
+          DOMAIN: gitea
+          ROOT_URL: http://gitea/
           DISABLE_SSH: true
         database:
           DB_TYPE: sqlite3
