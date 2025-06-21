@@ -82,11 +82,15 @@ spec:
           name: homepage-config
           subPath: widgets.yaml
           readOnly: true
+        - mountPath: /app/config
+          name: config-writable
         - mountPath: /tmp
           name: tmp
       volumes:
       - name: homepage-config
         configMap:
           name: homepage
+      - name: config-writable
+        emptyDir: {}
       - name: tmp
         emptyDir: {}
