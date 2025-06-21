@@ -9,7 +9,7 @@ spec:
     service:
       name: kubernetes-dashboard
       port:
-        number: 80
+        number: 443
   ingressClassName: tailscale
   tls:
   - hosts:
