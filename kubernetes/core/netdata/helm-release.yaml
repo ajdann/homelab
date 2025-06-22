@@ -16,23 +16,7 @@ spec:
         namespace: netdata
   values:
     ingress:
-      enabled: true
-      spec:
-        ingressClassName: tailscale
-      annotations:
-        tailscale.com/tags: tag:k8s-operator
-        gethomepage.dev/enabled: "true"
-        gethomepage.dev/name: "Netdata"
-        gethomepage.dev/description: "Real-time system monitoring"
-        gethomepage.dev/group: "Monitoring"
-        gethomepage.dev/icon: "netdata.png"
-        gethomepage.dev/href: "https://netdata.tail1345c.ts.net"
-        gethomepage.dev/widget.url: "https://netdata.tail1345c.ts.net"
-      hosts:
-      - netdata
-      tls:
-      - hosts:
-        - netdata
+      enabled: false
     parent:
       database:
         volumesize: 1Gi
