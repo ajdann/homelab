@@ -15,7 +15,7 @@ spec:
         name: gitea
         namespace: gitea
   values:
-    replicaCount: 0
+    replicaCount: 1
     resources:
       limits:
         cpu: 1000m

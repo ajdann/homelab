@@ -1,0 +1,1 @@
+https://gitea.com/gitea/helm-gitea
