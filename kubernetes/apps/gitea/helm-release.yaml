@@ -63,8 +63,8 @@ spec:
     postgresql-ha:
       enabled: false
     postgresql:
-      enabled: false
+      enabled: true
     valkey-cluster:
       enabled: false
     valkey:
-      enabled: false
+      enabled: true
