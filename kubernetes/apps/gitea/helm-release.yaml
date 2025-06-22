@@ -41,7 +41,12 @@ spec:
           DISABLE_SSH: true
         database:
           DB_TYPE: sqlite3
-          PATH: /data/gitea/gitea.db
+        session:
+          PROVIDER: memory
+        cache:
+          ADAPTER: memory
+        queue:
+          TYPE: level
         security:
           INSTALL_LOCK: true
         admin:
@@ -83,15 +88,12 @@ spec:
       tls:
       - hosts:
         - gitea
-    postgresql-ha:
-      enabled: true
-      postgresql:
-        postgresPassword: admin123
-        repmgrPassword: admin123
-      pgpool:
-        adminPassword: admin123
     valkey-cluster:
-      enabled: true
-      cluster:
-        nodes: 1
-        replicas: 0
+      enabled: false
+    valkey:
+      enabled: false
+    postgresql:
+      enabled: false
+    postgresql-ha:
+      enabled: false
+
