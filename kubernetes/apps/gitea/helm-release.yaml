@@ -60,6 +60,13 @@ spec:
       tls:
       - hosts:
         - gitea
+    postgresql-ha:
+      enabled: true
+      postgresql:
+        postgresPassword: admin123
+        repmgrPassword: admin123
+      pgpool:
+        adminPassword: admin123
     valkey-cluster:
       enabled: true
       cluster:
