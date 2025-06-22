@@ -1,0 +1,78 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kyverno
+  namespace: kyverno
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: kyverno
+      version: "3.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: kyverno
+        namespace: kyverno
+      interval: 1m
+  values:
+    # Basic configuration
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+    # Enable metrics
+    metrics:
+      enabled: true
+      service:
+        annotations:
+          prometheus.io/scrape: "true"
+          prometheus.io/port: "8000"
+
+    # Security settings
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 1000
+
+    # Pod security
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 1000
+
+    # Service account
+    serviceAccount:
+      create: true
+      annotations: {}
+
+    # RBAC
+    rbac:
+      create: true
+
+    # Admission controller
+    admissionController:
+      failurePolicy: Ignore
+      webhookTimeoutSeconds: 10
+      objectSelector: {}
+      namespaceSelector: {}
+
+    # Background controller
+    backgroundController:
+      enabled: true
+      workers: 4
+
+    # Cleanup controller
+    cleanupController:
+      enabled: true
+      workers: 4
+
+    # Reports controller
+    reportsController:
+      enabled: true
+      workers: 4

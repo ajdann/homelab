@@ -8,4 +8,4 @@ resources:
 - reloader
 - netdata
 - keda
-
+- kyverno
