@@ -23,3 +23,10 @@ spec:
     # Enable webhooks
     webhooks:
       enabled: true
+    # Enable all scalers
+    operator:
+      extraArgs:
+      - --enable-scalers=http
+      - --enable-scalers=cron
+      - --enable-scalers=cpu
+      - --enable-scalers=memory
