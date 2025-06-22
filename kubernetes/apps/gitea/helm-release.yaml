@@ -60,16 +60,8 @@ spec:
       tls:
       - hosts:
         - gitea
-    postgresql-ha:
-      enabled: true
-    postgresql:
-      enabled: false
     valkey-cluster:
       enabled: true
       cluster:
         nodes: 1
         replicas: 0
-    valkey:
-      enabled: false
-      master:
-        count: 1
