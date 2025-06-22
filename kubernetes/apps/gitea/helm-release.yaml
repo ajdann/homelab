@@ -66,5 +66,10 @@ spec:
       enabled: true
     valkey-cluster:
       enabled: false
+      cluster:
+        nodes: 1
+        replicas: 0
     valkey:
       enabled: true
+      master:
+        count: 1
