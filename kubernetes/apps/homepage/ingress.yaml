@@ -12,7 +12,7 @@ metadata:
     gethomepage.dev/group: "Homelab Services"
     gethomepage.dev/icon: "homepage.png"
     gethomepage.dev/widget.type: "homepage"
-    gethomepage.dev/widget.url: "http://homepage.tail1345c.ts.net"
+    gethomepage.dev/widget.url: "https://homepage.tail1345c.ts.net"
 spec:
   ingressClassName: tailscale
   rules:

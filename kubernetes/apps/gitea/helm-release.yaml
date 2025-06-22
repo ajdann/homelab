@@ -48,8 +48,7 @@ spec:
         gethomepage.dev/description: "Git repository management"
         gethomepage.dev/group: "Homelab Services"
         gethomepage.dev/icon: "gitea.png"
-        gethomepage.dev/widget.type: "gitea"
-        gethomepage.dev/widget.url: "http://gitea.tail1345c.ts.net"
+        gethomepage.dev/widget.url: "https://gitea.tail1345c.ts.net"
         gethomepage.dev/pod-selector: "app.kubernetes.io/name=gitea"
       hosts:
       - host: gitea
