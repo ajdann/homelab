@@ -1,7 +1,7 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: verify-flux-sources
+  name: verify-flux-sources-cel
   annotations:
     policies.kyverno.io/title: Verify Flux Sources in CEL expressions
     policies.kyverno.io/category: Flux in CEL

@@ -12,4 +12,3 @@ resources:
 - verify-flux-git-repositories.yaml
 - verify-flux-images.yaml
 - verify-flux-sources-in-cel.yaml
-- verify-flux-sources.yaml
