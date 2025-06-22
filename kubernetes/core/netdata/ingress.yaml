@@ -11,8 +11,8 @@ metadata:
     gethomepage.dev/description: "Real-time system monitoring"
     gethomepage.dev/group: "Monitoring"
     gethomepage.dev/icon: "netdata.png"
-    gethomepage.dev/href: "https://netdata.tail1345c.ts.net"
-    gethomepage.dev/widget.url: "https://netdata.tail1345c.ts.net"
+    gethomepage.dev/href: "https://netdata-1.tail1345c.ts.net/"
+    gethomepage.dev/widget.url: "https://netdata-1.tail1345c.ts.net/"
 spec:
   ingressClassName: tailscale
   rules:
