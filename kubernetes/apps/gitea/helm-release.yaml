@@ -61,15 +61,15 @@ spec:
       - hosts:
         - gitea
     postgresql-ha:
-      enabled: false
-    postgresql:
       enabled: true
-    valkey-cluster:
+    postgresql:
       enabled: false
+    valkey-cluster:
+      enabled: true
       cluster:
         nodes: 1
         replicas: 0
     valkey:
-      enabled: true
+      enabled: false
       master:
         count: 1
