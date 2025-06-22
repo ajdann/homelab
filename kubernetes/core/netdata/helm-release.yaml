@@ -27,6 +27,8 @@ spec:
         gethomepage.dev/icon: "netdata.png"
         gethomepage.dev/href: "https://netdata.tail1345c.ts.net"
         gethomepage.dev/widget.url: "https://netdata.tail1345c.ts.net"
+        spec:
+          ingressClassName: tailscale
       hosts:
       - host: netdata
         paths:
