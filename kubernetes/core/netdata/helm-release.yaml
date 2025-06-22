@@ -18,6 +18,8 @@ spec:
     ingress:
       enabled: true
       className: tailscale
+      spec:
+        ingressClassName: tailscale
       annotations:
         tailscale.com/tags: tag:k8s-operator
         gethomepage.dev/enabled: "true"
@@ -27,13 +29,8 @@ spec:
         gethomepage.dev/icon: "netdata.png"
         gethomepage.dev/href: "https://netdata.tail1345c.ts.net"
         gethomepage.dev/widget.url: "https://netdata.tail1345c.ts.net"
-      spec:
-        ingressClassName: tailscale
       hosts:
-      - host: netdata
-        paths:
-        - path: /
-          pathType: Prefix
+      - netdata
       tls:
       - hosts:
         - netdata
