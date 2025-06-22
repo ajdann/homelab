@@ -60,7 +60,7 @@ spec:
         livenessProbe:
           enabled: true
     persistence:
-      enabled: true
+      enabled: false
       size: 10Gi
     service:
       http:
