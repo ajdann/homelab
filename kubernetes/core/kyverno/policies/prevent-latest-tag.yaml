@@ -1,0 +1,32 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: prevent-latest-tag
+  annotations:
+    policies.kyverno.io/title: Prevent Latest Tag
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      This policy prevents the use of 'latest' image tags which can lead to unpredictable deployments and security issues.
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+  - name: check-latest-tag
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "Using 'latest' tag is not allowed. Please use a specific version tag."
+      pattern:
+        spec:
+          containers:
+          - image: "!*:latest"
+          =(ephemeralContainers):
+          - image: "!*:latest"
+          =(initContainers):
+          - image: "!*:latest"
