@@ -1,0 +1,68 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: netdata
+  namespace: netdata
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: netdata
+      version: "1.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: netdata
+        namespace: netdata
+  values:
+    parent:
+      database:
+        volumesize: 1Gi
+      service:
+        type: ClusterIP
+        port: 19999
+      ingress:
+        enabled: true
+        className: tailscale
+        annotations:
+          tailscale.com/tags: tag:k8s-operator
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: "Netdata"
+          gethomepage.dev/description: "Real-time system monitoring"
+          gethomepage.dev/group: "Monitoring"
+          gethomepage.dev/icon: "netdata.png"
+          gethomepage.dev/href: "https://netdata.tail1345c.ts.net"
+          gethomepage.dev/widget.url: "https://netdata.tail1345c.ts.net"
+        hosts:
+        - host: netdata
+          paths:
+          - path: /
+            pathType: Prefix
+        tls:
+        - hosts:
+          - netdata
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+    child:
+      configs:
+        netdata:
+          data: |
+            [db]
+              db = ram
+              retention = 3600
+            [health]
+              enabled = no
+            [web]
+              bind to = *
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi

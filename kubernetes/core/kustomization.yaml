@@ -6,3 +6,4 @@ resources:
 - tailscale
 - dashboard
 - reloader
+- netdata
