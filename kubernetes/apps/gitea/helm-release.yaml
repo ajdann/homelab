@@ -60,3 +60,11 @@ spec:
       tls:
       - hosts:
         - gitea
+    postgresql-ha:
+      enabled: false
+    postgresql:
+      enabled: false
+    valkey-cluster:
+      enabled: false
+    valkey:
+      enabled: false
