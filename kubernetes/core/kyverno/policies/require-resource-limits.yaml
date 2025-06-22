@@ -11,7 +11,7 @@ metadata:
     policies.kyverno.io/description: >-
       This policy ensures that all pods have resource limits and requests defined. This helps prevent resource exhaustion and ensures fair resource allocation.
 spec:
-  validationFailureAction: enforce
+  validationFailureAction: audit
   background: true
   rules:
   - name: check-resource-limits

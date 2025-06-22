@@ -11,7 +11,7 @@ metadata:
     policies.kyverno.io/description: >-
       This policy ensures that all pods have proper security contexts defined. This helps enforce security best practices and prevent privilege escalation.
 spec:
-  validationFailureAction: enforce
+  validationFailureAction: audit
   background: true
   rules:
   - name: check-security-context

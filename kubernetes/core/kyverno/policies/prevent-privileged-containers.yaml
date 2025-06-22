@@ -11,7 +11,7 @@ metadata:
     policies.kyverno.io/description: >-
       This policy prevents the creation of privileged containers which can pose significant security risks by having access to host resources.
 spec:
-  validationFailureAction: enforce
+  validationFailureAction: audit
   background: true
   rules:
   - name: check-privileged

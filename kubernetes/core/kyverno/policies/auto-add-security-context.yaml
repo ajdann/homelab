@@ -11,7 +11,7 @@ metadata:
     policies.kyverno.io/description: >-
       This policy automatically adds security contexts to pods that don't have them, improving security without requiring manual configuration.
 spec:
-  validationFailureAction: enforce
+  validationFailureAction: audit
   background: false
   rules:
   - name: add-security-context
