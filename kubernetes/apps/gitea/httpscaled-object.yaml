@@ -5,13 +5,14 @@ metadata:
   name: gitea-http-scaler
   namespace: gitea
 spec:
-  host: gitea.tail1345c.ts.net
-  targetPendingRequests: 100
+  hosts:
+  - gitea.tail1345c.ts.net
+  targetPendingRequests: 1
   scaledownPeriod: 300
   scaleTargetRef:
-    deployment: gitea
+    name: gitea
     service: gitea-http
     port: 3000
   replicas:
     min: 0
-    max: 3
+    max: 1
