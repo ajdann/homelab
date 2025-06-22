@@ -15,6 +15,7 @@ spec:
         name: gitea
         namespace: gitea
   values:
+    replicaCount: 0
     gitea:
       config:
         server:

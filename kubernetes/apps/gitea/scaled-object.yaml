@@ -1,0 +1,24 @@
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: gitea-scaler
+  namespace: gitea
+spec:
+  scaleTargetRef:
+    name: gitea
+    kind: Deployment
+  minReplicaCount: 0
+  maxReplicaCount: 3
+  pollingInterval: 30
+  cooldownPeriod: 300
+  fallback:
+    failureThreshold: 3
+    replicas: 1
+  triggers:
+  - type: http
+    metadata:
+      target: "https://gitea.tail1345c.ts.net"
+      activationThreshold: "1"
+      threshold: "1"
+      queryTime: "30"
