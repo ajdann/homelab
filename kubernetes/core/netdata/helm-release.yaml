@@ -15,32 +15,32 @@ spec:
         name: netdata
         namespace: netdata
   values:
+    ingress:
+      enabled: true
+      className: tailscale
+      annotations:
+        tailscale.com/tags: tag:k8s-operator
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: "Netdata"
+        gethomepage.dev/description: "Real-time system monitoring"
+        gethomepage.dev/group: "Monitoring"
+        gethomepage.dev/icon: "netdata.png"
+        gethomepage.dev/href: "https://netdata.tail1345c.ts.net"
+        gethomepage.dev/widget.url: "https://netdata.tail1345c.ts.net"
+      hosts:
+      - host: netdata
+        paths:
+        - path: /
+          pathType: Prefix
+      tls:
+      - hosts:
+        - netdata
     parent:
       database:
         volumesize: 1Gi
       service:
         type: ClusterIP
         port: 19999
-      ingress:
-        enabled: true
-        className: tailscale
-        annotations:
-          tailscale.com/tags: tag:k8s-operator
-          gethomepage.dev/enabled: "true"
-          gethomepage.dev/name: "Netdata"
-          gethomepage.dev/description: "Real-time system monitoring"
-          gethomepage.dev/group: "Monitoring"
-          gethomepage.dev/icon: "netdata.png"
-          gethomepage.dev/href: "https://netdata.tail1345c.ts.net"
-          gethomepage.dev/widget.url: "https://netdata.tail1345c.ts.net"
-        hosts:
-        - host: netdata
-          paths:
-          - path: /
-            pathType: Prefix
-        tls:
-        - hosts:
-          - netdata
       resources:
         limits:
           cpu: 500m
