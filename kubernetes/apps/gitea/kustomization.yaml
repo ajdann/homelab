@@ -6,4 +6,4 @@ resources:
 - namespace.yaml
 - helm-repository.yaml
 - helm-release.yaml
-- scaled-object.yaml
+- httpscaled-object.yaml
