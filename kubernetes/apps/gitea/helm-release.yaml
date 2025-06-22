@@ -16,6 +16,23 @@ spec:
         namespace: gitea
   values:
     replicaCount: 0
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 512Mi
+    podSecurityContext:
+      fsGroup: 1000
+    initContainers:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
     gitea:
       config:
         server:
@@ -31,6 +48,12 @@ spec:
           username: admin
           password: admin123
           email: admin@gitea.local
+        startupProbe:
+          enabled: true
+        readinessProbe:
+          enabled: true
+        livenessProbe:
+          enabled: true
     persistence:
       enabled: true
       size: 10Gi
