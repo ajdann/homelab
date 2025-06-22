@@ -24,11 +24,15 @@ spec:
       targetPort: 9090
     ingress:
       enabled: false
+    serviceAccount:
+      create: false
+      name: dashboard-admin
     extraArgs:
     - --enable-skip-login
     - --enable-insecure-login
     - --insecure-bind-address=0.0.0.0
     - --insecure-port=9090
+    - --token-ttl=0
     resources:
       limits:
         cpu: 200m
