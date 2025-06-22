@@ -9,3 +9,4 @@ resources:
 - netdata
 - keda
 - kyverno
+- policy-reporter
