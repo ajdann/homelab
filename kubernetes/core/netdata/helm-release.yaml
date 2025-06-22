@@ -17,7 +17,6 @@ spec:
   values:
     ingress:
       enabled: true
-      className: tailscale
       spec:
         ingressClassName: tailscale
       annotations:
