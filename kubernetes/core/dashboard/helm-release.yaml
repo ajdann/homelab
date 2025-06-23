@@ -18,6 +18,13 @@ spec:
   values:
     metricsScraper:
       enabled: true
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
     service:
       type: ClusterIP
       port: 80
@@ -40,3 +47,15 @@ spec:
       requests:
         cpu: 100m
         memory: 128Mi
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 2001
+      fsGroup: 2001
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      seccompProfile:
+        type: RuntimeDefault
