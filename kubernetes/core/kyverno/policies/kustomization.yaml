@@ -12,3 +12,7 @@ resources:
 - verify-flux-images.yaml
 - verify-flux-sources-in-cel.yaml
 - detect-non-flux-objects.yaml
+- pod-security-baseline-standards.yaml
+- pod-security-restricted.yaml
+- podsecurity-subrule-restricted-capabilities.yaml
+- podsecurity-subrule-restricted-seccomp.yaml
