@@ -1,0 +1,66 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: detect-non-flux-objects
+  annotations:
+    policies.kyverno.io/title: Detect Non-Flux Objects
+    policies.kyverno.io/category: Flux
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod, Deployment, Service, ConfigMap, Secret
+    policies.kyverno.io/description: >-
+      This policy detects objects that were not created by Flux by checking for Flux-specific labels and annotations. Objects without Flux labels may have been created manually or by other tools.
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+  - name: check-flux-labels
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+          - Deployment
+          - Service
+          - ConfigMap
+          - Secret
+          - Ingress
+          - PersistentVolumeClaim
+    exclude:
+      any:
+      - resources:
+          namespaces:
+          - kube-system
+          - default
+          - kube-public
+          - kube-node-lease
+      - resources:
+          namespaces:
+          - flux-system
+    validate:
+      message: "Object may not have been created by Flux. Consider using Flux for GitOps management."
+      anyPattern:
+      - metadata:
+          labels:
+            kustomize.toolkit.fluxcd.io/name: "?*"
+      - metadata:
+          labels:
+            kustomize.toolkit.fluxcd.io/namespace: "?*"
+      - metadata:
+          labels:
+            helm.toolkit.fluxcd.io/name: "?*"
+      - metadata:
+          labels:
+            helm.toolkit.fluxcd.io/namespace: "?*"
+      - metadata:
+          labels:
+            source.toolkit.fluxcd.io/name: "?*"
+      - metadata:
+          labels:
+            source.toolkit.fluxcd.io/namespace: "?*"
+      - metadata:
+          annotations:
+            fluxcd.io/automated: "?*"
+      - metadata:
+          annotations:
+            fluxcd.io/sync-checksum: "?*"
