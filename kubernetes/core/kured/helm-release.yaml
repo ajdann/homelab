@@ -19,7 +19,8 @@ spec:
       startTime: "3:00"
       endTime: "5:00"
       timeZone: "UTC"
-      rebootCommand: "/usr/bin/systemctl reboot"
+      rebootMethod: "signal"
+      rebootSignal: "39"
       period: "1h"
     resources:
       limits:
@@ -28,14 +29,17 @@ spec:
       requests:
         cpu: 50m
         memory: 64Mi
-    securityContext:
-      runAsNonRoot: true
-      runAsUser: 65534
-      runAsGroup: 65534
-      allowPrivilegeEscalation: false
+    containerSecurityContext:
+      privileged: false
       readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
       capabilities:
+        add:
+        - CAP_KILL
         drop:
-        - ALL
+        - '*'
       seccompProfile:
         type: RuntimeDefault
