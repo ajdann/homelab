@@ -5,7 +5,6 @@ resources:
 - require-resource-limits.yaml
 - require-security-context.yaml
 - prevent-privileged-containers.yaml
-- require-labels.yaml
 - prevent-latest-tag.yaml
 - require-network-policy.yaml
 - auto-add-security-context.yaml

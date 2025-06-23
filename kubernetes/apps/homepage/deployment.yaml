@@ -25,11 +25,14 @@ spec:
       automountServiceAccountToken: true
       containers:
       - name: homepage
-        image: ghcr.io/gethomepage/homepage:latest
+        image: ghcr.io/gethomepage/homepage:v1.3.2
         imagePullPolicy: Always
         securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
+          privileged: false
           capabilities:
             drop:
             - ALL
