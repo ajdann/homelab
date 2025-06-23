@@ -54,3 +54,42 @@ spec:
             readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
+  - name: add-deployment-pod-security-context
+    match:
+      any:
+      - resources:
+          kinds:
+          - Deployment
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 1001
+                runAsGroup: 1001
+                fsGroup: 1001
+                seccompProfile:
+                  type: RuntimeDefault
+  - name: add-deployment-container-security-context
+    match:
+      any:
+      - resources:
+          kinds:
+          - Deployment
+    mutate:
+      foreach:
+      - list: request.object.spec.template.spec.containers
+        patchStrategicMerge:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault

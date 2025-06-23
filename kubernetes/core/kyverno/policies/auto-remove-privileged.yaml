@@ -28,3 +28,15 @@ spec:
         patchStrategicMerge:
           securityContext:
             privileged: false
+  - name: remove-deployment-container-privileged
+    match:
+      any:
+      - resources:
+          kinds:
+          - Deployment
+    mutate:
+      foreach:
+      - list: request.object.spec.template.spec.containers
+        patchStrategicMerge:
+          securityContext:
+            privileged: false

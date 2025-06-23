@@ -33,3 +33,20 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
+  - name: add-deployment-container-resource-limits
+    match:
+      any:
+      - resources:
+          kinds:
+          - Deployment
+    mutate:
+      foreach:
+      - list: request.object.spec.template.spec.containers
+        patchStrategicMerge:
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
