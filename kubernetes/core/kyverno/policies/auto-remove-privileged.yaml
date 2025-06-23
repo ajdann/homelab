@@ -28,15 +28,3 @@ spec:
         patchStrategicMerge:
           securityContext:
             privileged: false
-  - name: remove-init-container-privileged
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    mutate:
-      foreach:
-      - list: request.object.spec.initContainers || []
-        patchStrategicMerge:
-          securityContext:
-            privileged: false

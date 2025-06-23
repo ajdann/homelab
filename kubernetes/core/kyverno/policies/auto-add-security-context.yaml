@@ -54,24 +54,3 @@ spec:
             readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
-  - name: add-init-container-security-context
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    mutate:
-      foreach:
-      - list: request.object.spec.initContainers || []
-        patchStrategicMerge:
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1001
-            runAsGroup: 1001
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-              - ALL
-            readOnlyRootFilesystem: true
-            seccompProfile:
-              type: RuntimeDefault

@@ -33,20 +33,3 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
-  - name: add-init-container-resource-limits
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    mutate:
-      foreach:
-      - list: request.object.spec.initContainers || []
-        patchStrategicMerge:
-          resources:
-            limits:
-              cpu: 500m
-              memory: 512Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
