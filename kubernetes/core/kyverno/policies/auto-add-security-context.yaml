@@ -62,7 +62,7 @@ spec:
           - Pod
     mutate:
       foreach:
-      - list: request.object.spec.initContainers
+      - list: request.object.spec.initContainers || []
         patchStrategicMerge:
           securityContext:
             runAsNonRoot: true
