@@ -24,7 +24,24 @@ spec:
         cpu: 100m
         memory: 512Mi
     podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
       fsGroup: 1000
+      seccompProfile:
+        type: RuntimeDefault
+    containerSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      allowPrivilegeEscalation: false
+      privileged: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      seccompProfile:
+        type: RuntimeDefault
     initContainers:
       resources:
         requests:
@@ -33,6 +50,18 @@ spec:
         limits:
           cpu: 500m
           memory: 512Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        allowPrivilegeEscalation: false
+        privileged: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: false
+        seccompProfile:
+          type: RuntimeDefault
     gitea:
       config:
         server:
@@ -96,4 +125,3 @@ spec:
       enabled: false
     postgresql-ha:
       enabled: false
-
