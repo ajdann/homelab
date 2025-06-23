@@ -40,6 +40,6 @@ spec:
         add:
         - CAP_KILL
         drop:
-        - '*'
+        - ALL
       seccompProfile:
         type: RuntimeDefault
