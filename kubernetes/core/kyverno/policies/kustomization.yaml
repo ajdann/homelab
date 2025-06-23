@@ -7,6 +7,7 @@ resources:
 - prevent-privileged-containers.yaml
 - prevent-latest-tag.yaml
 - require-network-policy.yaml
+- auto-add-security-context.yaml
 - verify-flux-git-repositories.yaml
 - verify-flux-images.yaml
 - verify-flux-sources-in-cel.yaml
