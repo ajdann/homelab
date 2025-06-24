@@ -10,3 +10,4 @@ resources:
 - keda
 - kyverno
 - policy-reporter
+- falco
