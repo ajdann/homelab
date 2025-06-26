@@ -2,29 +2,29 @@ cat .\butane.yaml | docker run --rm -i quay.io/coreos/butane:latest > ignition.j
 docker run --rm -v ${PWD}:/work -w /work quay.io/coreos/ignition-validate ignition.json
 
 ## Manual Setup Steps
-### Flux Set up
 
-1. helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
-  --namespace flux-system --create-namespace
-2. kubectl apply -f flux-system\fluxInstance.yaml
 ### Tailscale OAuth Secret
 
 The Tailscale operator requires OAuth credentials to function. These credentials need to be created manually as a Kubernetes secret. Follow these steps:
 
 1. Create a Tailscale OAuth client:
-   - Go to https://login.tailscale.com/admin/authkeys
+   - Go to https://login.tailscale.com/admin/settings/oauth
    - Click "Create OAuth Client"
    - Note down the Client ID and Client Secret
 
-2. Create the Kubernetes secret:
+2. Create the Tailscale namespace:
    ```bash
-   kubectl create secret generic operator-oauth \
-     --namespace tailscale \
+   kubectl create namespace tailscale
+   ```
+
+3. Create the Kubernetes secret:
+   ```bash
+   kubectl create secret generic operator-oauth --namespace tailscale \
      --from-literal=client_id=your-client-id \
      --from-literal=client_secret=your-client-secret
    ```
 
-3. Verify the secret was created:
+4. Verify the secret was created:
    ```bash
    kubectl get secret tailscale-oauth -n tailscale
    ```
@@ -32,9 +32,7 @@ The Tailscale operator requires OAuth credentials to function. These credentials
 Note: This secret needs to be created before deploying the Tailscale operator. The operator will use these credentials to authenticate with Tailscale.
 
 ### Tailscale Tag
-Add a 
 
-### Tailscale
 - Tailscale operator for Kubernetes integration
 - OAuth-based authentication
 - Automatic node management
@@ -48,3 +46,7 @@ Add a
    ```
 
 
+### Flux Set up
+
+1. helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator --namespace flux-system --create-namespace
+2. kubectl apply -f flux-system\fluxInstance.yaml
