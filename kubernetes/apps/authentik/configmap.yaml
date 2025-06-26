@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-bootstrap
+  namespace: authentik
+data:
+  ak.yaml: |
+    version: 1
+    blueprints:
+      - name: gitea-oauth-provider
+        model: authentik_providers_oauth2.oauth2provider
+        identifiers:
+          name: gitea
+        attrs:
+          name: gitea
+          client_id: gitea-client-id
+          client_secret: gitea-super-secret
+          authorization_flow: default-provider-authorization-implicit-consent
+          redirect_uris:
+            - https://gitea/user/oauth2/authentik/callback
+          signing_key: default
+          access_token_validity: 3600
+          refresh_token_validity: 86400
+          property_mappings:
+            - name: ak_email_mapping
+              property_mapping: ak_oauth2_scope_email
+            - name: ak_profile_mapping
+              property_mapping: ak_oauth2_scope_profile
+
+      - name: gitea-application
+        model: authentik_core.application
+        identifiers:
+          name: gitea
+        attrs:
+          name: Gitea
+          slug: gitea
+          provider: !BlueprintRef gitea-oauth-provider
+          protocol: oauth2
+          authorization_flow: default-application-authentication-flow
+          redirect_uris:
+            - https://gitea/user/oauth2/authentik/callback
+          meta_launch_url: https://gitea
+          open_in_new_tab: true
