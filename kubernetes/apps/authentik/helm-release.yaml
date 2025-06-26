@@ -16,7 +16,8 @@ spec:
         namespace: authentik
   values:
     blueprints:
-      - authentik-bootstrap
+      configMaps:
+        - authentik-bootstrap
     authentik:
       secret_key: "PleaseGenerateASecureKey"
       # This sends anonymous usage-data, stack traces on errors and
