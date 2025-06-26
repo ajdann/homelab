@@ -2,7 +2,11 @@ cat .\butane.yaml | docker run --rm -i quay.io/coreos/butane:latest > ignition.j
 docker run --rm -v ${PWD}:/work -w /work quay.io/coreos/ignition-validate ignition.json
 
 ## Manual Setup Steps
+### Flux Set up
 
+1. helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
+  --namespace flux-system --create-namespace
+2. kubectl apply -f flux-system\fluxInstance.yaml
 ### Tailscale OAuth Secret
 
 The Tailscale operator requires OAuth credentials to function. These credentials need to be created manually as a Kubernetes secret. Follow these steps:
