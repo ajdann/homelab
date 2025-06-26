@@ -13,8 +13,8 @@ data:
           name: gitea
         attrs:
           name: gitea
-          client_id: gitea-client-id
-          client_secret: gitea-super-secret
+          client_id: u4QfKMnaRrcfipiNKOnrihhhA5U9Ik8shlhTviL6
+          client_secret: UuWVUFWxY2Z9CA2F9BLNSnw4zpY46V84MTXMSGe6Tslx8h2y8rWefZIspMsvVQ97zKH0UnJlVepU2RmGdhiMjzMeY1i9AuKZzMrAIAKqBFGYqnT1nxUuT1GANDWds1RP
           authorization_flow: default-provider-authorization-implicit-consent
           redirect_uris:
             - https://gitea/user/oauth2/authentik/callback
