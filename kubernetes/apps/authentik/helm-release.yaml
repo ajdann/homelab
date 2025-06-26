@@ -28,10 +28,10 @@ spec:
         annotations:
           tailscale.com/tags: tag:k8s-operator
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/name: "Kubernetes Dashboard"
-          gethomepage.dev/description: "Kubernetes cluster management interface"
+          gethomepage.dev/name: "Authentik"
+          gethomepage.dev/description: "Authentik"
           gethomepage.dev/group: "Homelab Services"
-          gethomepage.dev/icon: "kubernetes.png"
+          gethomepage.dev/icon: "authentik.png"
           gethomepage.dev/href: "https://authentik.tail1345c.ts.net"
           gethomepage.dev/widget.type: "kubernetes"
           gethomepage.dev/widget.url: "https://authentik.tail1345c.ts.net"
