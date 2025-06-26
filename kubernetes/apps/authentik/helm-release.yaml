@@ -38,6 +38,10 @@ spec:
           gethomepage.dev/pod-selector: "app.kubernetes.io/name=authentik"
         ingressClassName: tailscale
         enabled: true
+        https: true
+        tls:
+          - hosts:
+            - authentik
         hosts:
         - authentik
     postgresql:
