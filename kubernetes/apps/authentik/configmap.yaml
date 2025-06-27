@@ -5,22 +5,22 @@ metadata:
   namespace: authentik
 data:
   gitea.yaml: |
-    version: 1
-    blueprints:
-      - name: gitea-oauth-provider
-        model: authentik_providers_oauth2.oauth2provider
+version: 1
+blueprints:
+      - name: gitea-debug-app
+        model: authentik_core.application
         identifiers:
-          name: gitea
+          name: gitea-debug-app
         attrs:
-          name: gitea
-          client_id: u4QfKMnaRrcfipiNKOnrihhhA5U9Ik8shlhTviL6
-          client_secret: UuWVUFWxY2Z9CA2F9BLNSnw4zpY46V84MTXMSGe6Tslx8h2y8rWefZIspMsvVQ97zKH0UnJlVepU2RmGdhiMjzMeY1i9AuKZzMrAIAKqBFGYqnT1nxUuT1GANDWds1RP
+          name: Gitea Debug App
+          slug: gitea-debug
+          provider: gitea
+          protocol: oauth2
           authorization_flow: default-provider-authorization-implicit-consent
           redirect_uris:
-            - https://gitea.local/user/oauth2/authentik/callback
-          signing_key: default
-          access_token_validity: 3600
-          refresh_token_validity: 86400
+          - https://gitea.local/user/oauth2/authentik/callback
+          meta_launch_url: https://gitea.local
+          open_in_new_tab: true
 
       - name: gitea-debug-app
         model: authentik_core.application
