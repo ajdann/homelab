@@ -7,3 +7,4 @@ resources:
 - helm-repository.yaml
 - helm-release.yaml
 - configmap.yaml
+- gitea-app.yaml
