@@ -18,6 +18,7 @@ spec:
     blueprints:
       configMaps:
         - authentik-bootstrap
+        - authentik-app-test
     authentik:
       secret_key: "PleaseGenerateASecureKey"
       # This sends anonymous usage-data, stack traces on errors and
