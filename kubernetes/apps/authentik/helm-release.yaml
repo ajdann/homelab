@@ -18,7 +18,7 @@ spec:
     blueprints:
       configMaps:
         - gitea-provider
-        - authentik-app-test
+        - gitea-app
     authentik:
       secret_key: "PleaseGenerateASecureKey"
       # This sends anonymous usage-data, stack traces on errors and

@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: authentik-app-test
+  name: gitea-app
   namespace: authentik
 data:
   gitea-app.yaml: |
     version: 1
     blueprints:
-      - name: gitea-debug-app
+      - name: gitea-app
         model: authentik_core.application
         identifiers:
-          name: gitea-debug-app
+          name: gitea-app
         attrs:
-          name: Gitea Debug App
-          slug: gitea-debug
+          name: Gitea App
+          slug: gitea-app
           provider: gitea
           protocol: oauth2
           authorization_flow: default-provider-authorization-implicit-consent
