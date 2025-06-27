@@ -5,22 +5,23 @@ metadata:
   namespace: authentik
 data:
   gitea.yaml: |
-version: 1
-blueprints:
-      - name: gitea-debug-app
-        model: authentik_core.application
-        identifiers:
-          name: gitea-debug-app
-        attrs:
-          name: Gitea Debug App
-          slug: gitea-debug
-          provider: gitea
-          protocol: oauth2
-          authorization_flow: default-provider-authorization-implicit-consent
-          redirect_uris:
-          - https://gitea.local/user/oauth2/authentik/callback
-          meta_launch_url: https://gitea.local
-          open_in_new_tab: true
+    version: 1
+    blueprints:
+
+    - name: gitea-debug-app
+      model: authentik_core.application
+      identifiers:
+        name: gitea-debug-app
+      attrs:
+        name: Gitea Debug App
+        slug: gitea-debug
+        provider: gitea
+        protocol: oauth2
+        authorization_flow: default-provider-authorization-implicit-consent
+        redirect_uris:
+        - https://gitea.local/user/oauth2/authentik/callback
+        meta_launch_url: https://gitea.local
+        open_in_new_tab: true
 
       - name: gitea-debug-app
         model: authentik_core.application
