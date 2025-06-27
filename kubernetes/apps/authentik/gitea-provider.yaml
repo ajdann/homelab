@@ -1,18 +1,18 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: authentik-bootstrap
+  name: gitea-provider
   namespace: authentik
 data:
-  gitea.yaml: |
+  gitea-provider.yaml: |
     version: 1
     blueprints:
       - name: gitea-oauth-provider
         model: authentik_providers_oauth2.oauth2provider
         identifiers:
-          name: gitea
+          name: gitea-provider
         attrs:
-          name: gitea
+          name: gitea-provider
           client_id: u4QfKMnaRrcfipiNKOnrihhhA5U9Ik8shlhTviL6
           client_secret: UuWVUFWxY2Z9CA2F9BLNSnw4zpY46V84MTXMSGe6Tslx8h2y8rWefZIspMsvVQ97zKH0UnJlVepU2RmGdhiMjzMeY1i9AuKZzMrAIAKqBFGYqnT1nxUuT1GANDWds1RP
           authorization_flow: default-provider-authorization-implicit-consent
