@@ -17,7 +17,7 @@ spec:
   values:
     blueprints:
       configMaps:
-        - authentik-bootstrap
+        - gitea-provider
         - authentik-app-test
     authentik:
       secret_key: "PleaseGenerateASecureKey"
