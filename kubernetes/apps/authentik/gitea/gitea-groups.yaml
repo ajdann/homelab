@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitea-groups
+  namespace: authentik
+data:
+  groups.yaml: |
+    # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+    version: 1
+    metadata:
+      name: gitea-groups
+    entries:
+      - model: authentik_core.group
+        state: present
+        identifiers:
+          name: gituser
+        attrs:
+          name: gituser
+          description: Gitea users with standard access
+
+      - model: authentik_core.group
+        state: present
+        identifiers:
+          name: gitadmin
+        attrs:
+          name: gitadmin
+          description: Gitea administrators
+
+      - model: authentik_core.group
+        state: present
+        identifiers:
+          name: gitrestricted
+        attrs:
+          name: gitrestricted
+          description: Gitea users with restricted access

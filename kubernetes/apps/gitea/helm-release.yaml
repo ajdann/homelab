@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: gitea
@@ -64,17 +64,28 @@ spec:
           type: RuntimeDefault
     gitea:
       oauth:
-        - name: "authentik"
-          provider: "openidConnect"
-          existingSecret: gitea-authentik-secret
-          autoDiscoverUrl: "http://authentik/application/o/gitea/.well-known/openid-configuration"
-          iconUrl: "http://authentik/static/dist/assets/icons/icon.png"
-          scopes: "email profile"
+      - name: "authentik"
+        provider: "openidConnect"
+        existingSecret: gitea-authentik-secret
+        autoDiscoverUrl: "https://authentik.tail1345c.ts.net/application/o/gitea-app/.well-known/openid-configuration"
+        iconUrl: "https://authentik.tail1345c.ts.net/static/dist/assets/icons/icon.png"
+        scopes: "openid email profile"
+        # required_claim_value: "" # Leave empty if no specific value is required
+        # required_claim_name: "gitea"
+        # group_claim_name: "gitea"
+        # admin_group: "admin"
+        # restricted_group: "restricted"
+        # requiredClaimValue: "" # Leave empty if no specific value is required
+        # requiredClaimName: "gitea"
+        # groupClaimName: "gitea"
+        # adminGroup: "admin"
+        # restrictedGroup: "restricted"
       config:
         server:
-          DOMAIN: gitea
-          ROOT_URL: https://gitea/
+          DOMAIN: gitea.tail1345c.ts.net
+          ROOT_URL: https://gitea.tail1345c.ts.net/
           DISABLE_SSH: true
+          ENABLE_AUTO_REGISTRATION: "true"
         database:
           DB_TYPE: sqlite3
         session:
@@ -86,8 +97,8 @@ spec:
         security:
           INSTALL_LOCK: true
         admin:
-          username: admin
-          password: admin123
+          username: MyAwesomeGiteaAdmin
+          password: AReallyAwesomeGiteaPassword
           email: admin@gitea.local
         startupProbe:
           enabled: true

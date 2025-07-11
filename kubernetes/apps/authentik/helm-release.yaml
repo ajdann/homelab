@@ -17,8 +17,10 @@ spec:
   values:
     blueprints:
       configMaps:
-        - gitea-provider
-        - gitea-app
+      - gitea-app
+      - gitea-provider
+      - gitea-property-mappings
+      - gitea-groups
     authentik:
       secret_key: "PleaseGenerateASecureKey"
       # This sends anonymous usage-data, stack traces on errors and
@@ -44,8 +46,8 @@ spec:
         enabled: true
         https: true
         tls:
-          - hosts:
-            - authentik
+        - hosts:
+          - authentik
         hosts:
         - authentik
     postgresql:

@@ -36,10 +36,10 @@ spec:
         - op: add
           path: /spec/template/spec/containers/0/args/-
           value: --requeue-dependency=5s
-  sync:
-    kind: GitRepository
-    url: "https://github.com/ajdann/homelab.git"
-    ref: "refs/heads/main"
-    path: "kubernetes"
-    # pullSecret: "flux-system"
-  # distribution omitted for brevity
+  # sync:
+  #   kind: GitRepository
+  #   url: "https://github.com/ajdann/homelab.git"
+  #   ref: "refs/heads/main"
+  #   path: "kubernetes"
+  #   # pullSecret: "flux-system"
+  # # distribution omitted for brevity

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitea-app
+  namespace: authentik
+data:
+  gitea-app.yaml: |
+    # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+    version: 1
+    metadata:
+      name: gitea-app
+    entries:
+      - model: authentik_core.application
+        state: present
+        identifiers:
+          name: gitea-app
+        attrs:
+          name: Gitea App
+          slug: gitea-app
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, gitea-provider]]
+          protocol: oauth2
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          redirect_uris:
+            - url: https://gitea.tail1345c.ts.net/user/oauth2/authentik/callback
+              matching_mode: strict
+          meta_launch_url: https://gitea.tail1345c.ts.net
+          open_in_new_tab: true
+          launch_url: https://gitea.tail1345c.ts.net
+          meta_icon: https://gitea.tail1345c.ts.net/img/gitea.svg
+          meta_description: Gitea Git Repository Management

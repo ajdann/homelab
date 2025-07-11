@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitea-property-mappings
+  namespace: authentik
+data:
+  property-mappings.yaml: |
+    # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+    version: 1
+    metadata:
+      name: property-mappings
+    entries:
+      - model: authentik_providers_oauth2.scopemapping
+        state: present
+        identifiers:
+          name: "authentik gitea OAuth Mapping: OpenID 'gitea'"
+        attrs:
+          name: "authentik gitea OAuth Mapping: OpenID 'gitea'"
+          scope_name: gitea
+          description: Gitea-specific user information with group-based claims
+          expression: |
+            return {
+                "gitea": [g.name for g in request.user.ak_groups.filter(name__in=["gitadmin", "gitrestricted"])]
+            }
+
+
+
