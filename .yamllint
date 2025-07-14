@@ -1,0 +1,20 @@
+---
+extends: default
+
+rules:
+  # 80 chars should be enough, but don't fail if a line is longer
+  line-length: disable
+  
+  # Allow both single and double quotes
+  quotes:
+    level: warning
+    quote-type: any
+  
+  # Allow trailing spaces in some cases
+  trailing-spaces: enable
+  
+  # Allow document start
+  document-start: disable
+  
+  # Allow comments
+  comments-indentation: disable 

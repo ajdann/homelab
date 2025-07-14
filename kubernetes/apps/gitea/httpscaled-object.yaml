@@ -6,7 +6,7 @@ metadata:
   namespace: gitea
 spec:
   hosts:
-  - gitea.tail1345c.ts.net
+    - gitea.tail1345c.ts.net
   targetPendingRequests: 1
   scaledownPeriod: 300
   scaleTargetRef:
