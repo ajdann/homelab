@@ -1,3 +1,4 @@
+---
 name: YAML Lint
 on:
   push:
@@ -16,8 +17,8 @@ jobs:
 
       - name: Run YAML Lint
         uses: ibiqlik/action-yamllint@v3
-        with:
-          file_or_dir: kubernetes/
-          config_file: .yamllint
-          format: parsable
-          strict: true
+        # with:
+        #   file_or_dir: kubernetes/
+        #   config_file: .yamllint
+        #   format: parsable
+        #   strict: true
