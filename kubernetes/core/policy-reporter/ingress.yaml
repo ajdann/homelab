@@ -6,27 +6,27 @@ metadata:
   namespace: policy-reporter
   annotations:
     tailscale.com/tags: tag:k8s-operator
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/name: "Policy Reporter"
-    gethomepage.dev/description: "Kyverno policy results dashboard"
-    gethomepage.dev/group: "Homelab Services"
-    gethomepage.dev/icon: "shield-check-outline"
-    gethomepage.dev/href: "https://policy-reporter.tail1345c.ts.net"
-    gethomepage.dev/widget.type: "policy-reporter"
-    gethomepage.dev/widget.url: "https://policy-reporter.tail1345c.ts.net"
+    gethomepage.dev/enabled: 'true'
+    gethomepage.dev/name: 'Policy Reporter'
+    gethomepage.dev/description: 'Kyverno policy results dashboard'
+    gethomepage.dev/group: 'Homelab Services'
+    gethomepage.dev/icon: 'shield-check-outline'
+    gethomepage.dev/href: 'https://policy-reporter.tail1345c.ts.net'
+    gethomepage.dev/widget.type: 'policy-reporter'
+    gethomepage.dev/widget.url: 'https://policy-reporter.tail1345c.ts.net'
 spec:
   ingressClassName: tailscale
   rules:
-  - host: policy-reporter
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: policy-reporter-ui
-            port:
-              number: 8080
+    - host: policy-reporter
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: policy-reporter-ui
+                port:
+                  number: 8080
   tls:
-  - hosts:
-    - policy-reporter
+    - hosts:
+        - policy-reporter

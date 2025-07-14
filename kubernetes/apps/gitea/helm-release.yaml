@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: gitea
-      version: "12.0.0"
+      version: '12.0.0'
       sourceRef:
         kind: HelmRepository
         name: gitea
@@ -38,7 +38,7 @@ spec:
       privileged: false
       capabilities:
         drop:
-        - ALL
+          - ALL
       readOnlyRootFilesystem: true
       seccompProfile:
         type: RuntimeDefault
@@ -58,34 +58,34 @@ spec:
         privileged: false
         capabilities:
           drop:
-          - ALL
+            - ALL
         readOnlyRootFilesystem: false
         seccompProfile:
           type: RuntimeDefault
     gitea:
       oauth:
-      - name: "authentik"
-        provider: "openidConnect"
-        existingSecret: gitea-authentik-secret
-        autoDiscoverUrl: "https://authentik.tail1j345c.ts.net/application/o/gitea-app/.well-known/openid-configuration"
-        iconUrl: "https://authentik.tail1345c.ts.net/static/dist/assets/icons/icon.png"
-        scopes: "openid email profile"
-        # required_claim_value: "" # Leave empty if no specific value is required
-        # required_claim_name: "gitea"
-        # group_claim_name: "gitea"
-        # admin_group: "admin"
-        # restricted_group: "restricted"
-        # requiredClaimValue: "" # Leave empty if no specific value is required
-        # requiredClaimName: "gitea"
-        # groupClaimName: "gitea"
-        # adminGroup: "admin"
-        # restrictedGroup: "restricted"
+        - name: 'authentik'
+          provider: 'openidConnect'
+          existingSecret: gitea-authentik-secret
+          autoDiscoverUrl: 'https://authentik.tail1345c.ts.net/application/o/gitea-app/.well-known/openid-configuration'
+          iconUrl: 'https://authentik.tail1345c.ts.net/static/dist/assets/icons/icon.png'
+          scopes: 'openid email profile'
+          # required_claim_value: "" # Leave empty if no specific value is required
+          # required_claim_name: "gitea"
+          # group_claim_name: "gitea"
+          # admin_group: "admin"
+          # restricted_group: "restricted"
+          # requiredClaimValue: "" # Leave empty if no specific value is required
+          # requiredClaimName: "gitea"
+          # groupClaimName: "gitea"
+          # adminGroup: "admin"
+          # restrictedGroup: "restricted"
       config:
         server:
           DOMAIN: gitea.tail1345c.ts.net
           ROOT_URL: https://gitea.tail1345c.ts.net/
           DISABLE_SSH: true
-          ENABLE_AUTO_REGISTRATION: "true"
+          ENABLE_AUTO_REGISTRATION: 'true'
         database:
           DB_TYPE: sqlite3
         session:
@@ -117,22 +117,22 @@ spec:
       className: tailscale
       annotations:
         tailscale.com/tags: tag:k8s-operator
-        gethomepage.dev/enabled: "true"
-        gethomepage.dev/name: "Gitea"
-        gethomepage.dev/description: "Git repository management"
-        gethomepage.dev/group: "Homelab Services"
-        gethomepage.dev/icon: "gitea.png"
-        gethomepage.dev/href: "https://gitea.tail1345c.ts.net"
-        gethomepage.dev/widget.url: "https://gitea.tail1345c.ts.net"
-        gethomepage.dev/pod-selector: "app.kubernetes.io/name=gitea"
+        gethomepage.dev/enabled: 'true'
+        gethomepage.dev/name: 'Gitea'
+        gethomepage.dev/description: 'Git repository management'
+        gethomepage.dev/group: 'Homelab Services'
+        gethomepage.dev/icon: 'gitea.png'
+        gethomepage.dev/href: 'https://gitea.tail1345c.ts.net'
+        gethomepage.dev/widget.url: 'https://gitea.tail1345c.ts.net'
+        gethomepage.dev/pod-selector: 'app.kubernetes.io/name=gitea'
       hosts:
-      - host: gitea
-        paths:
-        - path: /
-          pathType: Prefix
+        - host: gitea
+          paths:
+            - path: /
+              pathType: Prefix
       tls:
-      - hosts:
-        - gitea
+        - hosts:
+            - gitea
     valkey-cluster:
       enabled: false
     valkey:

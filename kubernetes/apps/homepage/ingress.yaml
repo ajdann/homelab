@@ -6,27 +6,27 @@ metadata:
   namespace: homepage
   annotations:
     tailscale.com/tags: tag:k8s-operator
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/name: "Homepage"
-    gethomepage.dev/description: "This dashboard"
-    gethomepage.dev/group: "Homelab Services"
-    gethomepage.dev/icon: "homepage.png"
-    gethomepage.dev/href: "https://homepage.tail1345c.ts.net"
-    gethomepage.dev/widget.type: "homepage"
-    gethomepage.dev/widget.url: "https://homepage.tail1345c.ts.net"
+    gethomepage.dev/enabled: 'true'
+    gethomepage.dev/name: 'Homepage'
+    gethomepage.dev/description: 'This dashboard'
+    gethomepage.dev/group: 'Homelab Services'
+    gethomepage.dev/icon: 'homepage.png'
+    gethomepage.dev/href: 'https://homepage.tail1345c.ts.net'
+    gethomepage.dev/widget.type: 'homepage'
+    gethomepage.dev/widget.url: 'https://homepage.tail1345c.ts.net'
 spec:
   ingressClassName: tailscale
   rules:
-  - host: homepage
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: homepage
-            port:
-              number: 80
+    - host: homepage
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: homepage
+                port:
+                  number: 80
   tls:
-  - hosts:
-    - homepage
+    - hosts:
+        - homepage

@@ -6,28 +6,28 @@ metadata:
   namespace: kubernetes-dashboard
   annotations:
     tailscale.com/tags: tag:k8s-operator
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/name: "Kubernetes Dashboard"
-    gethomepage.dev/description: "Kubernetes cluster management interface"
-    gethomepage.dev/group: "Homelab Services"
-    gethomepage.dev/icon: "kubernetes.png"
-    gethomepage.dev/href: "https://kubernetes-dashboard.tail1345c.ts.net"
-    gethomepage.dev/widget.type: "kubernetes"
-    gethomepage.dev/widget.url: "https://kubernetes-dashboard.tail1345c.ts.net"
-    gethomepage.dev/pod-selector: "app.kubernetes.io/name=kubernetes-dashboard"
+    gethomepage.dev/enabled: 'true'
+    gethomepage.dev/name: 'Kubernetes Dashboard'
+    gethomepage.dev/description: 'Kubernetes cluster management interface'
+    gethomepage.dev/group: 'Homelab Services'
+    gethomepage.dev/icon: 'kubernetes.png'
+    gethomepage.dev/href: 'https://kubernetes-dashboard.tail1345c.ts.net'
+    gethomepage.dev/widget.type: 'kubernetes'
+    gethomepage.dev/widget.url: 'https://kubernetes-dashboard.tail1345c.ts.net'
+    gethomepage.dev/pod-selector: 'app.kubernetes.io/name=kubernetes-dashboard'
 spec:
   ingressClassName: tailscale
   rules:
-  - host: kubernetes-dashboard
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: kubernetes-dashboard
-            port:
-              number: 443
+    - host: kubernetes-dashboard
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes-dashboard
+                port:
+                  number: 443
   tls:
-  - hosts:
-    - kubernetes-dashboard
+    - hosts:
+        - kubernetes-dashboard

@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: authentik
-      version: "2025.6.2"
+      version: '2025.6.2'
       sourceRef:
         kind: HelmRepository
         name: authentik
@@ -17,10 +17,10 @@ spec:
   values:
     blueprints:
       configMaps:
-      - gitea-app
-      - gitea-provider
-      - gitea-property-mappings
-      - gitea-groups
+        - gitea-app
+        - gitea-provider
+        - gitea-property-mappings
+        - gitea-groups
     authentik:
       error_reporting:
         enabled: true
@@ -28,23 +28,23 @@ spec:
       ingress:
         annotations:
           tailscale.com/tags: tag:k8s-operator
-          gethomepage.dev/enabled: "true"
-          gethomepage.dev/name: "Authentik"
-          gethomepage.dev/description: "Authentik"
-          gethomepage.dev/group: "Homelab Services"
-          gethomepage.dev/icon: "authentik.png"
-          gethomepage.dev/href: "https://authentik.tail1345c.ts.net"
-          gethomepage.dev/widget.type: "kubernetes"
-          gethomepage.dev/widget.url: "https://authentik.tail1345c.ts.net"
-          gethomepage.dev/pod-selector: "app.kubernetes.io/name=authentik"
+          gethomepage.dev/enabled: 'true'
+          gethomepage.dev/name: 'Authentik'
+          gethomepage.dev/description: 'Authentik'
+          gethomepage.dev/group: 'Homelab Services'
+          gethomepage.dev/icon: 'authentik.png'
+          gethomepage.dev/href: 'https://authentik.tail1345c.ts.net'
+          gethomepage.dev/widget.type: 'kubernetes'
+          gethomepage.dev/widget.url: 'https://authentik.tail1345c.ts.net'
+          gethomepage.dev/pod-selector: 'app.kubernetes.io/name=authentik'
         ingressClassName: tailscale
         enabled: true
         https: true
         tls:
-        - hosts:
-          - authentik
+          - hosts:
+              - authentik
         hosts:
-        - authentik
+          - authentik
     postgresql:
       enabled: true
     redis:
