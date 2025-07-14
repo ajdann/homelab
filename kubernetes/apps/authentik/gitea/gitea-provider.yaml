@@ -16,8 +16,8 @@ data:
           name: gitea-provider
         attrs:
           name: gitea-provider
-          client_id: u4QfKMnaRrcfipiNKOnrihhhA5U9Ik8shlhTviL6
-          client_secret: UuWVUFWxY2Z9CA2F9BLNSnw4zpY46V84MTXMSGe6Tslx8h2y8rWefZIspMsvVQ97zKH0UnJlVepU2RmGdhiMjzMeY1i9AuKZzMrAIAKqBFGYqnT1nxUuT1GANDWds1RP
+          client_id: "CLIENT_ID_PLACEHOLDER"
+          client_secret: "CLIENT_SECRET_PLACEHOLDER"
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           redirect_uris:

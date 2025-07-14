@@ -67,7 +67,7 @@ spec:
       - name: "authentik"
         provider: "openidConnect"
         existingSecret: gitea-authentik-secret
-        autoDiscoverUrl: "https://authentik.tail1345c.ts.net/application/o/gitea-app/.well-known/openid-configuration"
+        autoDiscoverUrl: "https://authentik.tail1j345c.ts.net/application/o/gitea-app/.well-known/openid-configuration"
         iconUrl: "https://authentik.tail1345c.ts.net/static/dist/assets/icons/icon.png"
         scopes: "openid email profile"
         # required_claim_value: "" # Leave empty if no specific value is required
@@ -97,9 +97,7 @@ spec:
         security:
           INSTALL_LOCK: true
         admin:
-          username: MyAwesomeGiteaAdmin
-          password: AReallyAwesomeGiteaPassword
-          email: admin@gitea.local
+          existingSecret: gitea-admin-secret
         startupProbe:
           enabled: true
         readinessProbe:
