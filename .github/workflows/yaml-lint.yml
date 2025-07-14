@@ -1,0 +1,23 @@
+name: YAML Lint
+on:
+  push:
+    branches: [main, master]
+    paths: ['kubernetes/**']
+  pull_request:
+    branches: [main, master]
+    paths: ['kubernetes/**']
+
+jobs:
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run YAML Lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: kubernetes/
+          config_file: .yamllint
+          format: parsable
+          strict: true
