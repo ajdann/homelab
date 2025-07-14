@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
   - ../../apps
   - ../../core
-  - secrets.yaml
 
 images:
   - name: ghcr.io/gethomepage/homepage
@@ -109,3 +108,5 @@ patches:
       - op: replace
         path: /spec/chart/spec/version
         value: "1.84.2"
+
+  - path: secrets.yaml

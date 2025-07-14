@@ -22,13 +22,8 @@ spec:
       - gitea-property-mappings
       - gitea-groups
     authentik:
-      secret_key: "PleaseGenerateASecureKey"
-      # This sends anonymous usage-data, stack traces on errors and
-      # performance data to sentry.io, and is fully opt-in
       error_reporting:
         enabled: true
-      postgresql:
-        password: "ThisIsNotASecurePassword"
     server:
       ingress:
         annotations:
@@ -52,7 +47,5 @@ spec:
         - authentik
     postgresql:
       enabled: true
-      auth:
-        password: "ThisIsNotASecurePassword"
     redis:
       enabled: true
