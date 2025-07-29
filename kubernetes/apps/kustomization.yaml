@@ -5,3 +5,5 @@ resources:
 - homepage
 - gitea
 - authentik
+- nextcloud
+# - seafile

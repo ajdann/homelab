@@ -1,0 +1,9 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: seafile
+  namespace: seafile
+spec:
+  interval: 1h
+  url: https://haiwen.github.io/seafile-helm-chart/repo

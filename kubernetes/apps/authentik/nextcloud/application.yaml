@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud-app
+  namespace: authentik
+data:
+  nextcloud-app.yaml: |
+    # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+    version: 1
+    metadata:
+      name: Nextcloud
+    entries:
+      - model: authentik_core.application
+        state: present
+        identifiers:
+          name: Nextcloud
+        attrs:
+          name: Nextcloud
+          slug: nextcloud-app
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, nextcloud]]
+          protocol: oauth2
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          redirect_uris:
+            - url: https://nextcloud.tail1345c.ts.net/user/oauth2/authentik/callback
+              matching_mode: strict
+          meta_launch_url: https://nextcloud.tail1345c.ts.net
+          open_in_new_tab: true
+          launch_url: https://nextcloud.tail1345c.ts.net
+          meta_icon: https://nextcloud.tail1345c.ts.net/img/nextcloud.svg
+          meta_description: nextcloud Git Repository Management

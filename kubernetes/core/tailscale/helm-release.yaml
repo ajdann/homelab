@@ -15,3 +15,7 @@ spec:
         name: tailscale
         namespace: tailscale
       interval: 1m
+  values:
+    oauth:
+      clientId: "keSoTxxXeb11CNTRL"
+      clientSecret: "tskey-client-keSoTxxXeb11CNTRL-JbQd5vbjM15cCBJc9fof15iHe392QKnN"

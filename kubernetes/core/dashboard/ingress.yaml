@@ -9,7 +9,7 @@ metadata:
     gethomepage.dev/enabled: 'true'
     gethomepage.dev/name: 'Kubernetes Dashboard'
     gethomepage.dev/description: 'Kubernetes cluster management interface'
-    gethomepage.dev/group: 'Homelab Services'
+    gethomepage.dev/group: 'Monitoring'
     gethomepage.dev/icon: 'kubernetes.png'
     gethomepage.dev/href: 'https://kubernetes-dashboard.tail1345c.ts.net'
     gethomepage.dev/widget.type: 'kubernetes'

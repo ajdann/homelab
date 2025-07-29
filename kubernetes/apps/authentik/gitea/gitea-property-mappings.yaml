@@ -8,7 +8,7 @@ data:
     # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
     version: 1
     metadata:
-      name: property-mappings
+      name: gitea-property-mappings
     entries:
       - model: authentik_providers_oauth2.scopemapping
         state: present

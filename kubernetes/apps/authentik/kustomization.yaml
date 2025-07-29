@@ -7,6 +7,7 @@ resources:
 - helm-repository.yaml
 - helm-release.yaml
 - ./gitea/gitea-app.yaml
-- ./gitea/gitea-provider.yaml
 - ./gitea/gitea-property-mappings.yaml
 - ./gitea/gitea-groups.yaml
+- ./nextcloud/property-mappings.yaml
+- ./nextcloud/application.yaml

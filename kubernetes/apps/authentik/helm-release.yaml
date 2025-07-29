@@ -17,10 +17,14 @@ spec:
   values:
     blueprints:
       configMaps:
-        - gitea-app
+      - gitea-app
+      - gitea-property-mappings
+      - gitea-groups
+      - nextcloud-property-mappings
+      - nextcloud-app
+      secrets:
         - gitea-provider
-        - gitea-property-mappings
-        - gitea-groups
+        - nextcloud-provider
     authentik:
       error_reporting:
         enabled: true
@@ -31,7 +35,7 @@ spec:
           gethomepage.dev/enabled: 'true'
           gethomepage.dev/name: 'Authentik'
           gethomepage.dev/description: 'Authentik'
-          gethomepage.dev/group: 'Homelab Services'
+          gethomepage.dev/group: 'Administration'
           gethomepage.dev/icon: 'authentik.png'
           gethomepage.dev/href: 'https://authentik.tail1345c.ts.net'
           gethomepage.dev/widget.type: 'kubernetes'
@@ -41,10 +45,10 @@ spec:
         enabled: true
         https: true
         tls:
-          - hosts:
-              - authentik
-        hosts:
+        - hosts:
           - authentik
+        hosts:
+        - authentik
     postgresql:
       enabled: true
     redis:
