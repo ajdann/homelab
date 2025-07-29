@@ -13,9 +13,9 @@ data:
       - model: authentik_core.application
         state: present
         identifiers:
-          name: Nextcloud
+          name: nextcloud
         attrs:
-          name: Nextcloud
+          name: nextcloud
           slug: nextcloud-app
           provider: !Find [authentik_providers_oauth2.oauth2provider, [name, nextcloud]]
           protocol: oauth2
@@ -27,4 +27,4 @@ data:
           open_in_new_tab: true
           launch_url: https://nextcloud.tail1345c.ts.net
           meta_icon: https://nextcloud.tail1345c.ts.net/img/nextcloud.svg
-          meta_description: nextcloud Git Repository Management
+          meta_description: Nextcloud

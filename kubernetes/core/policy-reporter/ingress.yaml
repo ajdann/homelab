@@ -9,11 +9,11 @@ metadata:
     gethomepage.dev/enabled: 'true'
     gethomepage.dev/name: 'Policy Reporter'
     gethomepage.dev/description: 'Kyverno policy results dashboard'
-    gethomepage.dev/group: 'Homelab Services'
-    gethomepage.dev/icon: 'shield-check-outline'
+    gethomepage.dev/group: 'Monitoring'
+    gethomepage.dev/icon: 'policycontroller.png'
     gethomepage.dev/href: 'https://policy-reporter.tail1345c.ts.net'
-    gethomepage.dev/widget.type: 'policy-reporter'
-    gethomepage.dev/widget.url: 'https://policy-reporter.tail1345c.ts.net'
+    # gethomepage.dev/widget.type: 'policy-reporter'
+    # gethomepage.dev/widget.url: 'https://policy-reporter.tail1345c.ts.net'
 spec:
   ingressClassName: tailscale
   rules:

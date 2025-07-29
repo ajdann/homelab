@@ -23,8 +23,8 @@ spec:
       - nextcloud-property-mappings
       - nextcloud-app
       secrets:
-        - gitea-provider
-        - nextcloud-provider
+      - gitea-provider
+      - nextcloud-provider
     authentik:
       error_reporting:
         enabled: true
@@ -38,9 +38,9 @@ spec:
           gethomepage.dev/group: 'Administration'
           gethomepage.dev/icon: 'authentik.png'
           gethomepage.dev/href: 'https://authentik.tail1345c.ts.net'
-          gethomepage.dev/widget.type: 'kubernetes'
-          gethomepage.dev/widget.url: 'https://authentik.tail1345c.ts.net'
-          gethomepage.dev/pod-selector: 'app.kubernetes.io/name=authentik'
+          # gethomepage.dev/widget.type: 'kubernetes'
+          # gethomepage.dev/widget.url: 'https://authentik.tail1345c.ts.net'
+          # gethomepage.dev/pod-selector: 'app.kubernetes.io/name=authentik'
         ingressClassName: tailscale
         enabled: true
         https: true

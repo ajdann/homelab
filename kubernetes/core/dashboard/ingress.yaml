@@ -12,8 +12,8 @@ metadata:
     gethomepage.dev/group: 'Monitoring'
     gethomepage.dev/icon: 'kubernetes.png'
     gethomepage.dev/href: 'https://kubernetes-dashboard.tail1345c.ts.net'
-    gethomepage.dev/widget.type: 'kubernetes'
-    gethomepage.dev/widget.url: 'https://kubernetes-dashboard.tail1345c.ts.net'
+    # gethomepage.dev/widget.type: 'kubernetes'
+    # gethomepage.dev/widget.url: 'https://kubernetes-dashboard.tail1345c.ts.net'
     gethomepage.dev/pod-selector: 'app.kubernetes.io/name=kubernetes-dashboard'
 spec:
   ingressClassName: tailscale

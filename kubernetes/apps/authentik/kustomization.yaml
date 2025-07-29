@@ -6,8 +6,8 @@ resources:
 - namespace.yaml
 - helm-repository.yaml
 - helm-release.yaml
-- ./gitea/gitea-app.yaml
-- ./gitea/gitea-property-mappings.yaml
-- ./gitea/gitea-groups.yaml
+- ./gitea/application.yaml
+- ./gitea/property-mappings.yaml
+- ./gitea/groups.yaml
 - ./nextcloud/property-mappings.yaml
 - ./nextcloud/application.yaml

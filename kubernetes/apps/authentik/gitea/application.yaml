@@ -13,11 +13,11 @@ data:
       - model: authentik_core.application
         state: present
         identifiers:
-          name: gitea-app
+          name: gitea
         attrs:
-          name: Gitea App
+          name: gitea
           slug: gitea-app
-          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, gitea-provider]]
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, gitea]]
           protocol: oauth2
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           redirect_uris:
