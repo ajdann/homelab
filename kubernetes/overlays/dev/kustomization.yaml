@@ -4,15 +4,19 @@ kind: Kustomization
 resources:
 - ../../apps
 - ../../core
-- ./secrets/secrets.yaml
+- ./secrets/
 
 images:
 - name: ghcr.io/gethomepage/homepage
   newTag: v1.4.0
 
 patchesStrategicMerge:
-  - ./secrets/gitea-provider-patch.yaml
-  - ./secrets/authentik-values-patch.yaml
+  - ./secrets/patches/authentik-values-patch.yaml
+
+# configMapGenerator:
+#   - name: global-vars
+#     literals:
+#       - domain=dev-tail1345c.ts.net
 
 patches:
 - target:
@@ -85,7 +89,7 @@ patches:
   patch: |-
     - op: replace
       path: /spec/chart/spec/version
-      value: "4.0.0"
+      value: "3.7.139"
 
 - target:
     kind: HelmRelease
@@ -105,12 +109,11 @@ patches:
       path: /spec/chart/spec/version
       value: "1.0.48"
 
-- target:
-    kind: HelmRelease
-    name: tailscale-operator
-    namespace: tailscale
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "1.84.2"
-# - path: secrets.yaml
+# - target:
+#     kind: HelmRelease
+#     name: tailscale-operator
+#     namespace: tailscale
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "1.84.2"
