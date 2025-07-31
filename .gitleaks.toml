@@ -1,0 +1,8 @@
+title = "Gitleaks Configuration"
+version = "2"
+
+[allowlist]
+description = "Ignore secrets in kubernetes/overlays/dev"
+paths = [
+    "kubernetes/overlays/dev/"
+]
