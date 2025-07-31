@@ -1,0 +1,39 @@
+- name: Bootstrap all nodes
+  hosts: all
+  become: true
+  tasks:
+    - name: Install base packages
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - python3
+        - python3-pip
+        - curl
+        - vim
+        - net-tools
+        - jq
+
+    - name: Install Python packages 
+      pip:
+        name:
+          - kubernetes
+        executable: pip3
+      become: true
+
+    - name: Download kubectl
+      get_url:
+        url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+      vars:
+        kubectl_version: "{{ lookup('url', 'https://dl.k8s.io/release/stable.txt') }}"
+
+
+    - name: Install kubernetes.core collection on control node
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install kubernetes.core --force
+      delegate_to: localhost
+      run_once: true
+      become: false

@@ -5,3 +5,5 @@
 .vscode/
 .env
 age.key
+.vagrant
+*.log
