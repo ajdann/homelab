@@ -7,3 +7,4 @@
 age.key
 .vagrant
 *.log
+kubeconfig

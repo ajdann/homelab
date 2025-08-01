@@ -4,7 +4,7 @@
   tasks:
     - name: Install base packages
       apt:
-        name: "{{ item }}"
+        name: '{{ item }}'
         state: present
         update_cache: yes
       loop:
@@ -14,8 +14,9 @@
         - vim
         - net-tools
         - jq
+        - glances
 
-    - name: Install Python packages 
+    - name: Install Python packages
       pip:
         name:
           - kubernetes
@@ -24,12 +25,23 @@
 
     - name: Download kubectl
       get_url:
-        url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+        url: 'https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl'
         dest: /usr/local/bin/kubectl
         mode: '0755'
       vars:
         kubectl_version: "{{ lookup('url', 'https://dl.k8s.io/release/stable.txt') }}"
 
+    - name: Install helm if not exists
+      unarchive:
+        src: https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz
+        dest: /usr/local/bin
+        extra_opts: '--strip-components=1'
+        owner: root
+        group: root
+        mode: 0755
+        remote_src: true
+      args:
+        creates: /usr/local/bin/helm
 
     - name: Install kubernetes.core collection on control node
       ansible.builtin.command:

@@ -2,6 +2,8 @@
 - name: Set up single-node K3s cluster
   hosts: localhost
   become: true
+  vars:
+    k3s_tls_san: '192.168.56.10'
   tasks:
     - name: Download K3s install script
       get_url:
@@ -10,7 +12,7 @@
         mode: '0755'
 
     - name: Run K3s install script (server)
-      command: sh /tmp/install-k3s.sh --disable traefik
+      command: sh /tmp/install-k3s.sh --disable traefik --tls-san={{ k3s_tls_san }}
       args:
         creates: /usr/local/bin/k3s
 
@@ -44,7 +46,6 @@
       register: k3s_kube_version
       changed_when: false
 
-
     - name: Verify K3s is running using kubectl
       become_user: vagrant
       shell: kubectl get nodes --no-headers
@@ -54,7 +55,7 @@
     - name: Print success message when K3s is running
       debug:
         msg:
-          - "✅ K3s is up and running!"
-          - "🖥️ Node: {{ ansible_hostname }}"
-          - "📦 Kubernetes Version: {{ k3s_kube_version.stdout }}"
-          - "📌 Status: {{ k3s_node_status.stdout_lines[0] }}"
+          - '✅ K3s is up and running!'
+          - '🖥️ Node: {{ ansible_hostname }}'
+          - '📦 Kubernetes Version: {{ k3s_kube_version.stdout }}'
+          - '📌 Status: {{ k3s_node_status.stdout_lines[0] }}'
