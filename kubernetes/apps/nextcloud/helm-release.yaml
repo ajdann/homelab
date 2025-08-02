@@ -63,3 +63,4 @@ spec:
 
         echo "Installing OpenID Connect user backend"
         php occ app:install user_oidc
+        php occ app:enable user_oidc
