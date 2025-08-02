@@ -48,3 +48,18 @@ spec:
         secretName: nextcloud-admin-credentials
         usernameKey: username
         passwordKey: password
+    lifecycle:
+    postStartCommand:
+      - su
+      - -s
+      - /bin/sh
+      - www-data
+      - -c
+      - |
+        echo "Waiting for Nextcloud to become ready..."
+        until php occ status >/dev/null 2>&1; do
+          sleep 5
+        done
+
+        echo "Installing OpenID Connect user backend"
+        php occ app:install user_oidc
