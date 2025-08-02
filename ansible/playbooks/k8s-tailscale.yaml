@@ -37,6 +37,7 @@
       loop:
         - TAILSCALE_CLIENT_ID
         - TAILSCALE_CLIENT_SECRET
+        - TAILSCALE_DOMAIN
 
     - name: Create tailscale namespace
       kubernetes.core.k8s:
@@ -59,6 +60,17 @@
             client_secret: "{{ env_vars.TAILSCALE_CLIENT_SECRET }}"
         state: present
 
+    - name: Create Tailscale operator OAuth secret
+      kubernetes.core.k8s:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: flux-substitutions
+          namespace: flux-system
+        data:
+          DOMAIN: "{{ env_vars.TAILSCALE_DOMAIN }}"
+        state: present
+
     - name: Display success message
       debug:
-        msg: "Successfully created operator-oauth secret in tailscale namespace"
+        msg: "Successfully set up Tailscale configuration in Kubernetes."

@@ -83,8 +83,8 @@ spec:
           # restrictedGroup: "restricted"
       config:
         server:
-          DOMAIN: gitea.tail1345c.ts.net
-          ROOT_URL: https://gitea.tail1345c.ts.net/
+          DOMAIN: gitea.${DOMAIN}
+          ROOT_URL: https://gitea.${DOMAIN}/
           DISABLE_SSH: true
           ENABLE_AUTO_REGISTRATION: 'true'
         database:

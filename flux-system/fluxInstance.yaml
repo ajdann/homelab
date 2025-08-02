@@ -42,3 +42,7 @@ spec:
     url: 'https://github.com/ajdann/homelab.git'
     ref: 'refs/heads/main'
     path: 'kubernetes/overlays/dev'
+    kustomize:
+      substituteFrom:
+        - kind: ConfigMap
+          name: flux-substitutions

@@ -9,7 +9,7 @@ ssh:
 bootstrap:
 	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/bootstrap.yaml"
 	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/k3s-single-node.yaml"
-	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/k8s-secrets.yaml"
+	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/k8s-tailscale.yaml"
 	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/bootstrap-k8s.yaml"
 
 kubeconfig:
