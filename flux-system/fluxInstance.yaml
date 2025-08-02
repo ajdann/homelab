@@ -36,13 +36,17 @@ spec:
           - op: add
             path: /spec/template/spec/containers/0/args/-
             value: --requeue-dependency=5s
+    postBuild:
+      substituteFrom:
+        - kind: ConfigMap
+          name: flux-substitutions
   sync:
     kind: GitRepository
     interval: 1m0s
     url: 'https://github.com/ajdann/homelab.git'
     ref: 'refs/heads/main'
     path: 'kubernetes/overlays/dev'
-    kustomize:
-      substituteFrom:
-        - kind: ConfigMap
-          name: flux-substitutions
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: flux-substitutions
