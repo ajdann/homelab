@@ -1,6 +1,34 @@
 cat .\butane.yaml | docker run --rm -i quay.io/coreos/butane:latest > ignition.json  
 docker run --rm -v ${PWD}:/work -w /work quay.io/coreos/ignition-validate ignition.json
 
+# Demo Setup: Local K3s Cluster with Flux via Vagrant & Ansible
+
+This project sets up a lightweight local **Kubernetes (K3s)** cluster using **Vagrant**, **Ansible**, and a **Makefile** for automation. It's designed for testing GitOps workflows with **Flux**, allowing you to deploy applications from a local or remote Git repository in a reproducible and automated way.
+
+---
+
+## ✅ Requirements
+
+Make sure the following tools are installed on your host machine:
+
+- [Vagrant](https://www.vagrantup.com/)
+- [VirtualBox](https://www.virtualbox.org/) (or another Vagrant-compatible provider)
+- [Ansible](https://www.ansible.com/)
+- [GNU Make](https://www.gnu.org/software/make/)
+- (Optional) [Helm](https://helm.sh/) – Installed inside the VM automatically if not present
+
+---
+
+## 🚀 Getting Started
+
+### 1. Start the VM
+```bash
+make up
+```
+### 1. Bootstrap the VM
+```bash
+make bootstrap
+```
 ## Manual Setup Steps
 
 ### Tailscale OAuth Secret
@@ -18,7 +46,7 @@ The Tailscale operator requires OAuth credentials to function. These credentials
    ```
 
 3. Create the Kubernetes secret:
-   ```bash
+   ```bash 
    kubectl create secret generic operator-oauth --namespace tailscale \
      --from-literal=client_id=your-client-id \
      --from-literal=client_secret=your-client-secret

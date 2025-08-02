@@ -13,10 +13,6 @@ images:
 patchesStrategicMerge:
   - ./secrets/patches/authentik-values-patch.yaml
 
-# configMapGenerator:
-#   - name: global-vars
-#     literals:
-#       - domain=dev-tail1345c.ts.net
 
 patches:
 - target:
