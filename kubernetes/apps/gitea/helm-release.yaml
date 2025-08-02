@@ -67,8 +67,8 @@ spec:
         - name: 'authentik'
           provider: 'openidConnect'
           existingSecret: gitea-authentik-secret
-          autoDiscoverUrl: 'https://authentik-server.authentik.svc.cluster.local/application/o/gitea-app/.well-known/openid-configuration'
-          iconUrl: 'https://authentik-server.authentik.svc.cluster.local/static/dist/assets/icons/icon.png'
+          autoDiscoverUrl: 'http://authentik-server.authentik.svc.cluster.local/application/o/gitea-app/.well-known/openid-configuration'
+          iconUrl: 'http://authentik-server.authentik.svc.cluster.local/static/dist/assets/icons/icon.png'
           scopes: 'openid email profile'
           # required_claim_value: "" # Leave empty if no specific value is required
           # required_claim_name: "gitea"
