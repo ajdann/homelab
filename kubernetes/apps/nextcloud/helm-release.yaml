@@ -48,6 +48,17 @@ spec:
         secretName: nextcloud-admin-credentials
         usernameKey: username
         passwordKey: password
+    extraEnv:
+      - name: AUTHENTIK_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: nextcloud-authentik-oidc
+            key: client_id
+      - name: AUTHENTIK_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: nextcloud-authentik-oidc
+            key: client_secret
     lifecycle:
       postStartCommand:
         - su
@@ -64,3 +75,16 @@ spec:
           echo "Installing OpenID Connect user backend"
           php occ app:install user_oidc
           php occ app:enable user_oidc
+
+          CLIENT_ID="${AUTHENTIK_CLIENT_ID}"
+          CLIENT_SECRET="${AUTHENTIK_CLIENT_SECRET}"
+
+          if ! php occ config:list | grep -q authentik; then
+            php occ user_oidc:provider authentik \
+              --clientid "$CLIENT_ID" \
+              --clientsecret "$CLIENT_SECRET" \
+              --discoveryuri "https://authentik-server.authentik.svc.cluster.local/application/o/nextcloud/.well-known/openid-configuration" \
+              --scope "openid email profile"
+          else
+            echo "OIDC provider 'authentik' already exists, skipping."
+          fi
