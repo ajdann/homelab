@@ -11,9 +11,9 @@ metadata:
     gethomepage.dev/description: 'File storage'
     gethomepage.dev/group: 'Homelab Services'
     gethomepage.dev/icon: 'seafile.png'
-    gethomepage.dev/href: 'https://seafile.tail1345c.ts.net'
+    gethomepage.dev/href: 'https://seafile.${DOMAIN}'
     gethomepage.dev/widget.type: 'homepage'
-    gethomepage.dev/widget.url: 'https://seafile.tail1345c.ts.net'
+    gethomepage.dev/widget.url: 'https://seafile.${DOMAIN}'
 spec:
   ingressClassName: tailscale
   rules:

@@ -11,9 +11,9 @@ metadata:
     gethomepage.dev/description: 'Kyverno policy results dashboard'
     gethomepage.dev/group: 'Monitoring'
     gethomepage.dev/icon: 'policycontroller.png'
-    gethomepage.dev/href: 'https://policy-reporter.tail1345c.ts.net'
+    gethomepage.dev/href: 'https://policy-reporter.${DOMAIN}'
     # gethomepage.dev/widget.type: 'policy-reporter'
-    # gethomepage.dev/widget.url: 'https://policy-reporter.tail1345c.ts.net'
+    # gethomepage.dev/widget.url: 'https://policy-reporter.${DOMAIN}'
 spec:
   ingressClassName: tailscale
   rules:

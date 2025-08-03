@@ -9,9 +9,9 @@ metadata:
     gethomepage.dev/icon: adguard-home.png
     gethomepage.dev/group: "Networking"
     gethomepage.dev/description: "DNS Ad blocker"
-    gethomepage.dev/href: 'https://adguard.tail1345c.ts.net'
+    gethomepage.dev/href: 'https://adguard.${DOMAIN}'
     # gethomepage.dev/widget.type: 'kubernetes'
-    # gethomepage.dev/widget.url: 'https://adguard.tail1345c.ts.net'
+    # gethomepage.dev/widget.url: 'https://adguard.${DOMAIN}'
 spec:
   ingressClassName: tailscale
   rules:

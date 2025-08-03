@@ -39,7 +39,7 @@ spec:
           gethomepage.dev/icon: 'authentik.png'
           gethomepage.dev/href: 'https://authentik.${DOMAIN}'
           # gethomepage.dev/widget.type: 'kubernetes'
-          # gethomepage.dev/widget.url: 'https://authentik.tail1345c.ts.net'
+          # gethomepage.dev/widget.url: 'https://authentik.${DOMAIN}'
           # gethomepage.dev/pod-selector: 'app.kubernetes.io/name=authentik'
         ingressClassName: tailscale
         enabled: true

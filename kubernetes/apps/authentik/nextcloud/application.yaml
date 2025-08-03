@@ -21,10 +21,10 @@ data:
           protocol: oauth2
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           redirect_uris:
-            - url: https://nextcloud.tail1345c.ts.net/user/oauth2/authentik/callback
+            - url: https://nextcloud.${DOMAIN}/user/oauth2/authentik/callback
               matching_mode: strict
-          meta_launch_url: https://nextcloud.tail1345c.ts.net
+          meta_launch_url: https://nextcloud.${DOMAIN}
           open_in_new_tab: true
-          launch_url: https://nextcloud.tail1345c.ts.net
-          meta_icon: https://nextcloud.tail1345c.ts.net/img/nextcloud.svg
+          launch_url: https://nextcloud.${DOMAIN}
+          meta_icon: https://nextcloud.${DOMAIN}/img/nextcloud.svg
           meta_description: Nextcloud

@@ -25,7 +25,7 @@ spec:
         gethomepage.dev/description: 'File storage'
         gethomepage.dev/group: 'Homelab Services'
         gethomepage.dev/icon: 'nextcloud.png'
-        gethomepage.dev/href: 'https://nextcloud.tail1345c.ts.net'
+        gethomepage.dev/href: 'https://nextcloud.${DOMAIN}'
         # For loadbalance over multiple Pods, it is useful to configure sticky session
         # nginx.ingress.kubernetes.io/affinity: cookie
         # traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
@@ -41,7 +41,7 @@ spec:
     nextcloud:
       host: 'nextcloud'
       trustedDomains: 
-        - 'nextcloud.tail1345c.ts.net'
+        - 'nextcloud.${DOMAIN}'
         - 'nextcloud'
       existingSecret:
         enabled: true

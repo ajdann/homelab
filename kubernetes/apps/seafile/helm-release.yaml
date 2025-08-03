@@ -30,7 +30,7 @@ spec:
         TIME_ZONE: "UTC"
         SEAFILE_LOG_TO_STDOUT: "true"
         SITE_ROOT: "/"
-        SEAFILE_SERVER_HOSTNAME: "seafile.tail1345c.ts.net"
+        SEAFILE_SERVER_HOSTNAME: "seafile.${DOMAIN}"
         SEAFILE_SERVER_PROTOCOL: "https"
 
         # for database

@@ -67,8 +67,8 @@ spec:
         - name: 'authentik'
           provider: 'openidConnect'
           existingSecret: gitea-authentik-secret
-          autoDiscoverUrl: 'http://authentik-server.authentik.svc.cluster.local/application/o/gitea-app/.well-known/openid-configuration'
-          iconUrl: 'http://authentik-server.authentik.svc.cluster.local/static/dist/assets/icons/icon.png'
+          autoDiscoverUrl: 'http://authentik.${DOMAIN}/application/o/gitea-app/.well-known/openid-configuration'
+          iconUrl: 'http://authentik.${DOMAIN}/static/dist/assets/icons/icon.png'
           # skipTlsVerify: # Idk if this works
           scopes: 'openid email profile'
           # required_claim_value: "" # Leave empty if no specific value is required
@@ -123,8 +123,8 @@ spec:
         gethomepage.dev/description: 'Git repository management'
         gethomepage.dev/group: 'Homelab Services'
         gethomepage.dev/icon: 'gitea.png'
-        gethomepage.dev/href: 'https://gitea.tail1345c.ts.net'
-        # gethomepage.dev/widget.url: 'https://gitea.tail1345c.ts.net'
+        gethomepage.dev/href: 'https://gitea.${DOMAIN}'
+        # gethomepage.dev/widget.url: 'https://gitea.${DOMAIN}'
         # gethomepage.dev/pod-selector: 'app.kubernetes.io/name=gitea'
       hosts:
         - host: gitea

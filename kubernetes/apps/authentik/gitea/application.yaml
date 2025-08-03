@@ -21,10 +21,10 @@ data:
           protocol: oauth2
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           redirect_uris:
-            - url: https://gitea.tail1345c.ts.net/user/oauth2/authentik/callback
+            - url: https://gitea.${DOMAIN}/user/oauth2/authentik/callback
               matching_mode: strict
-          meta_launch_url: https://gitea.tail1345c.ts.net
+          meta_launch_url: https://gitea.${DOMAIN}
           open_in_new_tab: true
-          launch_url: https://gitea.tail1345c.ts.net
-          meta_icon: https://gitea.tail1345c.ts.net/img/gitea.svg
+          launch_url: https://gitea.${DOMAIN}
+          meta_icon: https://gitea.${DOMAIN}/img/gitea.svg
           meta_description: Gitea Git Repository Management
