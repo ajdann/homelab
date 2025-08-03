@@ -26,7 +26,7 @@ spec:
           - containerPort: 53
             hostPort: 53
             protocol: TCP
-          - containerPort: 80
+          - containerPort: 3000
             hostPort: 3000
             protocol: TCP  # Web UI
         volumeMounts:
