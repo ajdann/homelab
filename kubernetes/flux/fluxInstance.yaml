@@ -1,3 +1,4 @@
+---
 apiVersion: fluxcd.controlplane.io/v1
 kind: FluxInstance
 metadata:
@@ -41,4 +42,4 @@ spec:
     interval: 1m0s
     url: 'https://github.com/ajdann/homelab.git'
     ref: 'refs/heads/main'
-    path: 'kubernetes/flux/kustomizations'
+    path: 'kubernetes/flux/'
