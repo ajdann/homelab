@@ -30,6 +30,6 @@
       changed_when: false
 
     - name: Apply FluxInstance manifest
-      ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/fluxInstance.yaml
+      ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/
       register: flux_instance_result
       changed_when: "'created' in flux_instance_result.stdout or 'configured' in flux_instance_result.stdout"
