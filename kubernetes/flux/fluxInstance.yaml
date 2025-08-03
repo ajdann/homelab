@@ -26,10 +26,6 @@ spec:
     networkPolicy: true
     domain: 'cluster.local'
   kustomize:
-    postBuild:
-      substituteFrom:
-        - kind: ConfigMap
-          name: flux-substitutions
     patches:
       - target:
           kind: Deployment
