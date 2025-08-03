@@ -54,23 +54,28 @@
           metadata:
             name: operator-oauth
             namespace: tailscale
+            labels:
+              app.kubernetes.io/managed-by: ansible
           type: Opaque
           stringData:
             client_id: "{{ env_vars.TAILSCALE_CLIENT_ID }}"
             client_secret: "{{ env_vars.TAILSCALE_CLIENT_SECRET }}"
         state: present
 
-    - name: Create Tailscale operator OAuth secret
+    - name: Create Tailscale Domain ConfigMap
       kubernetes.core.k8s:
-        apiVersion: v1
-        kind: ConfigMap
-        metadata:
-          name: flux-substitutions
-          namespace: flux-system
-        data:
-          DOMAIN: "{{ env_vars.TAILSCALE_DOMAIN }}"
         state: present
-
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: flux-substitutions
+            namespace: flux-system
+            labels:
+              app.kubernetes.io/managed-by: ansible
+          data:
+            DOMAIN: "{{ env_vars.TAILSCALE_DOMAIN }}"
+            
     - name: Display success message
       debug:
         msg: "Successfully set up Tailscale configuration in Kubernetes."
