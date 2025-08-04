@@ -42,8 +42,17 @@ make up
 ```bash
 make bootstrap
 ```
+#### 4. Access the Home Page
 
+Once the cluster is bootstrapped, open the following URL in your browser:
+http://homepage.YOUR_DOMAIN
+> Replace `YOUR_DOMAIN` with the actual domain you configured in your `.env` file.
 
+#### 5. (Optional) Get the kubeconfig
+Run the following command to extract kubeconfig at project root
+```bash
+make kubeconfig
+```
 ### Tailscale Setup
 
 The Tailscale operator requires OAuth credentials to function. These credentials need to be created manually as a Kubernetes secret. Follow these steps:
@@ -55,7 +64,7 @@ The Tailscale operator requires OAuth credentials to function. These credentials
 
 
 2. Set Up the Tailscale Tag
-- ⚠️ This is required for the Tailscale K8s Operator to function.
+- > ⚠️ This is required for the Tailscale K8s Operator to function.
   - Go to https://login.tailscale.com/admin/acls/file
   - Add the following to your ACL file:
   ```json
