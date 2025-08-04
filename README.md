@@ -66,8 +66,8 @@ The Tailscale operator requires OAuth credentials to function. These credentials
    - Save and apply the ACL changes.
 
 ## Storage
-TODO: Describe how storage is provisioned in the K3s cluster (e.g., local-path, NFS, or CSI driver setup).
+TODO
 ## Security
-TODO: Document secrets management, access control, firewall rules, and other security practices used.
+TODO
 ## High Availability
-TODO: Describe how to achieve high availability for control plane and workloads if applicable (e.g., multi-node setup, external DB, etc.).
+TODO
