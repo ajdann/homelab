@@ -1,3 +1,7 @@
+# 📖 Project Overview
+This project aims to build a secure and accessible Kubernetes-based homelab environment combined with Tailscale VPN for private, encrypted access over the internet.
+
+
 ## Demo Setup: Local K3s Cluster with Flux via Vagrant & Ansible
 
 This project sets up a local **Kubernetes (K3s)** cluster using **Vagrant**, **Ansible**, and a **Makefile**
