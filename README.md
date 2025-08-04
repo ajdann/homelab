@@ -1,13 +1,10 @@
-cat .\butane.yaml | docker run --rm -i quay.io/coreos/butane:latest > ignition.json  
-docker run --rm -v ${PWD}:/work -w /work quay.io/coreos/ignition-validate ignition.json
-
-# Demo Setup: Local K3s Cluster with Flux via Vagrant & Ansible
+## Demo Setup: Local K3s Cluster with Flux via Vagrant & Ansible
 
 This project sets up a local **Kubernetes (K3s)** cluster using **Vagrant**, **Ansible**, and a **Makefile**
 
 ---
 
-## ✅ Requirements
+### ✅ Requirements
 
 Make sure the following tools are installed on your host machine:
 
@@ -19,64 +16,54 @@ Make sure the following tools are installed on your host machine:
 
 ---
 
-## 🚀 Getting Started
 
-### 1. Set up Tailscale OAuth
+#### 1. Set up Tailscale OAuth
+[Go to Tailscale setup](#tailscale-setup)
 
-### 2. Start the VM
+#### 2. Set up env vars
+- Copy `.env.example` to `.env`:
+  ```bash
+  cp .env.example .env  
+  ```
+- Edit `.env` and fill in the required values:
+   - Tailscale Client ID
+   - Tailscale Client Secret
+   - Tailscale Domain
+
+#### 2. Start the VM
 ```bash
 make up
 ```
-### 3. Bootstrap the VM
+#### 3. Bootstrap the VM
 ```bash
 make bootstrap
 ```
 
 
-### Tailscale OAuth Secret
+### Tailscale Setup
 
 The Tailscale operator requires OAuth credentials to function. These credentials need to be created manually as a Kubernetes secret. Follow these steps:
 
 1. Create a Tailscale OAuth client:
    - Go to https://login.tailscale.com/admin/settings/oauth
    - Click "Create OAuth Client"
-   - Note down the Client ID and Client Secret
+   - Copy the Client ID and Client Secret
 
-2. Create the Tailscale namespace:
-   ```bash
-   kubectl create namespace tailscale
-   ```
 
-3. Create the Kubernetes secret:
-   ```bash 
-   kubectl create secret generic operator-oauth --namespace tailscale \
-     --from-literal=client_id=your-client-id \
-     --from-literal=client_secret=your-client-secret
-   ```
-
-4. Verify the secret was created:
-   ```bash
-   kubectl get secret tailscale-oauth -n tailscale
-   ```
-
-Note: This secret needs to be created before deploying the Tailscale operator. The operator will use these credentials to authenticate with Tailscale.
-
-### Tailscale Tag
-
-- Tailscale operator for Kubernetes integration
-- OAuth-based authentication
-- Automatic node management
-- **Important**: Requires `tag:k8s-operator` to be configured in Tailscale admin console
+2. Set Up the Tailscale Tag
+- ⚠️ This is required for the Tailscale K8s Operator to function.
   - Go to https://login.tailscale.com/admin/acls/file
-  - Add tag `k8s-operator`
+  - Add the following to your ACL file:
   ```json
 	"tagOwners": {
 		"tag:k8s-operator": ["autogroup:admin"],
 	},
    ```
+   - Save and apply the ACL changes.
 
 ## Storage
-
+TODO: Describe how storage is provisioned in the K3s cluster (e.g., local-path, NFS, or CSI driver setup).
 ## Security
-
+TODO: Document secrets management, access control, firewall rules, and other security practices used.
 ## High Availability
+TODO: Describe how to achieve high availability for control plane and workloads if applicable (e.g., multi-node setup, external DB, etc.).
