@@ -30,6 +30,16 @@
       changed_when: false
 
     - name: Apply FluxInstance manifest
-      ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/
+      ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/fluxInstance.yaml
       register: flux_instance_result
       changed_when: "'created' in flux_instance_result.stdout or 'configured' in flux_instance_result.stdout"
+
+    - name: Apply GitRepository manifest
+      ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/gitRepository.yaml
+      register: git_repository_result
+      changed_when: "'created' in git_repository_result.stdout or 'configured' in git_repository_result.stdout"
+
+    - name: Apply Flux Kustomization manifest
+      ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/kustomization.yaml
+      register: kustomization_result
+      changed_when: "'created' in kustomization_result.stdout or 'configured' in kustomization_result.stdout"
