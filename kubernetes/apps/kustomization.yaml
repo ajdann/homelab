@@ -6,4 +6,5 @@ resources:
 - gitea
 - authentik
 - nextcloud
+- adguard
 # - seafile

@@ -11,4 +11,3 @@ resources:
 - kyverno
 - policy-reporter
 - falco
-- adguard
