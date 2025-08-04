@@ -34,6 +34,14 @@
       register: flux_instance_result
       changed_when: "'created' in flux_instance_result.stdout or 'configured' in flux_instance_result.stdout"
 
+    - name: Wait until GitRepository CRD is available
+      shell: |
+        kubectl get crd gitrepositories.source.toolkit.fluxcd.io --no-headers
+      register: gitrepository_crd_check
+      retries: 30
+      delay: 5
+      until: gitrepository_crd_check.rc == 0
+
     - name: Apply GitRepository manifest
       ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/gitRepository.yaml
       register: git_repository_result
