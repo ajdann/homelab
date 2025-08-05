@@ -67,8 +67,16 @@ spec:
         - name: 'authentik'
           provider: 'openidConnect'
           existingSecret: gitea-authentik-secret
-          autoDiscoverUrl: 'http://authentik.${DOMAIN}/application/o/gitea-app/.well-known/openid-configuration'
-          iconUrl: 'http://authentik.${DOMAIN}/static/dist/assets/icons/icon.png'
+          # autoDiscoverUrl: 'http://authentik.${DOMAIN}/application/o/gitea-app/.well-known/openid-configuration'
+          # iconUrl: 'http://authentik.${DOMAIN}/static/dist/assets/icons/icon.png'
+          useCustomUrls: true
+          # These two are used by the browser — must be external
+          customAuthUrl: 'https://authentik.${DOMAIN}/application/o/authorize/'
+          customProfileUrl: 'http://authentik.${DOMAIN}/application/o/userinfo/'
+
+          # These two are used by Gitea internally — can be internal
+          customTokenUrl: 'http://authentik-server.authentik.svc.cluster.local/application/o/token/'
+          customEmailUrl: 'http://authentik-server.authentik.svc.cluster.local/application/o/userinfo/'
           # skipTlsVerify: # Idk if this works
           scopes: 'openid email profile'
           # required_claim_value: "" # Leave empty if no specific value is required
