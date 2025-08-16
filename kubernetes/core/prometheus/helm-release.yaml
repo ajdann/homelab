@@ -35,6 +35,7 @@ spec:
         scrapeInterval: 60s
         evaluationInterval: 60s
     alertmanager:
+      enabled: false
       alertmanagerSpec:
         resources:
           requests:
