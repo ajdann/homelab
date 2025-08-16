@@ -4,7 +4,7 @@ metadata:
   name: homelab-repo
   namespace: flux-system
 spec:
-  interval: 1m0s
+  interval: 10s
   url: https://github.com/ajdann/homelab.git
   ref:
     branch: main
