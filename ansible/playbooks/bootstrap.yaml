@@ -20,6 +20,7 @@
       pip:
         name:
           - kubernetes
+          - openshift
         executable: pip3
       become: true
 
