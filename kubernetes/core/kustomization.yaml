@@ -11,3 +11,4 @@ resources:
 - kyverno
 - policy-reporter
 - falco
+- prometheus
