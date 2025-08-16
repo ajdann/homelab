@@ -61,8 +61,11 @@ spec:
         - name: wazuh-indexer
           image: 'wazuh/wazuh-indexer:4.11.0'
           resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
             limits:
-              cpu: 500m
+              cpu: 400m
               memory: 1564Mi
           env:
             - name: OPENSEARCH_JAVA_OPTS
