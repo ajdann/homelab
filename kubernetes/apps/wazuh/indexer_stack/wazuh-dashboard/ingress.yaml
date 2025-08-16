@@ -24,7 +24,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: wazuh-dashboard
+                name: dashboard
                 port:
                   number: 443
   tls:
