@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: wazuh-dashboard
+  name: wazuh
   namespace: wazuh
   annotations:
     tailscale.com/tags: tag:k8s-operator
@@ -11,13 +11,13 @@ metadata:
     gethomepage.dev/description: 'Wazuh Dashboard for security monitoring'
     gethomepage.dev/group: 'Monitoring'
     gethomepage.dev/icon: 'policycontroller.png'
-    gethomepage.dev/href: 'https://wazuh-dashboard.${DOMAIN}'
+    gethomepage.dev/href: 'https://wazuh.${DOMAIN}'
     # gethomepage.dev/widget.type: 'wazuh'
-    # gethomepage.dev/widget.url: 'https://wazuh-dashboard.${DOMAIN}'
+    # gethomepage.dev/widget.url: 'https://wazuh.${DOMAIN}'
 spec:
   ingressClassName: tailscale
   rules:
-    - host: wazuh-dashboard
+    - host: wazuh
       http:
         paths:
           - path: /
