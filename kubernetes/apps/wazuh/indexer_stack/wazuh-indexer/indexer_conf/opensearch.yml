@@ -32,7 +32,6 @@
 
 # DEV SETUP
 
-# Cluster & Node
 cluster.name: homelab
 node.name: wazuh-indexer-0
 network.host: 0.0.0.0
@@ -41,15 +40,23 @@ cluster.initial_cluster_manager_nodes:
   - wazuh-indexer-0
 node.max_local_storage_nodes: 1
 
-# Paths
 path.data: /var/lib/wazuh-indexer
 path.logs: /var/log/wazuh-indexer
 
-# Security plugin (without SSL)
-plugins.security.ssl.http.enabled: false
-plugins.security.ssl.transport.enabled: false
+# SSL required by security plugin
+plugins.security.ssl.http.enabled: true
+plugins.security.ssl.transport.enabled: true
+plugins.security.ssl.transport.enforce_hostname_verification: false
+plugins.security.ssl.transport.resolve_hostname: false
 
-# Admin & Roles
+plugins.security.ssl.http.pemcert_filepath: /usr/share/wazuh-indexer/certs/node.pem
+plugins.security.ssl.http.pemkey_filepath: /usr/share/wazuh-indexer/certs/node-key.pem
+plugins.security.ssl.http.pemtrustedcas_filepath: /usr/share/wazuh-indexer/certs/root-ca.pem
+
+plugins.security.ssl.transport.pemcert_filepath: /usr/share/wazuh-indexer/certs/node.pem
+plugins.security.ssl.transport.pemkey_filepath: /usr/share/wazuh-indexer/certs/node-key.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: /usr/share/wazuh-indexer/certs/root-ca.pem
+
 plugins.security.authcz.admin_dn:
   - CN=admin,O=Company,L=California,C=US
 plugins.security.nodes_dn:
@@ -61,5 +68,4 @@ plugins.security.allow_default_init_securityindex: true
 plugins.security.check_snapshot_restore_write_privileges: true
 plugins.security.enable_snapshot_restore_privilege: true
 
-# Misc
 cluster.routing.allocation.disk.threshold_enabled: false
