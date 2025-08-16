@@ -58,3 +58,4 @@ resources:
 
   - indexer_stack/wazuh-dashboard/dashboard-svc.yaml
   - indexer_stack/wazuh-dashboard/dashboard-deploy.yaml
+  - indexer_stack/wazuh-dashboard/ingress.yaml

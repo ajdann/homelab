@@ -16,7 +16,7 @@ metadata:
     app: wazuh-dashboard
   annotations: {}
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: wazuh-dashboard
   ports:
