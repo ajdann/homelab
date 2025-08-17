@@ -1,49 +1,35 @@
 ---
-- name: Deploy Wazuh agent with host monitoring
+- name: Deploy and register Wazuh agent
   hosts: localhost
   become: true
   vars:
-    wazuh_manager_ip: "192.168.56.10"   # NodePort of Wazuh manager service
-    wazuh_manager_port: 31514           # NodePort mapped to 31514
-    wazuh_api_port: 32000               # NodePort mapped to 32000 for API
+    wazuh_manager_ip: "192.168.56.10"
+    wazuh_manager_port: 31514  # NodePort for agent-manager comms
+    wazuh_manager_auth_port: 31515  # Port for agent authentication
+    wazuh_api_port: 32000      # NodePort for Wazuh API
     wazuh_agent_name: "{{ inventory_hostname }}"
-    wazuh_api_secret_name: "wazuh-api-cred"
-    wazuh_api_secret_namespace: "wazuh"
+    wazuh_api_token: "{{ vault_wazuh_api_token }}"  # Use Ansible Vault for secrets
 
+  # Handlers (triggered by 'notify' in tasks)
+  handlers:
+    - name: Restart Wazuh agent
+      ansible.builtin.systemd:
+        name: wazuh-agent
+        state: restarted
+      listen: "restart_wazuh_agent"  # Allows multiple triggers
+
+    - name: Restart auditd
+      ansible.builtin.systemd:
+        name: auditd
+        state: restarted
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+      
   tasks:
-    - name: Ensure .kube directory exists
-      file:
-        path: "/home/{{ lookup('env','USER') }}/.kube"
-        state: directory
-        owner: "{{ lookup('env','USER') }}"
-        group: "{{ lookup('env','USER') }}"
-        mode: '0700'
-
-    - name: Copy kubeconfig for Ansible
-      copy:
-        src: /etc/rancher/k3s/k3s.yaml
-        dest: "/home/{{ lookup('env','USER') }}/.kube/config"
-        remote_src: true
-        owner: "{{ lookup('env','USER') }}"
-        group: "{{ lookup('env','USER') }}"
-        mode: '0600'
-
-    - name: Fetch Wazuh API secret from Kubernetes
-      kubernetes.core.k8s:
-        api_version: v1
-        kind: Secret
-        name: "{{ wazuh_api_secret_name }}"
-        namespace: "{{ wazuh_api_secret_namespace }}"
-        kubeconfig: "/home/{{ lookup('env','USER') }}/.kube/config"
-        state: present
-      register: wazuh_api_secret
-
-    - name: Decode Wazuh API username and password
-      set_fact:
-        wazuh_api_username: "{{ wazuh_api_secret.result.data.username | b64decode }}"
-        wazuh_api_password: "{{ wazuh_api_secret.result.data.password | b64decode }}"
-
-    - name: Add Wazuh repository GPG key
+    # --- Wazuh repo setup ---
+    - name: Add Wazuh GPG key
       ansible.builtin.apt_key:
         url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
         state: present
@@ -54,77 +40,166 @@
         state: present
         filename: wazuh
 
-    - name: Install Wazuh agent and dependencies
+    # --- Agent installation ---
+    - name: Install Wazuh agent
       ansible.builtin.apt:
-        name:
-          - wazuh-agent
-          - auditd
-          - lsb-release
+        name: wazuh-agent
         state: present
         update_cache: yes
 
+    # --- Configuration ---
     - name: Ensure ossec group exists
       ansible.builtin.group:
         name: ossec
         state: present
+        system: yes
 
+    - name: Ensure wazuh group exists
+      group:
+        name: wazuh
+        state: present
+        gid: 996  # Must match manager's group ID
+      when: "'wazuh' not in group_names"
+      
     - name: Ensure ossec user exists
       ansible.builtin.user:
         name: ossec
         group: ossec
         system: yes
         shell: /sbin/nologin
-        state: present
-        
-    - name: Configure Wazuh agent
-      template:
-        src: wazuh-agent.conf.j2
+        home: /var/ossec
+        create_home: yes
+      
+    - name: Deploy Wazuh agent config
+      ansible.builtin.template:
+        src: templates/wazuh-agent.conf.j2
         dest: /var/ossec/etc/ossec.conf
         owner: ossec
         group: ossec
-        mode: '0660'
-
-    - name: Ensure ossec.conf is owned by ossec
-      ansible.builtin.file:
-        path: /var/ossec/etc/ossec.conf
-        owner: ossec
-        group: ossec
         mode: '0640'
+      notify: "restart_wazuh_agent"  # Triggers handler
 
-    - name: Ensure Wazuh agent service is enabled and running
-      ansible.builtin.systemd:
+    - name: Set correct permissions
+      file:
+        path: /var/ossec/
+        owner: ossec
+        group: wazuh
+        mode: '0770'
+        recurse: yes
+
+    - name: Ensure .kube directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/.kube"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: '0700'
+        
+    - name: Ensure kubeconfig exists
+      ansible.builtin.stat:
+        path: /etc/rancher/k3s/k3s.yaml
+      register: k3s_config
+
+    - name: Copy kubeconfig for Ansible
+      ansible.builtin.copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "{{ ansible_user_dir }}/.kube/config"
+        remote_src: yes
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: '0600'
+      when: k3s_config.stat.exists
+
+    - name: Configure Wazuh agent registration
+      block:
+        - name: Fetch Wazuh authd secret from Kubernetes
+          kubernetes.core.k8s_info:
+            kind: Secret
+            name: wazuh-authd-pass
+            namespace: wazuh
+            # kubeconfig: "{{ ansible_user_dir }}/.kube/config"
+          register: wazuh_secret
+          no_log: true
+
+        # - name: Debug secret structure (optional)
+        #   ansible.builtin.debug:
+        #     var: wazuh_secret.resources[0].data
+        #   when: true  # Set to true for debugging, false in production
+
+        - name: Decode registration password
+          ansible.builtin.set_fact:
+            wazuh_registration_password: "{{ wazuh_secret.resources[0].data['authd.pass'] | b64decode }}"
+          no_log: true
+
+        - name: Register agent with manager
+          command: >
+            /var/ossec/bin/agent-auth -m {{ wazuh_manager_ip }}
+            -p {{ wazuh_manager_auth_port }}
+            -A "{{ wazuh_agent_name }}"
+            -P "{{ wazuh_registration_password }}"
+          register: auth_result
+          changed_when: "'Agent ID' in auth_result.stderr"
+          failed_when:
+            - auth_result.rc != 0
+            - "'Agent ID' not in auth_result.stderr"
+          # no_log: true
+
+      rescue:
+        - name: Log registration failure (without exposing password)
+          debug:
+            msg: "Agent registration failed. Check manager logs."
+          when: auth_result is failed
+
+    # --- Service management ---
+    - name: Ensure custom systemd service directory exists
+      file:
+        path: /etc/systemd/system
+        state: directory
+        mode: '0755'
+
+    - name: Deploy custom Wazuh agent systemd service
+      template:
+        src: templates/wazuh-agent.service.j2
+        dest: /etc/systemd/system/wazuh-agent.service
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - Reload systemd
+        - Restart Wazuh agent
+
+    - name: Ensure service is enabled and started
+      systemd:
         name: wazuh-agent
-        enabled: true
+        enabled: yes
         state: started
-        daemon_reload: true
+        daemon_reload: yes
 
-    - name: Ensure auditd service is enabled and running
-      ansible.builtin.systemd:
-        name: auditd
-        enabled: true
-        state: started
-
-    - name: Get Wazuh API token
+    # --- Agent registration (conditional) ---
+    - name: Check if agent already exists
       uri:
-        url: "https://{{ wazuh_manager_ip }}:{{ wazuh_api_port }}/security/user/authenticate"
-        method: POST
-        user: "{{ wazuh_api_username }}"
-        password: "{{ wazuh_api_password }}"
-        force_basic_auth: yes
-        return_content: yes
+        url: "https://{{ wazuh_manager_ip }}:{{ wazuh_api_port }}/agents?name={{ wazuh_agent_name }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ wazuh_api_token }}"
         validate_certs: no
-      register: wazuh_api_response
+      register: agent_check
+      ignore_errors: yes
+      when: wazuh_api_token is defined
 
-    - name: Register Wazuh agent via API
+    - name: Register new agent
       uri:
         url: "https://{{ wazuh_manager_ip }}:{{ wazuh_api_port }}/agents"
         method: POST
         headers:
-          Authorization: "Bearer {{ wazuh_api_response.json.data.token }}"
+          Authorization: "Bearer {{ wazuh_api_token }}"
         body_format: json
         body:
           name: "{{ wazuh_agent_name }}"
           ip: "{{ ansible_default_ipv4.address }}"
-        return_content: yes
         validate_certs: no
-      register: wazuh_agent_registration
+      register: agent_registration
+      when:
+        - wazuh_api_token is defined
+        - agent_check.json.data.total_affected_items == 0
+      no_log: true  # Hide sensitive output

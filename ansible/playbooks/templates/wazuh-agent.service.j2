@@ -1,0 +1,19 @@
+[Unit]
+Description=Wazuh Agent
+After=network.target
+StartLimitIntervalSec=60
+
+[Service]
+Type=forking
+User=ossec
+Group=wazuh
+ExecStart=/var/ossec/bin/wazuh-control start
+ExecStop=/var/ossec/bin/wazuh-control stop
+ExecReload=/var/ossec/bin/wazuh-control restart
+Restart=on-failure
+RestartSec=10s
+PermissionsStartOnly=true
+ExecStartPre=/bin/chown -R ossec:ossec /var/ossec/
+
+[Install]
+WantedBy=multi-user.target

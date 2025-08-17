@@ -15,7 +15,9 @@
         - net-tools
         - jq
         - glances
-
+        - gnupg
+        - lsb-release
+        
     - name: Install Python packages
       pip:
         name:
