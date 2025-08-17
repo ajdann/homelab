@@ -65,8 +65,8 @@ spec:
               cpu: 100m
               memory: 512Mi
             limits:
-              cpu: 400m
-              memory: 1564Mi
+              cpu: 500m
+              memory: 2048Mi
           env:
             - name: OPENSEARCH_JAVA_OPTS
               value: '-Xms1g -Xmx1g -Dlog4j2.formatMsgNoLookups=true'
