@@ -1,0 +1,74 @@
+---
+- name: Deploy Wazuh agent with host monitoring
+  hosts: localhost
+  become: true
+  vars:
+    wazuh_manager_ip: "192.168.56.10"   # NodePort or LoadBalancer IP
+    wazuh_manager_port: 55000           # Wazuh API port
+    wazuh_api_user: "admin"             # API user
+    wazuh_api_password: "StrongPassword" # API password
+    wazuh_agent_name: "{{ inventory_hostname }}"
+
+  tasks:
+    - name: Install Python requests module
+      ansible.builtin.pip:
+        name: requests
+        state: present
+
+    - name: Ensure ossec user and group exist
+      ansible.builtin.user:
+        name: ossec
+        group: ossec
+        state: present
+      ignore_errors: yes
+
+    - name: Install Wazuh agent and dependencies
+      ansible.builtin.apt:
+        name:
+          - wazuh-agent
+          - auditd
+        state: present
+        update_cache: yes
+
+    - name: Get agent registration key from Wazuh API
+      ansible.builtin.uri:
+        url: "https://{{ wazuh_manager_ip }}:{{ wazuh_manager_port }}/agents"
+        method: POST
+        user: "{{ wazuh_api_user }}"
+        password: "{{ wazuh_api_password }}"
+        force_basic_auth: yes
+        body_format: json
+        body:
+          name: "{{ wazuh_agent_name }}"
+          ip: "{{ ansible_default_ipv4.address }}"
+        validate_certs: false
+      register: wazuh_api_response
+
+    - name: Set agent key fact
+      ansible.builtin.set_fact:
+        wazuh_agent_key: "{{ wazuh_api_response.json.data.key }}"
+
+    - name: Configure Wazuh agent
+      template:
+        src: wazuh-agent.conf.j2
+        dest: /var/ossec/etc/ossec.conf
+        owner: ossec
+        group: ossec
+        mode: '0640'
+      vars:
+        agent_key: "{{ wazuh_agent_key }}"
+        manager_ip: "{{ wazuh_manager_ip }}"
+        agent_name: "{{ wazuh_agent_name }}"
+
+    - name: Ensure auditd service is enabled and running
+      ansible.builtin.systemd:
+        name: auditd
+        enabled: true
+        state: started
+
+    - name: Ensure Wazuh agent service is enabled and running
+      ansible.builtin.systemd:
+        name: wazuh-agent
+        enabled: true
+        state: started
+        daemon_reload: true

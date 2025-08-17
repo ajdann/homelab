@@ -1,0 +1,13 @@
+<ossec_config>
+  <client>
+    <server>
+      <address>{{ wazuh_manager_ip }}</address>
+      <port>{{ wazuh_manager_port }}</port>
+    </server>
+    <name>{{ wazuh_agent_name }}</name>
+  </client>
+
+  <logging>
+    <logall>yes</logall>
+  </logging>
+</ossec_config>
