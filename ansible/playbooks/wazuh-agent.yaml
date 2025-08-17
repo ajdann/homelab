@@ -4,8 +4,8 @@
   become: true
   vars:
     wazuh_manager_ip: "192.168.56.10"   # NodePort of Wazuh manager service
-    wazuh_manager_port: 1515           # NodePort mapped to 1515
-    wazuh_api_port: 32000               # NodePort mapped to 55000 for API
+    wazuh_manager_port: 31515           # NodePort mapped to 31515
+    wazuh_api_port: 32000               # NodePort mapped to 32000 for API
     wazuh_agent_name: "{{ inventory_hostname }}"
     wazuh_api_secret_name: "wazuh-api-cred"
     wazuh_api_secret_namespace: "wazuh"
