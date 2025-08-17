@@ -15,6 +15,7 @@ plugins.security.ssl.transport.pemcert_filepath: /usr/share/wazuh-indexer/certs/
 plugins.security.ssl.transport.pemkey_filepath: /usr/share/wazuh-indexer/certs/node-key.pem
 plugins.security.ssl.transport.pemtrustedcas_filepath: /usr/share/wazuh-indexer/certs/root-ca.pem
 plugins.security.ssl.http.enabled: true
+plugins.security.ssl.transport.enabled: true
 plugins.security.ssl.transport.enforce_hostname_verification: false
 plugins.security.ssl.transport.resolve_hostname: false
 plugins.security.authcz.admin_dn:
