@@ -9,20 +9,24 @@
     wazuh_agent_name: "{{ inventory_hostname }}"
     wazuh_api_secret_name: "wazuh-api-cred"
     wazuh_api_secret_namespace: "wazuh"
+
   tasks:
-    - name: Ensure ossec group exists
-      ansible.builtin.group:
-        name: ossec
-        state: present
+    - name: Ensure .kube directory exists
+      file:
+        path: "/home/{{ lookup('env','USER') }}/.kube"
+        state: directory
+        owner: "{{ lookup('env','USER') }}"
+        group: "{{ lookup('env','USER') }}"
+        mode: '0700'
 
-    - name: Ensure ossec user exists
-      ansible.builtin.user:
-        name: ossec
-        group: ossec
-        shell: /sbin/nologin
-        system: yes
-        state: present
-
+    - name: Copy kubeconfig for Ansible
+      copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "/home/{{ lookup('env','USER') }}/.kube/config"
+        remote_src: true
+        owner: "{{ lookup('env','USER') }}"
+        group: "{{ lookup('env','USER') }}"
+        mode: '0600'
 
     - name: Fetch Wazuh API secret from Kubernetes
       kubernetes.core.k8s:
@@ -30,13 +34,9 @@
         kind: Secret
         name: "{{ wazuh_api_secret_name }}"
         namespace: "{{ wazuh_api_secret_namespace }}"
-        kubeconfig: /etc/rancher/k3s/k3s.yaml
-        state: present   # just reads the object, doesn’t modify
+        kubeconfig: "/home/{{ lookup('env','USER') }}/.kube/config"
+        state: present
       register: wazuh_api_secret
-
-    # - name: Debug Wazuh API secret output
-    #   debug:
-    #     var: wazuh_api_secret
 
     - name: Decode Wazuh API username and password
       set_fact:
@@ -63,13 +63,19 @@
         state: present
         update_cache: yes
 
-    - name: Ensure ossec user and group exist
+    - name: Ensure ossec group exists
+      ansible.builtin.group:
+        name: ossec
+        state: present
+
+    - name: Ensure ossec user exists
       ansible.builtin.user:
         name: ossec
         group: ossec
+        system: yes
+        shell: /sbin/nologin
         state: present
-      ignore_errors: yes
-
+        
     - name: Configure Wazuh agent
       template:
         src: wazuh-agent.conf.j2
@@ -82,8 +88,8 @@
       ansible.builtin.file:
         path: /var/ossec/etc/ossec.conf
         owner: ossec
-        group: wazuh
-        mode: '0640'       
+        group: ossec
+        mode: '0640'
 
     - name: Ensure Wazuh agent service is enabled and running
       ansible.builtin.systemd:
