@@ -4,17 +4,25 @@
   become: true
   vars:
     wazuh_manager_ip: "192.168.56.10"   # NodePort of Wazuh manager service
-    wazuh_manager_port: 31514           # NodePort mapped to 1515
+    wazuh_manager_port: 1515           # NodePort mapped to 1515
     wazuh_api_port: 32000               # NodePort mapped to 55000 for API
     wazuh_agent_name: "{{ inventory_hostname }}"
     wazuh_api_secret_name: "wazuh-api-cred"
     wazuh_api_secret_namespace: "wazuh"
   tasks:
-
-    - name: Install Python requests module
-      ansible.builtin.pip:
-        name: requests
+    - name: Ensure ossec group exists
+      ansible.builtin.group:
+        name: ossec
         state: present
+
+    - name: Ensure ossec user exists
+      ansible.builtin.user:
+        name: ossec
+        group: ossec
+        shell: /sbin/nologin
+        system: yes
+        state: present
+
 
     - name: Fetch Wazuh API secret from Kubernetes
       kubernetes.core.k8s:
@@ -70,6 +78,13 @@
         group: ossec
         mode: '0660'
 
+    - name: Ensure ossec.conf is owned by ossec
+      ansible.builtin.file:
+        path: /var/ossec/etc/ossec.conf
+        owner: ossec
+        group: wazuh
+        mode: '0640'       
+
     - name: Ensure Wazuh agent service is enabled and running
       ansible.builtin.systemd:
         name: wazuh-agent
@@ -89,18 +104,17 @@
         method: POST
         user: "{{ wazuh_api_username }}"
         password: "{{ wazuh_api_password }}"
-        body_format: json
-        body: '{"username":"{{ wazuh_api_username }}","password":"{{ wazuh_api_password }}"}'
+        force_basic_auth: yes
         return_content: yes
         validate_certs: no
-      register: wazuh_api_token
+      register: wazuh_api_response
 
     - name: Register Wazuh agent via API
       uri:
         url: "https://{{ wazuh_manager_ip }}:{{ wazuh_api_port }}/agents"
         method: POST
         headers:
-          Authorization: "Bearer {{ (wazuh_api_token.json | from_json).data.token }}"
+          Authorization: "Bearer {{ wazuh_api_response.json.data.token }}"
         body_format: json
         body:
           name: "{{ wazuh_agent_name }}"

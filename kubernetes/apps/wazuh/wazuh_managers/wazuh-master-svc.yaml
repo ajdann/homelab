@@ -24,7 +24,7 @@ spec:
     - name: registration
       port: 1515
       targetPort: 1515
-      nodePort: 31515  # NodePort for host access
+      nodePort: 1515  # NodePort for host access
     - name: api
       port: 55000
       targetPort: 55000

@@ -21,6 +21,7 @@
         name:
           - kubernetes
           - openshift
+          - requests
         executable: pip3
       become: true
 
