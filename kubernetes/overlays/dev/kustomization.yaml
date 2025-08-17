@@ -14,96 +14,96 @@ patchesStrategicMerge:
   - ./secrets/patches/authentik-values-patch.yaml
 
 
-patches:
-- target:
-    kind: HelmRelease
-    name: gitea
-    namespace: gitea
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "12.0.0"
+# patches:
+# - target:
+#     kind: HelmRelease
+#     name: gitea
+#     namespace: gitea
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "12.0.0"
 
-- target:
-    kind: HelmRelease
-    name: kubernetes-dashboard
-    namespace: kubernetes-dashboard
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "6.0.8"
+# - target:
+#     kind: HelmRelease
+#     name: kubernetes-dashboard
+#     namespace: kubernetes-dashboard
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "6.0.8"
 
-- target:
-    kind: HelmRelease
-    name: falco
-    namespace: falco
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "2.0.0"
+# - target:
+#     kind: HelmRelease
+#     name: falco
+#     namespace: falco
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "2.0.0"
 
-- target:
-    kind: HelmRelease
-    name: keda
-    namespace: keda
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "2.14.0"
+# - target:
+#     kind: HelmRelease
+#     name: keda
+#     namespace: keda
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "2.14.0"
 
-- target:
-    kind: HelmRelease
-    name: keda-http-addon
-    namespace: keda
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "0.6.0"
+# - target:
+#     kind: HelmRelease
+#     name: keda-http-addon
+#     namespace: keda
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "0.6.0"
 
-- target:
-    kind: HelmRelease
-    name: kured
-    namespace: kured
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "5.7.0"
+# - target:
+#     kind: HelmRelease
+#     name: kured
+#     namespace: kured
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "5.7.0"
 
-- target:
-    kind: HelmRelease
-    name: kyverno
-    namespace: kyverno
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "3.1.0"
+# - target:
+#     kind: HelmRelease
+#     name: kyverno
+#     namespace: kyverno
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "3.1.0"
 
-- target:
-    kind: HelmRelease
-    name: netdata
-    namespace: netdata
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "3.7.139"
+# - target:
+#     kind: HelmRelease
+#     name: netdata
+#     namespace: netdata
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "3.7.139"
 
-- target:
-    kind: HelmRelease
-    name: policy-reporter
-    namespace: policy-reporter
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "2.0.0"
+# - target:
+#     kind: HelmRelease
+#     name: policy-reporter
+#     namespace: policy-reporter
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "2.0.0"
 
-- target:
-    kind: HelmRelease
-    name: reloader
-    namespace: reloader
-  patch: |-
-    - op: replace
-      path: /spec/chart/spec/version
-      value: "1.0.48"
+# - target:
+#     kind: HelmRelease
+#     name: reloader
+#     namespace: reloader
+#   patch: |-
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: "1.0.48"
 
 # - target:
 #     kind: HelmRelease
