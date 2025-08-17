@@ -1,9 +1,10 @@
 cluster.name: homelab
 node.name: homelab
 network.host: 0.0.0.0
-discovery.seed_hosts: wazuh-indexer-0.wazuh-indexer
-cluster.initial_cluster_manager_nodes:
-  - wazuh-indexer-0
+discovery.type: single-node
+# discovery.seed_hosts: wazuh-indexer-0.wazuh-indexer
+# cluster.initial_cluster_manager_nodes:
+#   - wazuh-indexer-0
 
 node.max_local_storage_nodes: "1"
 path.data: /var/lib/wazuh-indexer
