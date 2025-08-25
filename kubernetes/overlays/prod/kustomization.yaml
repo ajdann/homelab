@@ -10,6 +10,8 @@ images:
     newTag: v1.4.0
 
 patches:
+  - path: secrets.yaml
+
   - target:
       kind: HelmRelease
       name: gitea
@@ -108,5 +110,3 @@ patches:
       - op: replace
         path: /spec/chart/spec/version
         value: "1.84.2"
-
-  - path: secrets.yaml
