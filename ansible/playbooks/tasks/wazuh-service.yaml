@@ -1,0 +1,18 @@
+---
+- name: Deploy systemd service
+  template:
+    src: ../templates/wazuh-agent.service.j2
+    dest: /etc/systemd/system/wazuh-agent.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - restart_wazuh_agent
+
+- name: Ensure service is enabled
+  systemd:
+    name: wazuh-agent
+    enabled: yes
+    state: started
+    daemon_reload: yes

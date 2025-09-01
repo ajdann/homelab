@@ -5,15 +5,16 @@ StartLimitIntervalSec=60
 
 [Service]
 Type=forking
-User=ossec
+User=wazuh
 Group=wazuh
+AmbientCapabilities=CAP_SETUID CAP_SETGID
 ExecStart=/var/ossec/bin/wazuh-control start
 ExecStop=/var/ossec/bin/wazuh-control stop
 ExecReload=/var/ossec/bin/wazuh-control restart
 Restart=on-failure
 RestartSec=10s
 PermissionsStartOnly=true
-ExecStartPre=/bin/chown -R ossec:ossec /var/ossec/
+ExecStartPre=/bin/chown -R wazuh:wazuh /var/ossec/
 
 [Install]
 WantedBy=multi-user.target

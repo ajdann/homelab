@@ -1,0 +1,49 @@
+---
+- name: Stop Wazuh agent if running
+  systemd:
+    name: wazuh-agent
+    state: stopped
+  ignore_errors: true
+
+- name: Kill any remaining processes
+  shell: |
+    if pgrep -u wazuh >/dev/null; then
+      pkill -9 -u wazuh
+    fi
+  args:
+    executable: /bin/bash
+  register: kill_result
+  changed_when: kill_result.rc == 0
+  ignore_errors: true
+
+- name: Ensure wazuh group exists
+  group:
+    name: wazuh
+    state: present
+    gid: 996
+
+- name: Create/modify wazuh user
+  user:
+    name: wazuh
+    group: wazuh
+    system: yes
+    shell: /sbin/nologin
+    home: /var/ossec
+  notify: restart_wazuh_agent
+
+- name: Deploy Wazuh agent config
+  template:
+    src: ../templates/wazuh-agent.conf.j2
+    dest: /var/ossec/etc/ossec.conf
+    owner: wazuh
+    group: wazuh
+    mode: '0640'
+  notify: restart_wazuh_agent
+
+- name: Set correct permissions
+  file:
+    path: /var/ossec/
+    owner: wazuh
+    group: wazuh
+    mode: '0770'
+    recurse: yes

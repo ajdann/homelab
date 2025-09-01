@@ -8,8 +8,83 @@
     <config-profile>ubuntu,linux,debian</config-profile>
     <notify_time>10</notify_time>
     <time-reconnect>60</time-reconnect>
+    <enrollment>
+      <enabled>yes</enabled>
+      <port>{{ wazuh_manager_auth_port }}</port>
+      <agent_name>{{ wazuh_agent_name }}</agent_name>
+    </enrollment>
   </client>
-  <logging>
-    <log_level>debug</log_level>
-  </logging>
+
+  <!-- File Integrity Monitoring -->
+  <syscheck>
+    <disabled>no</disabled>
+    <frequency>43200</frequency>
+    <scan_on_start>yes</scan_on_start>
+    <directories check_all="yes">/etc,/usr/bin,/usr/sbin</directories>
+    <directories check_all="yes">/bin,/sbin,/boot</directories>
+    <ignore>/etc/mtab</ignore>
+    <ignore>/etc/hosts.deny</ignore>
+    <!-- Add any additional directories to monitor -->
+  </syscheck>
+
+  <!-- Log Collection -->
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/syslog</location>
+  </localfile>
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/auth.log</location>
+  </localfile>
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/secure</location>
+  </localfile>
+  <!-- Add application-specific logs if needed -->
+
+  <!-- Rootcheck Configuration -->
+  <rootcheck>
+    <disabled>no</disabled>
+    <check_files>yes</check_files>
+    <check_trojans>yes</check_trojans>
+    <check_dev>yes</check_dev>
+    <check_sys>yes</check_sys>
+    <check_pids>yes</check_pids>
+    <check_ports>yes</check_ports>
+    <check_if>yes</check_if>
+  </rootcheck>
+
+  <!-- Optional: Vulnerability Detection -->
+  <vulnerability-detector>
+    <enabled>yes</enabled>
+    <interval>5m</interval>
+    <ignore_time>6h</ignore_time>
+    <run_on_start>yes</run_on_start>
+  </vulnerability-detector>
+
+  <vulnerability-detection>
+   <enabled>yes</enabled>
+   <index-status>yes</index-status>
+   <feed-update-interval>60m</feed-update-interval>
+  </vulnerability-detection>
+
+<!-- System inventory -->
+<wodle name="syscollector">
+  <disabled>no</disabled>
+  <interval>1h</interval>
+  <scan_on_start>yes</scan_on_start>
+  <hardware>yes</hardware>
+  <os>yes</os>
+  <network>yes</network>
+  <packages>yes</packages>
+  <hotfixes>yes</hotfixes>
+  <ports all="no">yes</ports>
+  <processes>yes</processes>
+
+  <!-- Database synchronization settings -->
+  <synchronization>
+    <max_eps>10</max_eps>
+  </synchronization>
+</wodle>
+
 </ossec_config>

@@ -1,0 +1,78 @@
+---
+- name: Ensure kube directory structure
+  file:
+    path: "{{ ansible_user_dir }}/.kube"
+    state: directory
+    mode: '0700'
+
+- name: Locate k3s config
+  stat:
+    path: /etc/rancher/k3s/k3s.yaml
+  register: k3s_config
+  changed_when: false
+
+- name: Copy kubeconfig
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ ansible_user_dir }}/.kube/config"
+    remote_src: yes
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: '0600'
+  when: k3s_config.stat.exists
+
+- name: Verify Kubernetes access
+  command: kubectl cluster-info
+  register: kube_test
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+  changed_when: false
+  failed_when: kube_test.rc != 0
+  when: k3s_config.stat.exists
+
+- name: Fetch Wazuh authd password from Kubernetes
+  kubernetes.core.k8s_info:
+    kind: Secret
+    name: wazuh-authd-pass
+    namespace: wazuh
+  register: wazuh_secret
+  # no_log: true  # Prevents secret leakage in logs
+
+- name: Debug secret structure (optional)
+  ansible.builtin.debug:
+    var: wazuh_secret.resources[0].data
+  when: wazuh_debug | default(false)
+
+- name: Decode registration password
+  ansible.builtin.set_fact:
+    wazuh_registration_password: "{{ wazuh_secret.resources[0].data['authd.pass'] | b64decode }}"
+  no_log: true
+
+
+- name: Get system hostname
+  command: hostname -s
+  register: system_hostname
+  changed_when: false
+
+
+- name: Check if agent is already registered
+  stat:
+    path: /var/ossec/etc/client.keys
+  register: agent_keys
+
+- name: Register agent with manager
+  command: >
+    /var/ossec/bin/agent-auth -m {{ wazuh_manager_ip }}
+    -p {{ wazuh_manager_auth_port }}
+    -A "{{ system_hostname.stdout }}"
+    -P "{{ wazuh_registration_password }}"
+  register: auth_result
+  changed_when: >
+    "'Agent ID' in auth_result.stderr or
+     'Waiting for server reply' in auth_result.stderr"
+  failed_when: >
+    "auth_result.rc != 0 and
+     'Duplicate agent name' not in auth_result.stderr and
+     'already exists' not in auth_result.stderr"
+  when: not agent_keys.stat.exists
+  # no_log: true
