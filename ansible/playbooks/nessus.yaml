@@ -1,0 +1,132 @@
+---
+- name: Install and configure Nessus on the VM itself
+  hosts: localhost
+  become: yes
+  vars:
+    nessus_admin_user: admin
+    nessus_admin_password: "YourStrongPassword"
+    nessus_host: "127.0.0.1"
+    nessus_activation_code: "YOUR_NESSUS_ESSENTIALS_CODE"
+    scan_name: "Homelab Scan"
+    scan_targets: "192.168.222.0/24"
+
+  tasks:
+
+    ######################################################
+    # 1. Install Nessus packages
+    ######################################################
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install dependencies
+      apt:
+        name:
+          - wget
+          - gnupg2
+          - lsb-release
+        state: present
+
+    - name: Download Nessus package
+      get_url:
+        url: "https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.9.3-ubuntu1604_i386.deb"
+        dest: "/tmp/nessus.deb"
+
+    - name: Install Nessus
+      apt:
+        deb: "/tmp/nessus.deb"
+        state: present
+
+    - name: Enable and start Nessus service
+      systemd:
+        name: nessusd
+        enabled: yes
+        state: started
+
+    ######################################################
+    # 2. Wait for Nessus web interface
+    ######################################################
+    - name: Wait for Nessus to start
+      uri:
+        url: "https://{{ nessus_host }}:8834"
+        method: GET
+        validate_certs: no
+      register: nessus_status
+      until: nessus_status.status == 200
+      retries: 10
+      delay: 30
+
+    ######################################################
+    # 3. Create session (login)
+    ######################################################
+    - name: Login to Nessus
+      uri:
+        url: "https://{{ nessus_host }}:8834/session"
+        method: POST
+        body_format: json
+        body:
+          username: "{{ nessus_admin_user }}"
+          password: "{{ nessus_admin_password }}"
+        validate_certs: no
+      register: login_result
+
+    - name: Set Nessus token
+      set_fact:
+        nessus_token: "{{ login_result.json.token }}"
+
+    ######################################################
+    # 4. Activate Nessus Essentials
+    ######################################################
+    - name: Activate Nessus Essentials
+      uri:
+        url: "https://{{ nessus_host }}:8834/plugin/feed"
+        method: POST
+        headers:
+          X-Cookie: "token={{ nessus_token }}"
+        body_format: json
+        body:
+          accept_software_agreement: True
+          feed_type: "essentials"
+          activation_code: "{{ nessus_activation_code }}"
+        validate_certs: no
+      ignore_errors: yes
+
+    ######################################################
+    # 5. Create and launch network scan
+    ######################################################
+    - name: Get list of scan policies
+      uri:
+        url: "https://{{ nessus_host }}:8834/policies"
+        method: GET
+        headers:
+          X-Cookie: "token={{ nessus_token }}"
+        validate_certs: no
+      register: policies_result
+
+    - name: Find Basic Network Scan policy ID
+      set_fact:
+        basic_policy_id: "{{ policies_result.json.policies | selectattr('name','equalto','Basic Network Scan') | map(attribute='id') | list | first }}"
+
+    - name: Create a network scan
+      uri:
+        url: "https://{{ nessus_host }}:8834/scans"
+        method: POST
+        headers:
+          X-Cookie: "token={{ nessus_token }}"
+        body_format: json
+        body:
+          uuid: "adf0b3da-xxxx-xxxx-xxxx-xxxxxxxxxxxx"  # Replace with actual Basic Network Scan template UUID if needed
+          settings:
+            name: "{{ scan_name }}"
+            targets: "{{ scan_targets }}"
+            policy_id: "{{ basic_policy_id }}"
+        validate_certs: no
+      register: scan_creation
+
+    - name: Launch the scan
+      uri:
+        url: "https://{{ nessus_host }}:8834/scans/{{ scan_creation.json.scan.id }}/launch"
+        method: POST
+        headers:
+          X-Cookie: "token={{ nessus_token }}"
+        validate_certs: no
