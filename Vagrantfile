@@ -66,8 +66,11 @@ end
     pfsense.ssh.shell = 'sh'
     pfsense.ssh.insert_key = false
 
-    pfsense.vm.network "public_network", bridge: "en0: Wi-Fi (Wireless)", auto_config: false
-    pfsense.vm.network "private_network", ip: "192.168.222.1", auto_config: false
+    pfsense.vm.network "public_network" , auto_config: false
+    pfsense.vm.network "private_network",
+      ip: "192.168.222.1",
+      # auto_config: false,
+      virtualbox__intnet: "k3s-lan"
     pfsense.vm.network "forwarded_port", guest: 80, host: 8080
     pfsense.vm.network "forwarded_port", guest: 443, host: 8443
 
@@ -92,15 +95,17 @@ end
     nessus.vm.box = "ubuntu/jammy64"
     nessus.vm.hostname = "nessus"
     nessus.vm.synced_folder ".", "/vagrant", disabled: false
-    nessus.vm.network "forwarded_port", guest: 8834, host: 8834
+    nessus.vm.network "private_network",
+      ip: "192.168.222.20",
+      auto_config: false,
+      virtualbox__intnet: "k3s-lan"
+
 
     nessus.vm.provider "virtualbox" do |vb|
       vb.name   = "nessus"
       vb.cpus   = VM_RESOURCES["nessus"][:cpus]
       vb.memory = VM_RESOURCES["nessus"][:memory]
     end
-    # Apply netplan with correct static IP
-    # Disabled for now as it doesnt work..
     # configure_netplan(nessus, "192.168.222.20")
 
     nessus.vm.provision "shell", inline: <<-SHELL
@@ -120,7 +125,9 @@ end
   config.vm.define "k3s-master" do |master|
     master.vm.box = "ubuntu/jammy64"
     master.vm.hostname = "k3s-master"
-    master.vm.network "private_network", ip: "192.168.222.10"
+    master.vm.network "private_network",
+      ip: "192.168.222.10",
+      virtualbox__intnet: "k3s-lan"
 
     master.vm.provider "virtualbox" do |vb|
       vb.name   = "k3s-master"
@@ -128,7 +135,7 @@ end
       vb.memory = VM_RESOURCES["k3s-master"][:memory]
     end
 
-    configure_netplan(master, "192.168.222.10")
+    # configure_netplan(master, "192.168.222.10")
     master.vm.provision "shell", inline: <<-SHELL
       sudo apt update
       sudo apt install -y ansible
@@ -144,7 +151,9 @@ end
     config.vm.define "k3s-worker#{i}" do |worker|
       worker.vm.box = "ubuntu/jammy64"
       worker.vm.hostname = "k3s-worker#{i}"
-      worker.vm.network "private_network", ip: "192.168.222.1#{i}"
+      worker.vm.network "private_network",
+        ip: "192.168.222.1#{i}",
+        virtualbox__intnet: "k3s-lan"
 
       worker.vm.provider "virtualbox" do |vb|
         vb.name   = "k3s-worker#{i}"
@@ -152,7 +161,7 @@ end
         vb.memory = VM_RESOURCES["k3s-worker"][:memory]
       end
 
-      configure_netplan(worker, "192.168.222.1#{i}")
+      # configure_netplan(worker, "192.168.222.1#{i}")
       worker.vm.provision "shell", inline: <<-SHELL
         sudo apt update
         sudo apt install -y ansible

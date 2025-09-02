@@ -3,6 +3,7 @@ This project aims to build a secure and accessible Kubernetes-based homelab envi
 
 
 ## Architecture Overview
+```mermaid
 graph TB
     subgraph "Network Security Layer"
         PF[pfSense Firewall]
@@ -46,7 +47,7 @@ graph TB
     FL --> APP2
     KY --> APP1
     KY --> APP2
-
+```
 ## Demo Setup: Local K3s Cluster with Flux via Vagrant & Ansible
 
 This project sets up a local **Kubernetes (K3s)** cluster using **Vagrant**, **Ansible**, and a **Makefile**
@@ -128,134 +129,106 @@ Security Architecture
 The security stack follows defense-in-depth principles:
 
 1. **Network Security** - Perimeter protection and secure access
-2. **Infrastructure Security **- Kubernetes hardening and compliance
+2. **Infrastructure Security**- Kubernetes hardening and compliance
 3. **Runtime Security** - Real-time threat detection and response
 4. **Policy Enforcement** - Automated security policy management
 5. **Vulnerability Managemen**t - Regular security assessments
 
 ### Security Tools
 
-#### 🛡️ Network Security
-##### pfSense Firewallva
-Purpose: Network perimeter security and traffic filtering
-Features:
+#### Network Security
+##### pfSense Firewall
+**Purpose**: Network perimeter security and traffic filtering
 
-Stateful packet filtering
-VPN termination
-Intrusion detection/prevention (IDS/IPS)
-Traffic shaping and monitoring
-
-
-Integration: Acts as the primary gateway protecting the entire homelab infrastructure
-
-Tailscale VPN
-
-Purpose: Zero-trust network access and secure remote connectivity
-Features:
-
-WireGuard-based mesh VPN
-Identity-based access control
-End-to-end encryption
-Automatic key rotation
+**Features**:
+- Stateful packet filtering
+- VPN termination
+- Intrusion detection/prevention (IDS/IPS)
+- Traffic shaping and monitoring
 
 
-Integration: Provides secure access to Kubernetes services without exposing them to the internet
+**Integration**: Acts as the primary gateway protecting the entire homelab infrastructure
 
-🔍 Vulnerability Management
-Nessus Vulnerability Scanner
+#### Tailscale VPN
 
-Purpose: Comprehensive vulnerability assessment and compliance scanning
-Features:
+**Purpose**: Zero-trust network access and secure remote connectivity
 
-Network and host vulnerability scanning
-Configuration auditing
-Compliance reporting (PCI DSS, NIST, CIS)
-Risk prioritization
+**Features**:
+- WireGuard-based mesh VPN
+- Identity-based access control
+- End-to-end encryption
+- Automatic key rotation
 
+**Integration**: Provides secure access to Kubernetes services without exposing them to the internet
 
-Usage: Regular scans of the entire infrastructure to identify security weaknesses
+### Vulnerability Management
+#### Nessus Vulnerability Scanner
 
-📊 Security Information and Event Management (SIEM)
-Wazuh
+**Purpose**: Comprehensive vulnerability assessment and compliance scanning
 
-Purpose: Centralized security monitoring, log analysis, and threat detection
-Features:
-
-Log aggregation and analysis
-File integrity monitoring (FIM)
-Rootkit detection
-Security compliance monitoring
-Integration with threat intelligence feeds
+**Features**:
+- Network and host vulnerability scanning
+- Configuration auditing
+- Compliance reporting (PCI DSS, NIST, CIS)
+- Risk prioritization
 
 
-Deployment: Monitors both Kubernetes cluster activities and host-level events
+**Usage**: Regular scans of the entire infrastructure to identify security weaknesses
 
-🚨 Runtime Security
-Falco
+### Security Information and Event Management (SIEM)
+#### Wazuh
 
-Purpose: Runtime security monitoring for Kubernetes workloads
-Features:
+**Purpose**: Centralized security monitoring, log analysis, and threat detection
 
-Anomaly detection using syscall monitoring
-Kubernetes audit event analysis
-Real-time alerting for suspicious activities
-Custom rule engine for threat detection
+**Features**:
+- Log aggregation and analysis
+- File integrity monitoring (FIM)
+- Rootkit detection
+- Security compliance monitoring
+- Integration with threat intelligence feeds
 
+**Deployment**: Monitors both Kubernetes cluster activities and host-level events
 
-Integration: Sends alerts to Wazuh SIEM for centralized security event management
+### Runtime Security
+#### Falco
 
-📋 Policy Enforcement
-Kyverno
+**Purpose**: Runtime security monitoring for Kubernetes workloads
+**Features**:
+- Anomaly detection using syscall monitoring
+- Kubernetes audit event analysis
+- Real-time alerting for suspicious activities
+- Custom rule engine for threat detection
 
-Purpose: Kubernetes-native policy engine for security and governance
-Features:
+**Integration**: Sends alerts to Wazuh SIEM for centralized security event management
 
-Pod Security Standards enforcement
-Resource validation and mutation
-Image scanning integration
-Network policy automation
-Configuration drift prevention
+### Policy Enforcement
+#### Kyverno
 
-
-Policies Implemented:
-
-Require non-root containers
-Enforce resource limits
-Block privileged containers
-Validate image sources and signatures
-
-
-
-🔧 Compliance & Hardening
-Kube-bench (Planned Implementation)
-
-Purpose: CIS Kubernetes Benchmark compliance verification
-Features:
-
-Automated security configuration checks
-CIS benchmark compliance reporting
-Integration with CI/CD pipelines
-Remediation guidance
+**Purpose**: Kubernetes-native policy engine for security and governance
+**Features**:
+- Pod Security Standards enforcement
+- Resource validation and mutation
+- Image scanning integration
+- Network policy automation
+- Configuration drift prevention
 
 
-Future Integration: Will be implemented to ensure Kubernetes cluster adheres to security best practices
+**Policies Implemented**:
+- Require non-root containers
+- Enforce resource limits
+- Block privileged containers
 
-Security Monitoring Dashboard
-The security tools integrate to provide comprehensive visibility:
 
-Wazuh Dashboard: Central security operations center showing alerts, compliance status, and security metrics
-Falco Integration: Runtime security events forwarded to Wazuh for correlation
-Kyverno Reports: Policy violations and enforcement statistics
-Nessus Reports: Vulnerability assessment results and remediation tracking
+### Compliance & Hardening
+**Kube-bench** (Planned Implementation)
+**Purpose**: CIS Kubernetes Benchmark compliance verification
+**Features**:
+- Automated security configuration checks
+- CIS benchmark compliance reporting
+- Integration with CI/CD pipelines
+- Remediation guidance
 
-Security Best Practices Implemented
-
-Least Privilege Access: All services run with minimal required permissions
-Network Segmentation: Kubernetes network policies restrict inter-pod communication
-Image Security: Container images are scanned and must come from approved registries
-Secrets Management: Kubernetes secrets are encrypted at rest and in transit
-Audit Logging: Comprehensive logging of all cluster activities
-Regular Updates: Automated patching and vulnerability remediation processes
+**Future Integration**: Will be implemented to ensure Kubernetes cluster adheres to security best practices
 
 ## High Availability
 TODO
