@@ -7,8 +7,8 @@
     wazuh_manager_port: 31514  # Agent-manager communication port
     wazuh_manager_auth_port: 31515  # Custom enrollment port
     wazuh_api_port: 32000      # NodePort for Wazuh API
-    wazuh_agent_name: "{{ inventory_hostname }}"
-    wazuh_api_token: "{{ vault_wazuh_api_token }}"  # Use Ansible Vault for secrets
+    wazuh_agent_name: "k3s-master"
+    wazuh_api_token: "{{ vault_wazuh_api_token }}"
 
   # Handlers (triggered by 'notify' in tasks)
   handlers:

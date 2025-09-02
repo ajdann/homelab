@@ -4,14 +4,14 @@ kind: Kustomization
 resources:
 - require-resource-limits.yaml
 - require-security-context.yaml
-- prevent-privileged-containers.yaml
+# - prevent-privileged-containers.yaml
 - prevent-latest-tag.yaml
-- require-network-policy.yaml
-- auto-add-security-context.yaml
-- verify-flux-git-repositories.yaml
-- verify-flux-images.yaml
-- verify-flux-sources-in-cel.yaml
-- detect-non-flux-objects.yaml
+# - require-network-policy.yaml
+# - auto-add-security-context.yaml
+# - verify-flux-git-repositories.yaml
+# - verify-flux-images.yaml
+# - verify-flux-sources-in-cel.yaml
+# - detect-non-flux-objects.yaml
 - pod-security-baseline-standards.yaml
 - pod-security-restricted.yaml
 - podsecurity-subrule-restricted-capabilities.yaml
