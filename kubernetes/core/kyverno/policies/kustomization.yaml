@@ -5,7 +5,7 @@ resources:
 - require-resource-limits.yaml
 - require-security-context.yaml
 # - prevent-privileged-containers.yaml
-- prevent-latest-tag.yaml
+# - prevent-latest-tag.yaml
 # - require-network-policy.yaml
 # - auto-add-security-context.yaml
 # - verify-flux-git-repositories.yaml
@@ -14,5 +14,5 @@ resources:
 # - detect-non-flux-objects.yaml
 - pod-security-baseline-standards.yaml
 - pod-security-restricted.yaml
-- podsecurity-subrule-restricted-capabilities.yaml
-- podsecurity-subrule-restricted-seccomp.yaml
+# - podsecurity-subrule-restricted-capabilities.yaml
+# - podsecurity-subrule-restricted-seccomp.yaml
