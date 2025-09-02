@@ -113,7 +113,6 @@ end
       sudo apt install -y ansible python3-requests wget gnupg2 lsb-release
     SHELL
     
-    # Run the playbook
     nessus.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "/vagrant/ansible/playbooks/nessus.yaml"
     end
@@ -142,6 +141,15 @@ end
       ping -c 3 8.8.8.8
       ping -c 3 archive.ubuntu.com
     SHELL
+
+    master.vm.provision "ansible_local" do |ansible|
+      ansible.playbook = [
+        "/vagrant/ansible/playbooks/bootstrap.yaml",
+        "/vagrant/ansible/playbooks/k3s-single-node.yaml",
+        "/vagrant/ansible/playbooks/k8s-tailscale.yaml",
+        "/vagrant/ansible/playbooks/bootstrap-k8s.yaml",
+        "/vagrant/ansible/playbooks/wazuh-agent.yaml"
+      ]
   end
 
   ######################################################
