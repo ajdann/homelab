@@ -16,7 +16,11 @@ bootstrap:
 # 	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/generate-wazuh-certs.yaml"
 
 kubeconfig:
-	vagrant ssh -c "sudo cat /etc/rancher/k3s/k3s.yaml | sed 's/127.0.0.1/192.168.56.10/' > /vagrant/kubeconfig"
+	vagrant ssh k3s-master -c "sudo cat /etc/rancher/k3s/k3s.yaml > /vagrant/kubeconfig"
+# 	vagrant ssh k3s-master -c "sudo cat /etc/rancher/k3s/k3s.yaml | sed 's/127.0.0.1/192.168.222.10/' > /vagrant/kubeconfig"
 
 destroy:
 	vagrant destroy -f
+
+reload:
+	vagrant reload --provision

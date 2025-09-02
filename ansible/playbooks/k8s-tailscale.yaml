@@ -1,6 +1,6 @@
 ---
 - name: Create Tailscale Kubernetes secret from .env file
-  hosts: localhost
+  hosts: all
   gather_facts: false
   vars:
     env_file_path: "/vagrant/.env"

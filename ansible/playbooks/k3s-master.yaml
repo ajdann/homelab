@@ -1,0 +1,5 @@
+- import_playbook: bootstrap.yaml
+- import_playbook: k3s-single-node.yaml
+- import_playbook: k8s-tailscale.yaml
+- import_playbook: bootstrap-k8s.yaml
+- import_playbook: wazuh-agent.yaml

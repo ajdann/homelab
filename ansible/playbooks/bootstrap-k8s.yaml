@@ -1,6 +1,6 @@
 ---
 - name: Install Helm, Flux Operator via Helm, and Apply FluxInstance
-  hosts: localhost
+  hosts: all
   connection: local
   gather_facts: false
 

@@ -3,8 +3,8 @@
 # ------------------------------------------------------
 VM_RESOURCES = {
   "pfsense"     => { cpus: 1, memory: 1024 },
-  "nessus"      => { cpus: 2, memory: 2048 },
-  "k3s-master"  => { cpus: 2, memory: 2048 },
+  "nessus"      => { cpus: 1, memory: 1024 },
+  "k3s-master"  => { cpus: 3, memory: 5120 },
   "k3s-worker"  => { cpus: 1, memory: 1024 },  # applies to all workers
 }
 
@@ -124,6 +124,8 @@ end
   config.vm.define "k3s-master" do |master|
     master.vm.box = "ubuntu/jammy64"
     master.vm.hostname = "k3s-master"
+
+    master.vm.network "forwarded_port", guest: 6443, host: 6443
     master.vm.network "private_network",
       ip: "192.168.222.10",
       virtualbox__intnet: "k3s-lan"
@@ -137,19 +139,18 @@ end
     # configure_netplan(master, "192.168.222.10")
     master.vm.provision "shell", inline: <<-SHELL
       sudo apt update
+      sudo apt install software-properties-common -y 
+      sudo add-apt-repository --yes --update ppa:ansible/ansible
       sudo apt install -y ansible
-      ping -c 3 8.8.8.8
-      ping -c 3 archive.ubuntu.com
+      sudo ansible-galaxy collection install kubernetes.core --force
+      ansible-galaxy collection install kubernetes.core --force
     SHELL
 
     master.vm.provision "ansible_local" do |ansible|
-      ansible.playbook = [
-        "/vagrant/ansible/playbooks/bootstrap.yaml",
-        "/vagrant/ansible/playbooks/k3s-single-node.yaml",
-        "/vagrant/ansible/playbooks/k8s-tailscale.yaml",
-        "/vagrant/ansible/playbooks/bootstrap-k8s.yaml",
-        "/vagrant/ansible/playbooks/wazuh-agent.yaml"
-      ]
+      ansible.playbook = "/vagrant/ansible/playbooks/k3s-master.yaml"
+      ansible.inventory_path = "/vagrant/ansible/inventory/hosts.yaml"
+      ansible.limit = "localhost"
+
   end
 
   ######################################################
@@ -176,4 +177,5 @@ end
       SHELL
     end
   end
+end
 end

@@ -17,6 +17,8 @@
         - glances
         - gnupg
         - lsb-release
+        - btop
+        - htop
         
     - name: Install Python packages
       pip:
@@ -61,9 +63,8 @@
       register: flux_install
       changed_when: "'flux version' in flux_install.stdout"
 
-    - name: Install kubernetes.core collection on control node
-      ansible.builtin.command:
-        cmd: ansible-galaxy collection install kubernetes.core --force
-      delegate_to: localhost
-      run_once: true
-      become: false
+    # - name: Ensure kubernetes.core collection is installed
+    #   ansible.builtin.ansible_galaxy:
+    #     command: collection
+    #     name: kubernetes.core
+    #     state: present

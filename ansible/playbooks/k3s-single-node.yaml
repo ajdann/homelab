@@ -1,9 +1,9 @@
 ---
 - name: Set up single-node K3s cluster
-  hosts: localhost
+  hosts: all
   become: true
   vars:
-    k3s_tls_san: '192.168.56.10'
+    k3s_tls_san: '192.168.222.10'
   tasks:
     - name: Download K3s install script
       get_url:
