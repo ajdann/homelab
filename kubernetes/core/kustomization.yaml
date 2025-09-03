@@ -10,5 +10,5 @@ resources:
 # - keda
 - kyverno
 - policy-reporter
-# - falco
+- falco
 # - prometheus
