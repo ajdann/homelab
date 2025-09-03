@@ -4,7 +4,7 @@
 VM_RESOURCES = {
   "pfsense"     => { cpus: 1, memory: 1024 },
   "nessus"      => { cpus: 1, memory: 1024 },
-  "k3s-master"  => { cpus: 4, memory: 7168 },
+  "k3s-master"  => { cpus: 4, memory: 9216 },
   "k3s-worker"  => { cpus: 1, memory: 1024 },  # applies to all workers
 }
 
@@ -124,6 +124,8 @@ end
   config.vm.define "k3s-master" do |master|
     master.vm.box = "ubuntu/jammy64"
     master.vm.hostname = "k3s-master"
+    master.disksize.size = "60GB"
+
 
     master.vm.network "forwarded_port", guest: 6443, host: 6443
     master.vm.network "private_network",
