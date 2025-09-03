@@ -4,7 +4,7 @@
 VM_RESOURCES = {
   "pfsense"     => { cpus: 1, memory: 1024 },
   "nessus"      => { cpus: 1, memory: 1024 },
-  "k3s-master"  => { cpus: 4, memory: 6144 },
+  "k3s-master"  => { cpus: 4, memory: 7168 },
   "k3s-worker"  => { cpus: 1, memory: 1024 },  # applies to all workers
 }
 
