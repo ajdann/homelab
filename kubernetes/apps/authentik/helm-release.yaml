@@ -29,7 +29,7 @@ spec:
       secret_key: 'PleaseGenerateASecureKey'
       postgresql:
         user: authentik
-        password: 'ThisIsNotASecurePassword'
+        password: 'LKz0EYm4ivI'
       error_reporting:
         enabled: true
     server:
