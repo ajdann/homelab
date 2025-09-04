@@ -56,7 +56,7 @@ spec:
     postgresql:
       auth:
         username: authentik
-        password: 'ThisIsNotASecurePassword' 
+        password: 'LKz0EYm4ivI' 
       enabled: true
     redis:
       enabled: true
