@@ -15,6 +15,13 @@ spec:
         name: authentik
         namespace: authentik
   values:
+    authentik:
+      secret_key: 'PleaseGenerateASecureKey'
+      postgresql:
+        password: 'ThisIsNotASecurePassword'
+    postgresql:
+      auth:
+        password: 'ThisIsNotASecurePassword' 
     blueprints:
       configMaps:
       - gitea-app
