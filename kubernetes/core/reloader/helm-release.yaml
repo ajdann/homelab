@@ -5,6 +5,10 @@ metadata:
   name: reloader
   namespace: reloader
 spec:
+  install:
+    disableWait: true
+  upgrade:
+    disableWait: true
   interval: 5m
   chart:
     spec:
