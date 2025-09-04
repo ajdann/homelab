@@ -6,6 +6,10 @@ metadata:
   namespace: gitea
 spec:
   interval: 5m
+  install:
+    disableWait: true
+  upgrade:
+    disableWait: true
   chart:
     spec:
       chart: gitea
