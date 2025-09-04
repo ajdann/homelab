@@ -6,6 +6,10 @@ metadata:
   namespace: nextcloud
 spec:
   interval: 5m
+  install:
+    disableWait: true
+  upgrade:
+    disableWait: true
   chart:
     spec:
       chart: nextcloud
