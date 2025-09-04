@@ -28,6 +28,7 @@ spec:
     authentik:
       secret_key: 'PleaseGenerateASecureKey'
       postgresql:
+        user: authentik
         password: 'ThisIsNotASecurePassword'
       error_reporting:
         enabled: true
@@ -54,6 +55,7 @@ spec:
         - authentik
     postgresql:
       auth:
+        username: authentik
         password: 'ThisIsNotASecurePassword' 
       enabled: true
     redis:

@@ -10,8 +10,8 @@ resources:
 # - name: ghcr.io/gethomepage/homepage
 #   newTag: v1.4.0
 
-# patchesStrategicMerge:
-#   - ./secrets/patches/authentik-values-patch.yaml
+patchesStrategicMerge:
+  - ./secrets/patches/authentik-values-patch.yaml
 
 
 # patches:
