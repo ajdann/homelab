@@ -38,16 +38,17 @@
   register: wazuh_secret
   # no_log: true  # Prevents secret leakage in logs
 
-- name: Debug secret structure (optional)
-  ansible.builtin.debug:
-    var: wazuh_secret.resources[0].data
-  when: wazuh_debug | default(false)
+
+  # when: wazuh_debug | default(false)
 
 - name: Decode registration password
   ansible.builtin.set_fact:
     wazuh_registration_password: "{{ wazuh_secret.resources[0].data['authd.pass'] | b64decode }}"
   # no_log: true
 
+- name: Show decoded password (for debugging)
+  ansible.builtin.debug:
+    var: wazuh_registration_password
 
 - name: Get system hostname
   command: hostname -s
@@ -59,6 +60,10 @@
   stat:
     path: /var/ossec/etc/client.keys
   register: agent_keys
+
+- name: Debug agent keys presence
+  ansible.builtin.debug:
+    var: agent_keys
 
 - name: Register agent with manager
   command: >
@@ -74,5 +79,5 @@
     "auth_result.rc != 0 and
      'Duplicate agent name' not in auth_result.stderr and
      'already exists' not in auth_result.stderr"
-  when: not agent_keys.stat.exists
+  # when: not agent_keys.stat.exists
   # no_log: true

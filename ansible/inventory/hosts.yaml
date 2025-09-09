@@ -2,3 +2,8 @@ all:
   hosts:
     localhost:
       ansible_connection: local
+
+    proxmox:
+      ansible_host: 192.168.1.157   # Proxmox node IP
+      ansible_user: root
+      ansible_connection: local

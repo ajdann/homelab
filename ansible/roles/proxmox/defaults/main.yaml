@@ -1,0 +1,7 @@
+---
+vm_defaults:
+  cores: 2
+  memory: 4096
+  disk: 32
+  ostemplate: local:vztmpl/debian-12-standard_12.2-1_amd64.tar.zst
+  net_bridge: vmbr1

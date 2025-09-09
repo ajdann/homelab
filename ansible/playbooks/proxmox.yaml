@@ -1,0 +1,8 @@
+---
+- name: Deploy Homelab VMs on Proxmox
+  hosts: proxmox
+  gather_facts: no
+  roles:
+    - role: proxmox
+  vars_files:
+    - ../group_vars/proxmox.yaml

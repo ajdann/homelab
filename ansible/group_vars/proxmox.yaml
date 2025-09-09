@@ -1,0 +1,15 @@
+---
+# Proxmox API connection
+proxmox_api_host: 192.168.1.157
+proxmox_api_user: root@pam
+proxmox_api_password: 12345678
+proxmox_node: pve
+
+# Default VM credentials
+vm_user: admin
+vm_password: SuperSecret123
+vm_ssh_pub_key: /home/ajdin/.ssh/id_rsa.pub
+
+# Network configuration
+homelab_network_cidr: 10.0.0.0/24
+homelab_gateway: 10.0.0.1

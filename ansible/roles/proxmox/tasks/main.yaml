@@ -1,0 +1,41 @@
+---
+- name: Create k3s master node
+  community.general.proxmox:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    vmid: "{{ k3s_nodes.master.vmid }}"
+    name: "{{ k3s_nodes.master.name }}"
+    node: "{{ proxmox_node }}"
+    cores: "{{ k3s_nodes.master.cores | default(vm_defaults.cores) }}"
+    memory: "{{ k3s_nodes.master.memory | default(vm_defaults.memory) }}"
+    disk: "local-lvm:{{ k3s_nodes.master.disk | default(vm_defaults.disk) }}"
+    ostemplate: "{{ k3s_template }}"
+    net0: "virtio,bridge={{ vm_defaults.net_bridge }}"
+    ide2: "local:cloudinit"
+    ciuser: "{{ vm_user }}"
+    cipassword: "{{ vm_password }}"
+    sshkeys: "{{ lookup('file', k3s_ssh_pub_key) }}"
+    ipconfig0: "ip={{ k3s_nodes.master.ip }}/24,gw={{ homelab_gateway }}"
+    state: present
+
+- name: Create k3s worker nodes
+  community.general.proxmox:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    vmid: "{{ item.vmid }}"
+    name: "{{ item.name }}"
+    node: "{{ proxmox_node }}"
+    cores: "{{ item.cores | default(vm_defaults.cores) }}"
+    memory: "{{ item.memory | default(vm_defaults.memory) }}"
+    disk: "local-lvm:{{ item.disk | default(vm_defaults.disk) }}"
+    ostemplate: "{{ k3s_template }}"
+    net0: "virtio,bridge={{ vm_defaults.net_bridge }}"
+    ide2: "local:cloudinit"
+    ciuser: "{{ vm_user }}"
+    cipassword: "{{ vm_password }}"
+    sshkeys: "{{ lookup('file', k3s_ssh_pub_key) }}"
+    ipconfig0: "ip={{ item.ip }}/24,gw={{ homelab_gateway }}"
+    state: present
+  loop: "{{ k3s_nodes.workers }}"
