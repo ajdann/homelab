@@ -6,4 +6,11 @@ all:
     proxmox:
       ansible_host: 192.168.1.157   # Proxmox node IP
       ansible_user: root
-      ansible_connection: local
+      ansible_connection: ssh
+      ansible_password: 12345678
+
+
+    debian12-cloudinit:
+      ansible_host: 192.168.1.200
+      ansible_user: ansible
+      ansible_password: securepassword

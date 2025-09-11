@@ -1,41 +1,69 @@
----
-- name: Create k3s master node
-  community.general.proxmox:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    vmid: "{{ k3s_nodes.master.vmid }}"
-    name: "{{ k3s_nodes.master.name }}"
-    node: "{{ proxmox_node }}"
-    cores: "{{ k3s_nodes.master.cores | default(vm_defaults.cores) }}"
-    memory: "{{ k3s_nodes.master.memory | default(vm_defaults.memory) }}"
-    disk: "local-lvm:{{ k3s_nodes.master.disk | default(vm_defaults.disk) }}"
-    ostemplate: "{{ k3s_template }}"
-    net0: "virtio,bridge={{ vm_defaults.net_bridge }}"
-    ide2: "local:cloudinit"
-    ciuser: "{{ vm_user }}"
-    cipassword: "{{ vm_password }}"
-    sshkeys: "{{ lookup('file', k3s_ssh_pub_key) }}"
-    ipconfig0: "ip={{ k3s_nodes.master.ip }}/24,gw={{ homelab_gateway }}"
-    state: present
+- name: Include Cloud-Init tasks
+  include_tasks: cloud-init.yaml
 
-- name: Create k3s worker nodes
-  community.general.proxmox:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    vmid: "{{ item.vmid }}"
-    name: "{{ item.name }}"
-    node: "{{ proxmox_node }}"
-    cores: "{{ item.cores | default(vm_defaults.cores) }}"
-    memory: "{{ item.memory | default(vm_defaults.memory) }}"
-    disk: "local-lvm:{{ item.disk | default(vm_defaults.disk) }}"
-    ostemplate: "{{ k3s_template }}"
-    net0: "virtio,bridge={{ vm_defaults.net_bridge }}"
-    ide2: "local:cloudinit"
-    ciuser: "{{ vm_user }}"
-    cipassword: "{{ vm_password }}"
-    sshkeys: "{{ lookup('file', k3s_ssh_pub_key) }}"
-    ipconfig0: "ip={{ item.ip }}/24,gw={{ homelab_gateway }}"
-    state: present
-  loop: "{{ k3s_nodes.workers }}"
+
+# - name: Include upload-cloud-init tasks
+#   include_tasks: upload-cloud-init.yaml
+
+# ---
+# - name: Check if k3s master VM already exists
+#   community.general.proxmox_kvm:
+#     api_user: "{{ proxmox_api_user }}"
+#     api_password: "{{ proxmox_api_password }}"
+#     api_host: "{{ proxmox_api_host }}"
+#     node: "{{ proxmox_node }}"
+#     vmid: "{{ k3s_nodes.master.vmid }}"
+#     state: current
+#   register: vm_exists
+#   ignore_errors: true
+
+# - name: Create k3s master VM from Cloud-Init template
+#   community.general.proxmox_kvm:
+#     api_user: "{{ proxmox_api_user }}"
+#     api_password: "{{ proxmox_api_password }}"
+#     api_host: "{{ proxmox_api_host }}"
+#     node: "{{ proxmox_node }}"
+#     clone: "debian-12-cloudinit"
+#     storage: local-lvm
+#     format: qcow2
+#     cores: "{{ k3s_nodes.master.cores | default(vm_defaults.cores) }}"
+#     memory: "{{ k3s_nodes.master.memory | default(vm_defaults.memory) }}"
+#     onboot: true
+#     timeout: 600
+#     newid: "{{ k3s_nodes.master.vmid }}"
+#     name: "{{ k3s_nodes.master.name }}"
+#     ciuser: "{{ vm_user }}"
+#     cipassword: "{{ vm_password }}"
+#     sshkeys: "{{ lookup('file', k3s_ssh_pub_key) }}"
+#     ipconfig:
+#       - ip: "{{ k3s_nodes.master.ip }}/24"
+#         gw: "{{ homelab_gateway }}"
+#     nameserver: "{{ homelab_gateway }}"
+#     searchdomain: "homelab.local"
+#     update: true
+#     state: present
+#   when: vm_exists.failed
+
+# - name: Start k3s master VM
+#   community.general.proxmox_kvm:
+#     api_user: "{{ proxmox_api_user }}"
+#     api_password: "{{ proxmox_api_password }}"
+#     api_host: "{{ proxmox_api_host }}"
+#     node: "{{ proxmox_node }}"
+#     vmid: "{{ k3s_nodes.master.vmid }}"
+#     state: started
+
+# - name: Wait for VM SSH to become available
+#   wait_for:
+#     host: "{{ k3s_nodes.master.ip }}"
+#     port: 22
+#     delay: 10
+#     timeout: 600
+#     state: started
+
+# - name: Test SSH connectivity
+#   ansible.builtin.ping:
+#   delegate_to: "{{ k3s_nodes.master.ip }}"
+#   vars:
+#     ansible_user: "{{ vm_user }}"
+#     ansible_ssh_private_key_file: "{{ k3s_ssh_private_key | default('~/.ssh/id_rsa') }}"

@@ -1,0 +1,44 @@
+---
+- name: Ensure qcow directory exists
+  ansible.builtin.file:
+    path: /var/lib/vz/template/qcow
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download Debian 12 cloud image
+  ansible.builtin.get_url:
+    url: "{{ cloud_image_url }}"
+    dest: "{{ cloud_image_path }}"
+    mode: '0644'
+    force: no
+
+- name: Create Debian 12 VM shell
+  ansible.builtin.command: >
+    qm create {{ vmid }} --name {{ vm_name }}
+    --memory 2048 --cores 2
+    --net0 virtio,bridge={{ net_bridge }}
+    --serial0 socket --vga serial0
+    --scsihw virtio-scsi-pci
+  args:
+    creates: "/etc/pve/qemu-server/{{ vmid }}.conf"
+
+- name: Import Debian 12 disk into Proxmox storage
+  ansible.builtin.command: >
+    qm importdisk {{ vmid }} {{ cloud_image_path }} {{ disk_storage }}
+  args:
+    creates: "/var/lib/vz/images/{{ vmid }}"
+
+- name: Attach imported disk and cloud-init drive
+  ansible.builtin.shell: |
+    qm set {{ vmid }} --scsi0 {{ disk_storage }}:vm-{{ vmid }}-disk-0
+    qm set {{ vmid }} --ide2 {{ disk_storage }}:cloudinit
+    qm set {{ vmid }} --boot c --bootdisk scsi0
+    qm set {{ vmid }} --ciuser {{ cloud_user }} --sshkey "{{ ssh_pub_key }}"
+    qm set {{ vmid }} --ipconfig0 ip=dhcp
+  args:
+    creates: "/etc/pve/qemu-server/{{ vmid }}.conf"
+
+- name: Convert VM to template
+  ansible.builtin.command: qm template {{ vmid }}

@@ -1,0 +1,24 @@
+  #cloud-config
+
+users:
+  - name: admin
+    gecos: "K3s User"
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: false
+    passwd: "$6$RyyUNUO5cuzi9l1P$6wwwniPPDIQu4gkiqm.Rw/wZm6T4Yc4Vyyzj1HucarHfMoit8K06/iYeHJyIfpccR.rgiEk2/vXA3VZ9ZE7dK."
+    shell: /bin/bash
+
+ssh_pwauth: true
+disable_root: true
+
+packages:
+  - qemu-guest-agent
+  - sudo
+
+runcmd:
+  - systemctl enable --now qemu-guest-agent
+  - echo "export LANG=C.UTF-8" >> /etc/profile
+
+timezone: "UTC"
+
+final_message: "Cloud-init setup complete for k3suser."

@@ -1,8 +1,8 @@
----
-- name: Deploy Homelab VMs on Proxmox
+- name: Create Debian 12 Cloud-Init Template on Proxmox
   hosts: proxmox
+  connection: local
   gather_facts: no
   roles:
-    - role: proxmox
+    - role: ../roles/proxmox
   vars_files:
     - ../group_vars/proxmox.yaml
