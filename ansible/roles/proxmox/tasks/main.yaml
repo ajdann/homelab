@@ -12,10 +12,6 @@
   register: ssh_pub_key_content
   delegate_to: localhost
 
-- name: Unlock the VM just in case
-  ansible.builtin.command: "qm unlock {{ vmid }}"
-  delegate_to: localhost
-  ignore_errors: true
 
 - name: Destroy old template to ensure a clean slate
   community.general.proxmox_kvm:

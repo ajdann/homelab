@@ -8,3 +8,5 @@ age.key
 .vagrant
 *.log
 kubeconfig
+secrets/
+terraform/secrets.auto.tfvars

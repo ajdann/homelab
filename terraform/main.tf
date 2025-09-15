@@ -7,20 +7,32 @@ terraform {
   }
 }
 
-provider "proxmox" {}
-
-# Define variables for VM properties
-variable "proxmox_node" {
-  description = "The Proxmox node to deploy to"
-  default     = "pve"
+provider "proxmox" {
+  pm_api_url      = "https://192.168.1.157:8006/api2/json"
+  pm_user         = "root@pam"
+  pm_password     = var.proxmox_api_password
+  pm_tls_insecure = "true"
 }
 
-variable "template_name" {
-  description = "The name of the template to clone from"
-  default     = "debian12-cloudinit"
+
+
+data "template_file" "cloud_init_user_data" {
+  template = file("${path.module}/cloud-init.yml")
+
+  vars = {
+    user           = var.cloud_init_user
+    password       = var.cloud_init_password
+    ssh_public_key = var.cloud_init_ssh_public_key
+  }
 }
 
-# Resource to create the k3s-master VM
+resource "proxmox_cloud_init_disk" "cloud_init" {
+  name         = "k3s-master-cloud-init.iso"
+  pve_node     = var.proxmox_node
+  storage      = "local"
+  user_data    = data.template_file.cloud_init_user_data.rendered
+}
+
 resource "proxmox_vm_qemu" "k3s_master" {
   # VM General settings
   name        = "k3s-master"
@@ -36,12 +48,26 @@ resource "proxmox_vm_qemu" "k3s_master" {
   agent  = 1 # Enable QEMU Guest Agent
   memory = 4096
   scsihw = "virtio-scsi-pci"
-  boot   = "scsi0" # CRITICAL: Boot from the correct disk
+  boot   = "order=scsi0"
+
   cpu {
-    cores  = 2
+    cores   = 2
     sockets = 1
-    type   = "host"
+    type    = "host"
   }
+
+  disks {
+    scsi {
+      scsi0 {
+        disk {
+          size    = var.vm_disk_size
+          storage = "local-lvm"
+        }
+      }
+    }
+  }
+
+  ide2 = "${proxmox_cloud_init_disk.cloud_init.storage}:cloudinit"
 
   # Network settings
   network {
@@ -49,13 +75,4 @@ resource "proxmox_vm_qemu" "k3s_master" {
     model  = "virtio"
     bridge = "vmbr0"
   }
-
-  # Cloud-Init settings
-  ipconfig0   = "ip=10.0.0.10/24,gw=10.0.0.1"
-  ciuser      = "admin"
-  cipassword  = "SuperSecret123"
-  # sshkeys     = <<-EOT
-  #   # Paste your public SSH key here
-  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA... user@domain
-  # EOT
 }
