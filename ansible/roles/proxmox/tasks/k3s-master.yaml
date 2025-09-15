@@ -1,0 +1,41 @@
+
+# - name: Create k3s master VM from Cloud-Init template
+#   community.general.proxmox_kvm:
+#     api_user: "{{ proxmox_api_user }}"
+#     api_password: "{{ proxmox_api_password }}"
+#     api_host: "{{ proxmox_api_host }}"
+#     node: "{{ proxmox_node }}"
+#     clone: "{{ vm_name }}"
+#     newid: "{{ k3s_nodes.master.vmid }}"
+#     name: "{{ k3s_nodes.master.name }}"
+#     full: true
+#     cores: "{{ k3s_nodes.master.cores | default(vm_defaults.cores) }}"
+#     memory: "{{ k3s_nodes.master.memory | default(vm_defaults.memory) }}"
+#     ciuser: "{{ vm_user }}"
+#     cipassword: "{{ vm_password }}"
+#     sshkeys: "{{ ssh_pub_key }}"
+#     ipconfig: "ip={{ k3s_nodes.master.ip }}/24,gw={{ homelab_gateway }}"
+#     nameservers: "{{ nameserver }}"
+#     searchdomains: "{{ searchdomain }}"
+#     boot: order=scsi0
+#     onboot: true
+#     state: present
+#   delegate_to: localhost
+
+# - name: Start k3s master VM
+#   community.general.proxmox_kvm:
+#     api_user: "{{ proxmox_api_user }}"
+#     api_password: "{{ proxmox_api_password }}"
+#     api_host: "{{ proxmox_api_host }}"
+#     vmid: "{{ k3s_nodes.master.vmid }}"
+#     state: started
+#   delegate_to: localhost
+
+# - name: Wait for VM SSH to become available
+#   wait_for:
+#     host: "{{ k3s_nodes.master.ip }}"
+#     port: 22
+#     delay: 20
+#     timeout: 600
+#     state: started
+#   delegate_to: localhost

@@ -33,7 +33,7 @@
 
 - name: Deploy Wazuh agent config
   template:
-    src: ../templates/wazuh-agent.conf.j2
+    src: wazuh-agent.conf.j2
     dest: /var/ossec/etc/ossec.conf
     owner: wazuh
     group: wazuh

@@ -1,69 +1,75 @@
-- name: Include Cloud-Init tasks
-  include_tasks: cloud-init.yaml
+---
+# This task runs on the Ansible controller (your local machine)
+- name: Install proxmoxer library locally
+  ansible.builtin.pip:
+    name: proxmoxer
+    state: present
+  delegate_to: localhost
 
+- name: Destroy k3s-master VM to ensure a clean slate
+  community.general.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ k3s_nodes.master.vmid }}"
+    state: absent
+  delegate_to: localhost
+  ignore_errors: true
 
-# - name: Include upload-cloud-init tasks
-#   include_tasks: upload-cloud-init.yaml
+- name: Destroy old template to ensure a clean slate
+  community.general.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ vmid }}"
+    state: absent
+  delegate_to: localhost
+  ignore_errors: true
 
-# ---
-# - name: Check if k3s master VM already exists
-#   community.general.proxmox_kvm:
-#     api_user: "{{ proxmox_api_user }}"
-#     api_password: "{{ proxmox_api_password }}"
-#     api_host: "{{ proxmox_api_host }}"
-#     node: "{{ proxmox_node }}"
-#     vmid: "{{ k3s_nodes.master.vmid }}"
-#     state: current
-#   register: vm_exists
-#   ignore_errors: true
+# The following tasks run ON THE PROXMOX SERVER itself
+# They use shell commands that only exist on the server
+- name: Ensure qcow directory exists
+  ansible.builtin.file:
+    path: /var/lib/vz/template/qcow
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
-# - name: Create k3s master VM from Cloud-Init template
-#   community.general.proxmox_kvm:
-#     api_user: "{{ proxmox_api_user }}"
-#     api_password: "{{ proxmox_api_password }}"
-#     api_host: "{{ proxmox_api_host }}"
-#     node: "{{ proxmox_node }}"
-#     clone: "debian-12-cloudinit"
-#     storage: local-lvm
-#     format: qcow2
-#     cores: "{{ k3s_nodes.master.cores | default(vm_defaults.cores) }}"
-#     memory: "{{ k3s_nodes.master.memory | default(vm_defaults.memory) }}"
-#     onboot: true
-#     timeout: 600
-#     newid: "{{ k3s_nodes.master.vmid }}"
-#     name: "{{ k3s_nodes.master.name }}"
-#     ciuser: "{{ vm_user }}"
-#     cipassword: "{{ vm_password }}"
-#     sshkeys: "{{ lookup('file', k3s_ssh_pub_key) }}"
-#     ipconfig:
-#       - ip: "{{ k3s_nodes.master.ip }}/24"
-#         gw: "{{ homelab_gateway }}"
-#     nameserver: "{{ homelab_gateway }}"
-#     searchdomain: "homelab.local"
-#     update: true
-#     state: present
-#   when: vm_exists.failed
+- name: Download Debian 12 cloud image
+  ansible.builtin.get_url:
+    url: "{{ cloud_image_url }}"
+    dest: "{{ cloud_image_path }}"
+    mode: '0644'
+  register: download_status
+  until: download_status is succeeded
+  retries: 5
+  delay: 10
 
-# - name: Start k3s master VM
-#   community.general.proxmox_kvm:
-#     api_user: "{{ proxmox_api_user }}"
-#     api_password: "{{ proxmox_api_password }}"
-#     api_host: "{{ proxmox_api_host }}"
-#     node: "{{ proxmox_node }}"
-#     vmid: "{{ k3s_nodes.master.vmid }}"
-#     state: started
+- name: Create Debian 12 VM shell for template
+  ansible.builtin.command: >
+    qm create {{ vmid }} --name {{ vm_name }}
+    --memory 2048 --cores 2
+    --net0 virtio,bridge={{ net_bridge }}
+    --serial0 socket --vga serial0
+    --scsihw virtio-scsi-pci
+  args:
+    creates: "/etc/pve/qemu-server/{{ vmid }}.conf"
 
-# - name: Wait for VM SSH to become available
-#   wait_for:
-#     host: "{{ k3s_nodes.master.ip }}"
-#     port: 22
-#     delay: 10
-#     timeout: 600
-#     state: started
+- name: Import Debian 12 disk to template VM
+  ansible.builtin.command: >
+    qm importdisk {{ vmid }} {{ cloud_image_path }} {{ disk_storage }}
 
-# - name: Test SSH connectivity
-#   ansible.builtin.ping:
-#   delegate_to: "{{ k3s_nodes.master.ip }}"
-#   vars:
-#     ansible_user: "{{ vm_user }}"
-#     ansible_ssh_private_key_file: "{{ k3s_ssh_private_key | default('~/.ssh/id_rsa') }}"
+- name: Configure template VM settings
+  ansible.builtin.shell: |
+    qm set {{ vmid }} --scsi0 {{ disk_storage }}:vm-{{ vmid }}-disk-0
+    qm set {{ vmid }} --ide2 {{ disk_storage }}:cloudinit
+    qm set {{ vmid }} --boot c --bootdisk scsi0
+    qm set {{ vmid }} --ciuser {{ cloud_user }}
+    qm set {{ vmid }} --sshkeys "{{ vm_ssh_pub_key }}"
+    qm set {{ vmid }} --ipconfig0 ip=dhcp
+
+- name: Convert VM to template
+  ansible.builtin.command: qm template {{ vmid }}

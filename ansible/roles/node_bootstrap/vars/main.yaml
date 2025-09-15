@@ -1,0 +1,2 @@
+---
+kubectl_version: "{{ lookup('url', 'https://dl.k8s.io/release/stable.txt') }}"

@@ -7,59 +7,55 @@ terraform {
   }
 }
 
-provider "proxmox" {
-  pm_api_url      = "https://192.168.1.157:8006/api2/json"
-  pm_user         = "root@pam"
-  pm_password     = "12345678"
-  pm_tls_insecure = true
+provider "proxmox" {}
+
+# Define variables for VM properties
+variable "proxmox_node" {
+  description = "The Proxmox node to deploy to"
+  default     = "pve"
 }
 
-resource "proxmox_vm_qemu" "k3s_master" {
-  name        = "k3s-master"
-  target_node = "pve"
-  vmid        = 101
-  clone       = "debian12-cloudinit"   # 👈 clone 
-   your template
-  full_clone  = true                   # 👈 makes VM independent from template
-  memory      = 2048
-  onboot      = true
-  scsihw      = "virtio-scsi-pci"
-  boot        = "cdn"
+variable "template_name" {
+  description = "The name of the template to clone from"
+  default     = "debian12-cloudinit"
+}
 
+# Resource to create the k3s-master VM
+resource "proxmox_vm_qemu" "k3s_master" {
+  # VM General settings
+  name        = "k3s-master"
+  target_node = var.proxmox_node
+  vmid        = 100
+  onboot      = true
+
+  # Cloning settings
+  clone       = var.template_name
+  full_clone  = true
+
+  # System settings
+  agent  = 1 # Enable QEMU Guest Agent
+  memory = 4096
+  scsihw = "virtio-scsi-pci"
+  boot   = "scsi0" # CRITICAL: Boot from the correct disk
   cpu {
-    cores = 2
-    type  = "host"
+    cores  = 2
+    sockets = 1
+    type   = "host"
   }
 
-  # Network configuration
+  # Network settings
   network {
-    id     = 0  # Required argument, must be unique integer :cite[7]
+    id     = 0
     model  = "virtio"
     bridge = "vmbr0"
   }
 
-  # Disk configuration
-  disk {
-    slot     = "scsi0" 
-    type     = "disk"
-    storage  = "local-lvm"
-    size     = "32G"
-    discard  = false
-  }
-
-  serial {
-    id   = 0
-    type = "socket"
-  }
-
-  cicustom = "user=local:snippets/bootstrap.yaml"
-  # # Cloud-init config
-  # ciuser      = "k3suser"
-  # cipassword  = "securepassword"
-  # # ipconfig0   = "ip=192.168.1.50/24,gw=192.168.1.1"
-  # nameserver  = "1.1.1.1"
-  # searchdomain = "homelab.local"
-
-  # It's recommended to enable the QEMU agent for better management
-  agent = 1
+  # Cloud-Init settings
+  ipconfig0   = "ip=10.0.0.10/24,gw=10.0.0.1"
+  ciuser      = "admin"
+  cipassword  = "SuperSecret123"
+  # sshkeys     = <<-EOT
+  #   # Paste your public SSH key here
+  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA... user@domain
+  # EOT
 }

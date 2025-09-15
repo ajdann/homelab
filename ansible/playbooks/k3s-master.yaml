@@ -1,5 +1,16 @@
-- import_playbook: bootstrap.yaml
-- import_playbook: k3s-single-node.yaml
-- import_playbook: k8s-tailscale.yaml
-- import_playbook: bootstrap-k8s.yaml
-- import_playbook: wazuh-agent.yaml
+---
+- name: Build the complete k3s master node
+  hosts: all
+  become: true
+  roles:
+    - role: node_bootstrap
+    - role: k3s_server
+    - role: tailscale_config
+      # This role runs locally, so we need to delegate it.
+      delegate_to: localhost
+      run_once: true
+    - role: flux_bootstrap
+      # This role runs locally, so we need to delegate it.
+      delegate_to: localhost
+      run_once: true
+    - role: wazuh_agent

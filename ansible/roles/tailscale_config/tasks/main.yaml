@@ -1,0 +1,83 @@
+---
+- name: Check if .env file exists
+  stat:
+    path: "{{ env_file_path }}"
+  register: env_file_stat
+
+- name: Fail if .env file doesn't exist
+  fail:
+    msg: ".env file not found at {{ env_file_path }}"
+  when: not env_file_stat.stat.exists
+
+- name: Read .env file
+  slurp:
+    src: "{{ env_file_path }}"
+  register: env_file_content
+
+- name: Parse environment variables
+  set_fact:
+    env_vars: "{{ env_vars | default({}) | combine({item.split('=')[0].strip(): item.split('=')[1:]|join('=')|trim}) }}"
+  loop: "{{ (env_file_content.content | b64decode).split('\n') }}"
+  when: 
+    - item.strip() != ''
+    - "=' in item"
+    - not item.strip().startswith('#')
+
+- name: Check for required Tailscale variables
+  fail:
+    msg: "Missing {{ item }} in .env file"
+  when: item not in env_vars
+  loop:
+    - TAILSCALE_CLIENT_ID
+    - TAILSCALE_CLIENT_SECRET
+    - TAILSCALE_DOMAIN
+
+- name: Create tailscale namespace
+  kubernetes.core.k8s:
+    name: tailscale
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Create Tailscale operator OAuth secret
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: operator-oauth
+        namespace: tailscale
+        labels:
+          app.kubernetes.io/managed-by: ansible
+      type: Opaque
+      stringData:
+        client_id: "{{ env_vars.TAILSCALE_CLIENT_ID }}"
+        client_secret: "{{ env_vars.TAILSCALE_CLIENT_SECRET }}"
+    state: present
+
+
+- name: Create flux-system namespace
+  kubernetes.core.k8s:
+    name: flux-system
+    api_version: v1
+    kind: Namespace
+    state: present
+
+
+- name: Create Tailscale Domain ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: flux-substitutions
+        namespace: flux-system
+        labels:
+          app.kubernetes.io/managed-by: ansible
+      data:
+        DOMAIN: "{{ env_vars.TAILSCALE_DOMAIN }}"
+        
+- name: Display success message
+  debug:
+    msg: "Successfully set up Tailscale configuration in Kubernetes."

@@ -1,0 +1,93 @@
+---
+- name: Ensure certs directory exists
+  file:
+    path: "{{ certs_dir }}/indexer_cluster"
+    state: directory
+    mode: '0700'
+
+# Root CA
+- name: Generate root CA certificate
+  command: >
+    openssl req -x509 -batch -nodes -days 3650
+    -newkey rsa:2048
+    -keyout {{ certs_dir }}/indexer_cluster/root-ca-key.pem
+    -out {{ certs_dir }}/indexer_cluster/root-ca.pem
+  args:
+    creates: "{{ certs_dir }}/indexer_cluster/root-ca.pem"
+
+# Component certs (node, dashboard, admin, filebeat)
+- name: Generate component certs
+  command: >
+    openssl req -x509 -batch -nodes -days 365
+    -newkey rsa:2048
+    -keyout {{ certs_dir }}/indexer_cluster/{{ item }}-key.pem
+    -out {{ certs_dir }}/indexer_cluster/{{ item }}.pem
+  args:
+    creates: "{{ certs_dir }}/indexer_cluster/{{ item }}.pem"
+  loop:
+    - node
+    - dashboard
+    - admin
+    - filebeat
+
+# Dashboard HTTP cert (from your bash script)
+- name: Ensure dashboard_http directory exists
+  file:
+    path: "{{ certs_dir }}/dashboard_http"
+    state: directory
+    mode: '0700'
+
+- name: Generate dashboard HTTP cert
+  command: >
+    openssl req -x509 -batch -nodes -days 365
+    -newkey rsa:2048
+    -keyout {{ certs_dir }}/dashboard_http/key.pem
+    -out {{ certs_dir }}/dashboard_http/cert.pem
+  args:
+    creates: "{{ certs_dir }}/dashboard_http/cert.pem"
+
+- name: Create wazuh namespace
+  kubernetes.core.k8s:
+    name: wazuh
+    api_version: v1
+    kind: Namespace
+    state: present
+
+
+# Create indexer-certs secret
+- name: Create Kubernetes secret for indexer-certs
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: indexer-certs
+        namespace: wazuh
+      type: Opaque
+      data:
+        root-ca.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/root-ca.pem') | b64encode }}"
+        node.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/node.pem') | b64encode }}"
+        node-key.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/node-key.pem') | b64encode }}"
+        dashboard.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/dashboard.pem') | b64encode }}"
+        dashboard-key.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/dashboard-key.pem') | b64encode }}"
+        admin.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/admin.pem') | b64encode }}"
+        admin-key.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/admin-key.pem') | b64encode }}"
+        filebeat.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/filebeat.pem') | b64encode }}"
+        filebeat-key.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/filebeat-key.pem') | b64encode }}"
+
+# Create dashboard-certs secret (root-ca + dashboard_http certs)
+- name: Create Kubernetes secret for dashboard-certs
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: dashboard-certs
+        namespace: wazuh
+      type: Opaque
+      data:
+        cert.pem: "{{ lookup('file', certs_dir + '/dashboard_http/cert.pem') | b64encode }}"
+        key.pem: "{{ lookup('file', certs_dir + '/dashboard_http/key.pem') | b64encode }}"
+        root-ca.pem: "{{ lookup('file', certs_dir + '/indexer_cluster/root-ca.pem') | b64encode }}"

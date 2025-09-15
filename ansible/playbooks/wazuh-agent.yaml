@@ -9,50 +9,5 @@
     wazuh_api_port: 32000      # NodePort for Wazuh API
     wazuh_agent_name: "k3s-master"
     wazuh_api_token: "{{ vault_wazuh_api_token }}"
-
-  # Handlers (triggered by 'notify' in tasks)
-  handlers:
-    - import_tasks: ./handlers/wazuh-restart.yaml
-      
-  tasks:
-    # --- Wazuh repo setup ---
-    - import_tasks: ./tasks/wazuh-install.yaml
-
-
-    # --- Configuration ---
-    - import_tasks: ./tasks/wazuh-configure.yaml
-
-    # --- Registration ---
-    - import_tasks: ./tasks/wazuh-registration.yaml
-
-    # --- Service management ---
-    - import_tasks: ./tasks/wazuh-service.yaml
-
-    # --- Agent registration (conditional) ---
-    # - name: Check if agent already exists
-    #   uri:
-    #     url: "https://{{ wazuh_manager_ip }}:{{ wazuh_api_port }}/agents?name={{ wazuh_agent_name }}"
-    #     method: GET
-    #     headers:
-    #       Authorization: "Bearer {{ wazuh_api_token }}"
-    #     validate_certs: no
-    #   register: agent_check
-    #   ignore_errors: yes
-    #   when: wazuh_api_token is defined
-
-    # - name: Register new agent
-    #   uri:
-    #     url: "https://{{ wazuh_manager_ip }}:{{ wazuh_api_port }}/agents"
-    #     method: POST
-    #     headers:
-    #       Authorization: "Bearer {{ wazuh_api_token }}"
-    #     body_format: json
-    #     body:
-    #       name: "{{ wazuh_agent_name }}"
-    #       ip: "{{ ansible_default_ipv4.address }}"
-    #     validate_certs: no
-    #   register: agent_registration
-    #   when:
-    #     - wazuh_api_token is defined
-    #     - agent_check.json.data.total_affected_items == 0
-    #   no_log: true  # Hide sensitive output
+  roles:
+    - wazuh-agent
