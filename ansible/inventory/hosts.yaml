@@ -8,6 +8,7 @@ all:
       ansible_user: root
       ansible_connection: ssh
       ansible_password: 12345678
+      ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
 
 
     debian12-cloudinit:

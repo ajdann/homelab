@@ -6,14 +6,14 @@
     state: present
   delegate_to: localhost
 
-- name: Destroy k3s-master VM to ensure a clean slate
-  community.general.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    node: "{{ proxmox_node }}"
-    vmid: "{{ k3s_nodes.master.vmid }}"
-    state: absent
+- name: Read SSH public key
+  ansible.builtin.slurp:
+    src: "{{ vm_ssh_pub_key }}"
+  register: ssh_pub_key_content
+  delegate_to: localhost
+
+- name: Unlock the VM just in case
+  ansible.builtin.command: "qm unlock {{ vmid }}"
   delegate_to: localhost
   ignore_errors: true
 
@@ -48,28 +48,31 @@
   retries: 5
   delay: 10
 
-- name: Create Debian 12 VM shell for template
-  ansible.builtin.command: >
-    qm create {{ vmid }} --name {{ vm_name }}
-    --memory 2048 --cores 2
-    --net0 virtio,bridge={{ net_bridge }}
-    --serial0 socket --vga serial0
-    --scsihw virtio-scsi-pci
-  args:
-    creates: "/etc/pve/qemu-server/{{ vmid }}.conf"
-
-- name: Import Debian 12 disk to template VM
-  ansible.builtin.command: >
-    qm importdisk {{ vmid }} {{ cloud_image_path }} {{ disk_storage }}
-
-- name: Configure template VM settings
-  ansible.builtin.shell: |
-    qm set {{ vmid }} --scsi0 {{ disk_storage }}:vm-{{ vmid }}-disk-0
-    qm set {{ vmid }} --ide2 {{ disk_storage }}:cloudinit
-    qm set {{ vmid }} --boot c --bootdisk scsi0
-    qm set {{ vmid }} --ciuser {{ cloud_user }}
-    qm set {{ vmid }} --sshkeys "{{ vm_ssh_pub_key }}"
-    qm set {{ vmid }} --ipconfig0 ip=dhcp
-
-- name: Convert VM to template
-  ansible.builtin.command: qm template {{ vmid }}
+- name: Create Debian 12 VM for template
+  community.general.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ vmid }}"
+    name: "{{ vm_name }}"
+    memory: 2048
+    cores: 2
+    net:
+      net0: "virtio,bridge={{ net_bridge }}"
+    serial:
+      serial0: socket
+    vga: serial0
+    scsihw: "virtio-scsi-pci"
+    scsi:
+      scsi0: "{{ disk_storage }}:0,import-from={{ cloud_image_path }}"
+    ide:
+      ide2: "{{ disk_storage }}:cloudinit"
+    boot: "order=scsi0"
+    ciuser: "{{ cloud_user }}"
+    sshkeys: "{{ ssh_pub_key_content.content | b64decode }}"
+    ipconfig:
+      ipconfig0: "ip=dhcp"
+    template: true
+    timeout: 600
+  delegate_to: localhost
