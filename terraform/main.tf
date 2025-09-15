@@ -64,10 +64,14 @@ resource "proxmox_vm_qemu" "k3s_master" {
           storage = "local-lvm"
         }
       }
+      scsi1 {
+        cdrom {
+          iso = "${proxmox_cloud_init_disk.cloud_init.id}"
+        }
     }
-  }
+    }
 
-  ide2 = "${proxmox_cloud_init_disk.cloud_init.storage}:cloudinit"
+  }
 
   # Network settings
   network {

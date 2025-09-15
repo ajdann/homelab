@@ -10,3 +10,5 @@ age.key
 kubeconfig
 secrets/
 terraform/secrets.auto.tfvars
+*.tfstate
+*.tfstate.backup
