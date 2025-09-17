@@ -10,7 +10,7 @@ terraform {
 provider "proxmox" {
   pm_api_url      = "https://192.168.1.157:8006/api2/json"
   pm_user         = "root@pam"
-  pm_password     = var.proxmox_api_password
+  pm_password     = file("../secrets/proxmox_api_password")
   pm_tls_insecure = "true"
 }
 
@@ -72,9 +72,18 @@ disks {
   }
 
   # Cloud-Init settings
-  ciuser   = var.cloud_init_user
-  cipassword = var.cloud_init_password
+  ciuser   = file("../secrets/vm_user")
+  cipassword = file("../secrets/vm_password")
   ciupgrade = true
-  sshkeys  = var.cloud_init_ssh_public_key
+  sshkeys  = file("../secrets/vm_ssh_pub_key")
+
+  serial {
+    id = 0
+    type = "socket"
+  }
+
+  vga {
+    type = "serial0"
+  }
 
 }

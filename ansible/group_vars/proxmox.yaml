@@ -6,9 +6,9 @@ proxmox_api_password: 12345678
 proxmox_node: pve
 
 # Default VM credentials
-vm_user: admin
-vm_password: SuperSecret123
-vm_ssh_pub_key: /home/ajdin/.ssh/id_rsa.pub
+vm_user: "{{ lookup('file', '../secrets/vm_user') }}"
+vm_password: "{{ lookup('file', '../secrets/vm_password') }}"
+vm_ssh_pub_key: "{{ lookup('file', '../secrets/vm_ssh_pub_key') }}"
 ssh_pub_key: /home/ajdin/.ssh/id_rsa.pub
 
 
@@ -19,8 +19,8 @@ disk_storage: local-lvm
 disk_size: 16G
 cloud_image_url: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
 cloud_image_path: "/var/lib/vz/template/qcow/debian-12-genericcloud-amd64.qcow2"
-cloud_user: "ansible"
-cloud_password: "securepassword"
+cloud_user: "{{ lookup('file', '../secrets/vm_user') }}"
+cloud_password: "{{ lookup('file', '../secrets/vm_password') }}"
 net_bridge: "vmbr0"
 searchdomain: "homelab.local"
 

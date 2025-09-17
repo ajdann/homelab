@@ -12,11 +12,6 @@
       - libguestfs-tools
     state: present
 
-- name: Read SSH public key
-  ansible.builtin.slurp:
-    src: "{{ vm_ssh_pub_key }}"
-  register: ssh_pub_key_content
-  delegate_to: localhost
 
 
 - name: Destroy old template to ensure a clean slate
@@ -30,8 +25,6 @@
   delegate_to: localhost
   ignore_errors: true
 
-# The following tasks run ON THE PROXMOX SERVER itself
-# They use shell commands that only exist on the server
 - name: Ensure qcow directory exists
   ansible.builtin.file:
     path: /var/lib/vz/template/qcow
@@ -50,13 +43,9 @@
   retries: 5
   delay: 10
 
-- name: Install qemu-guest-agent using virt-customize
+- name: Resize the cloud image
   ansible.builtin.command:
-    cmd: >
-      virt-customize -a {{ cloud_image_path }}
-      --install qemu-guest-agent
-      --run-command "systemctl enable qemu-guest-agent"
-      --run-command "systemctl start qemu-guest-agent"
+    cmd: qemu-img resize {{ cloud_image_path }} 32G
 
 - name: Create Debian 12 VM for template
   community.general.proxmox_kvm:
@@ -66,6 +55,7 @@
     node: "{{ proxmox_node }}"
     vmid: "{{ vmid }}"
     name: "{{ vm_name }}"
+    agent: 1
     memory: 2048
     cores: 2
     net:
@@ -79,8 +69,9 @@
     ide:
       ide2: "{{ disk_storage }}:cloudinit"
     boot: "order=scsi0"
+    cipassword: "{{ cloud_password }}"
     ciuser: "{{ cloud_user }}"
-    sshkeys: "{{ ssh_pub_key_content.content | b64decode }}"
+    sshkeys: "{{ vm_ssh_pub_key }}"
     template: true
     timeout: 600
   delegate_to: localhost

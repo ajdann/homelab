@@ -13,19 +13,7 @@ variable "template_name" {
   default     = "debian12-cloudinit"
 }
 
-variable "cloud_init_user" {
-  description = "The username for the cloud-init user."
-  default     = "admin"
-}
 
-variable "cloud_init_password" {
-  description = "The password for the cloud-init user."
-  sensitive   = true
-}
-
-variable "cloud_init_ssh_public_key" {
-  description = "The public SSH key for the cloud-init user."
-}
 
 variable "cloud_init_ssh_private_key" {
   description = "The private SSH key for the cloud-init user."
