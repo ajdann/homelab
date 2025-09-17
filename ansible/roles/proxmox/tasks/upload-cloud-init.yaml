@@ -1,16 +1,35 @@
 # ---
-# - name: Ensure Proxmox snippets directory exists
-#   ansible.builtin.file:
-#     path: /var/lib/vz/snippets
-#     state: directory
-#     owner: root
-#     group: root
-#     mode: '0755'
+- name: Ensure Proxmox snippets directory exists
+  ansible.builtin.file:
+    path: /var/lib/vz/snippets
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
-# - name: Upload custom cloud-init file to Proxmox
-#   ansible.builtin.copy:
-#     src: files/bootstrap.yaml   # local path
-#     dest: /var/lib/vz/snippets/bootstrap.yaml
-#     owner: root
-#     group: root
-#     mode: '0644'
+
+- name: Create cloud-init ISO locally
+  ansible.builtin.command:
+    cmd: "cloud-localds /tmp/{{ vm_name }}-cloudinit.iso {{ cloud_init_file }}"
+  delegate_to: localhost
+  args:
+    creates: "/tmp/{{ vm_name }}-cloudinit.iso"
+
+- name: Upload cloud-init ISO to Proxmox storage
+  ansible.builtin.copy:
+    src: "/tmp/{{ vm_name }}-cloudinit.iso"
+    dest: "/var/lib/vz/template/iso/{{ vm_name }}-cloudinit.iso"
+    owner: root
+    group: root
+    mode: '0644'
+  delegate_to: "{{ proxmox_node }}"
+  
+
+- name: Upload custom cloud-init file to Proxmox
+  ansible.builtin.copy:
+    src: files/bootstrap.yaml   # local path
+    dest: /var/lib/vz/snippets/bootstrap.yaml
+    owner: root
+    group: root
+    mode: '0644'
+

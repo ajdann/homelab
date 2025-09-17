@@ -15,24 +15,6 @@ provider "proxmox" {
 }
 
 
-
-data "template_file" "cloud_init_user_data" {
-  template = file("${path.module}/cloud-init.yml")
-
-  vars = {
-    user           = var.cloud_init_user
-    password       = var.cloud_init_password
-    ssh_public_key = var.cloud_init_ssh_public_key
-  }
-}
-
-resource "proxmox_cloud_init_disk" "cloud_init" {
-  name         = "k3s-master-cloud-init.iso"
-  pve_node     = var.proxmox_node
-  storage      = "local"
-  user_data    = data.template_file.cloud_init_user_data.rendered
-}
-
 resource "proxmox_vm_qemu" "k3s_master" {
   # VM General settings
   name        = "k3s-master"
@@ -50,33 +32,49 @@ resource "proxmox_vm_qemu" "k3s_master" {
   scsihw = "virtio-scsi-pci"
   boot   = "order=scsi0"
 
+  ipconfig0 = "ip=192.168.1.200/24,gw=192.168.1.1" # Set your desired IP and gateway
+
   cpu {
     cores   = 2
     sockets = 1
     type    = "host"
   }
 
-  disks {
-    scsi {
-      scsi0 {
-        disk {
-          size    = var.vm_disk_size
-          storage = "local-lvm"
-        }
+# disk {
+#   slot = "scsi0"
+#   size = "32G"
+#   type = "disk"
+#   storage = "local-lvm"
+# }
+
+disks {
+  scsi {
+    scsi0 {
+      disk {
+        size    = "32G"
+        storage = "local-lvm"
       }
-      scsi1 {
-        cdrom {
-          iso = "${proxmox_cloud_init_disk.cloud_init.id}"
-        }
     }
-    }
-
   }
-
+  ide {
+    ide0 {
+      cloudinit {
+        storage = "local-lvm"
+      }
+    }
+  }
+}
   # Network settings
   network {
     id     = 0
     model  = "virtio"
     bridge = "vmbr0"
   }
+
+  # Cloud-Init settings
+  ciuser   = var.cloud_init_user
+  cipassword = var.cloud_init_password
+  ciupgrade = true
+  sshkeys  = var.cloud_init_ssh_public_key
+
 }

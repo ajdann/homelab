@@ -6,6 +6,12 @@
     state: present
   delegate_to: localhost
 
+- name: Install libguestfs-tools on proxmox
+  ansible.builtin.package:
+    name:
+      - libguestfs-tools
+    state: present
+
 - name: Read SSH public key
   ansible.builtin.slurp:
     src: "{{ vm_ssh_pub_key }}"
@@ -44,6 +50,14 @@
   retries: 5
   delay: 10
 
+- name: Install qemu-guest-agent using virt-customize
+  ansible.builtin.command:
+    cmd: >
+      virt-customize -a {{ cloud_image_path }}
+      --install qemu-guest-agent
+      --run-command "systemctl enable qemu-guest-agent"
+      --run-command "systemctl start qemu-guest-agent"
+
 - name: Create Debian 12 VM for template
   community.general.proxmox_kvm:
     api_user: "{{ proxmox_api_user }}"
@@ -67,8 +81,6 @@
     boot: "order=scsi0"
     ciuser: "{{ cloud_user }}"
     sshkeys: "{{ ssh_pub_key_content.content | b64decode }}"
-    ipconfig:
-      ipconfig0: "ip=dhcp"
     template: true
     timeout: 600
   delegate_to: localhost

@@ -11,10 +11,6 @@ vm_password: SuperSecret123
 vm_ssh_pub_key: /home/ajdin/.ssh/id_rsa.pub
 ssh_pub_key: /home/ajdin/.ssh/id_rsa.pub
 
-# Network configuration
-homelab_network_cidr: 10.0.0.0/24
-homelab_gateway: 10.0.0.1
-nameserver: "1.1.1.1"
 
 
 vmid: 9000
@@ -28,16 +24,11 @@ cloud_password: "securepassword"
 net_bridge: "vmbr0"
 searchdomain: "homelab.local"
 
+
+
 # VM Creation Settings
 vm_defaults:
   cores: 2
   memory: 2048
   bridge: "{{ net_bridge }}"
 
-k3s_nodes:
-  master:
-    vmid: 100
-    name: k3s-master
-    ip: 10.0.0.10
-    cores: 4
-    memory: 4096
