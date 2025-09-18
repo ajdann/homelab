@@ -12,12 +12,9 @@ vm_ssh_pub_key: "{{ lookup('file', playbook_dir + '/../../secrets/vm_ssh_pub_key
 
 
 
-vmid: 9000
-vm_name: debian12-cloudinit
 disk_storage: local-lvm
 disk_size: 32G
-cloud_image_url: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
-cloud_image_path: "/var/lib/vz/template/qcow/debian-12-genericcloud-amd64.qcow2"
+
 net_bridge: "vmbr0"
 searchdomain: "homelab.local"
 

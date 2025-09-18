@@ -1,23 +1,4 @@
 ---
-- name: Install libguestfs-tools on proxmox
-  ansible.builtin.package:
-    name:
-      - libguestfs-tools
-    state: present
-
-
-
-- name: Destroy old template to ensure a clean slate
-  community.general.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    node: "{{ proxmox_node }}"
-    vmid: "{{ vmid }}"
-    state: absent
-  delegate_to: localhost
-  ignore_errors: true
-
 - name: Ensure qcow directory exists
   ansible.builtin.file:
     path: /var/lib/vz/template/qcow
@@ -26,45 +7,8 @@
     group: root
     mode: '0755'
 
-- name: Download Debian 12 cloud image
-  ansible.builtin.get_url:
-    url: "{{ cloud_image_url }}"
-    dest: "{{ cloud_image_path }}"
-    mode: '0644'
-  register: download_status
-  until: download_status is succeeded
-  retries: 5
-  delay: 10
+- name: Include Debian tasks
+  ansible.builtin.include_tasks: "debian.yaml"
 
-- name: Resize the cloud image
-  ansible.builtin.command:
-    cmd: qemu-img resize {{ cloud_image_path }} 32G
-
-- name: Create Debian 12 VM for template
-  community.general.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    node: "{{ proxmox_node }}"
-    vmid: "{{ vmid }}"
-    name: "{{ vm_name }}"
-    agent: 1
-    memory: 2048
-    cores: 2
-    net:
-      net0: "virtio,bridge={{ net_bridge }}"
-    serial:
-      serial0: socket
-    vga: serial0
-    scsihw: "virtio-scsi-pci"
-    scsi:
-      scsi0: "{{ disk_storage }}:0,import-from={{ cloud_image_path }}"
-    ide:
-      ide2: "{{ disk_storage }}:cloudinit"
-    boot: "order=scsi0"
-    cipassword: "{{ vm_password }}"
-    ciuser: "{{ vm_user }}"
-    sshkeys: "{{ vm_ssh_pub_key }}"
-    template: true
-    timeout: 600
-  delegate_to: localhost
+- name: Include Alpine tasks
+  ansible.builtin.include_tasks: "alpine.yaml"

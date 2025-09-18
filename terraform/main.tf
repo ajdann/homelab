@@ -8,7 +8,7 @@ resource "proxmox_vm_qemu" "server" {
   onboot      = true
 
   # Cloning settings
-  clone      = var.template_name
+  clone      = each.value.template
   full_clone = true
 
   # System settings

@@ -3,10 +3,6 @@ variable "proxmox_node" {
   default     = "pve"
 }
 
-variable "template_name" {
-  description = "The name of the template to clone from"
-  default     = "debian12-cloudinit"
-}
 
 variable "vms" {
   description = "A map of VMs to create"
@@ -18,6 +14,7 @@ variable "vms" {
     sockets   = number
     ipconfig0 = string
     disk_size = string
+    template  = string
   }))
   default = {}
 }
