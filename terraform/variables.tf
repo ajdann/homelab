@@ -8,7 +8,16 @@ variable "template_name" {
   default     = "debian12-cloudinit"
 }
 
-variable "vm_disk_size" {
-  description = "The size of the VM disk in GB."
-  default     = 32
+variable "vms" {
+  description = "A map of VMs to create"
+  type = map(object({
+    name      = string
+    vmid      = number
+    memory    = number
+    cores     = number
+    sockets   = number
+    ipconfig0 = string
+    disk_size = string
+  }))
+  default = {}
 }

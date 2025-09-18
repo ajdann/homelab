@@ -1,8 +1,10 @@
-resource "proxmox_vm_qemu" "k3s_master" {
+resource "proxmox_vm_qemu" "server" {
+  for_each = var.vms
+
   # VM General settings
-  name        = "k3s-master"
+  name        = each.value.name
   target_node = var.proxmox_node
-  vmid        = 100
+  vmid        = each.value.vmid
   onboot      = true
 
   # Cloning settings
@@ -11,30 +13,23 @@ resource "proxmox_vm_qemu" "k3s_master" {
 
   # System settings
   agent  = 1 # Enable QEMU Guest Agent
-  memory = 4096
+  memory = each.value.memory
   scsihw = "virtio-scsi-pci"
   boot   = "order=scsi0"
 
-  ipconfig0 = "ip=192.168.1.200/24,gw=192.168.1.1" # Set your desired IP and gateway
+  ipconfig0 = each.value.ipconfig0
 
   cpu {
-    cores   = 2
-    sockets = 1
+    cores   = each.value.cores
+    sockets = each.value.sockets
     type    = "host"
   }
-
-  # disk {
-  #   slot = "scsi0"
-  #   size = "32G"
-  #   type = "disk"
-  #   storage = "local-lvm"
-  # }
 
   disks {
     scsi {
       scsi0 {
         disk {
-          size    = "32G"
+          size    = each.value.disk_size
           storage = "local-lvm"
         }
       }
@@ -68,5 +63,4 @@ resource "proxmox_vm_qemu" "k3s_master" {
   vga {
     type = "serial0"
   }
-
 }

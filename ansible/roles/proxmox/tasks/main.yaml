@@ -1,11 +1,4 @@
 ---
-# This task runs on the Ansible controller (your local machine)
-- name: Install proxmoxer library locally
-  ansible.builtin.pip:
-    name: proxmoxer
-    state: present
-  delegate_to: localhost
-
 - name: Install libguestfs-tools on proxmox
   ansible.builtin.package:
     name:
