@@ -1,0 +1,32 @@
+---
+- name: Install HAProxy and Keepalived
+  apt:
+    name:
+      - haproxy
+      - keepalived
+    state: present
+    update_cache: yes
+
+- name: Configure HAProxy
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify: restart haproxy
+
+- name: Configure Keepalived
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  notify: restart keepalived
+
+- name: Ensure HAProxy service is started and enabled
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
+
+- name: Ensure Keepalived service is started and enabled
+  service:
+    name: keepalived
+    state: started
+    enabled: yes
