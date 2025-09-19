@@ -3,14 +3,5 @@
   hosts: all
   become: true
   roles:
-    - role: node_bootstrap
-    - role: k3s_server
-    - role: tailscale_config
-      # This role runs locally, so we need to delegate it.
-      delegate_to: localhost
-      run_once: true
-    - role: flux_bootstrap
-      # This role runs locally, so we need to delegate it.
-      delegate_to: localhost
-      run_once: true
-    - role: wazuh_agent
+    - role: ../roles/node_bootstrap
+    - role: ../roles/k3s_server

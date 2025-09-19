@@ -5,51 +5,35 @@
     dest: /tmp/install-k3s.sh
     mode: '0755'
 
-- name: Run K3s install script (server)
-  command: sh /tmp/install-k3s.sh --disable traefik --tls-san={{ k3s_tls_san }}
+- name: Generate K3s cluster token
+  run_once: true
+  shell: "openssl rand -hex 16"
+  register: k3s_cluster_token_raw
+  delegate_to: localhost
+
+- name: Store K3s cluster token
+  run_once: true
+  set_fact:
+    k3s_cluster_token: "{{ k3s_cluster_token_raw.stdout }}"
+
+- name: Run K3s install script (first master)
+  when: inventory_hostname == groups['k3s_masters'][0]
+  command: >
+    sh /tmp/install-k3s.sh 
+    --cluster-init 
+    --token {{ k3s_cluster_token }} 
+    --tls-san {{ haproxy_vip }}
+    --disable traefik
   args:
     creates: /usr/local/bin/k3s
 
-- name: Ensure .kube directory exists
-  file:
-    path: /home/vagrant/.kube
-    state: directory
-    owner: vagrant
-    group: vagrant
-    mode: '0755'
-
-- name: Copy K3s kubeconfig to ~/.kube/config
-  copy:
-    remote_src: yes
-    src: /etc/rancher/k3s/k3s.yaml
-    dest: /home/vagrant/.kube/config
-    owner: vagrant
-    group: vagrant
-    mode: '0600'
-
-- name: Wait for K3s service to become active
-  shell: systemctl is-active k3s
-  register: k3s_status
-  retries: 10
-  delay: 5
-  until: k3s_status.stdout == "active"
-
-- name: Get Kubernetes version
-  become_user: vagrant
-  shell: kubectl version --output=json | jq -r '.serverVersion.gitVersion'
-  register: k3s_kube_version
-  changed_when: false
-
-- name: Verify K3s is running using kubectl
-  become_user: vagrant
-  shell: kubectl get nodes --no-headers
-  register: k3s_node_status
-  changed_when: false
-
-- name: Print success message when K3s is running
-  debug:
-    msg:
-      - '✅ K3s is up and running!'
-      - '🖥️ Node: {{ ansible_hostname }}'
-      - '📦 Kubernetes Version: {{ k3s_kube_version.stdout }}'
-      - '📌 Status: {{ k3s_node_status.stdout_lines[0] }}'
+- name: Run K3s install script (other masters)
+  when: inventory_hostname != groups['k3s_masters'][0]
+  command: >
+    sh /tmp/install-k3s.sh 
+    --server https://{{ haproxy_vip }}:6443 
+    --token {{ k3s_cluster_token }} 
+    --tls-san {{ haproxy_vip }}
+    --disable traefik
+  args:
+    creates: /usr/local/bin/k3s
