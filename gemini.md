@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project is a homelab setup managed with a variety of tools including Ansible, Kubernetes (K3s), Terraform, and Vagrant. The goal is to automate the setup and management of a personal cloud environment.
+This project is a homelab setup managed with a variety of tools including Ansible, Kubernetes (K3s), Terraform, Vagrant, and Proxmox. The goal is to automate the setup and management of a personal cloud environment.
 
 ## File Structure
 
@@ -23,6 +23,7 @@ This project is a homelab setup managed with a variety of tools including Ansibl
 -   Kubernetes
 -   Terraform
 -   Vagrant
+-   Proxmox
 
 ## User Preferences
 

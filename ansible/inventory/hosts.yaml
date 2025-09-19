@@ -7,7 +7,7 @@ all:
       ansible_host: 192.168.1.157   # Proxmox node IP
       ansible_user: root
       ansible_connection: ssh
-      ansible_password: "{{ lookup('file', playbook_dir + '/../../secrets/proxmox_password') }}"
+      ansible_password: "{{ lookup('file', playbook_dir + '/../../secrets/proxmox_api_password') }}"
       ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
 
     k3s-master-1:
