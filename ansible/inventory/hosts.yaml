@@ -7,33 +7,32 @@ all:
       ansible_host: 192.168.1.157   # Proxmox node IP
       ansible_user: root
       ansible_connection: ssh
-      ansible_password: "{{ lookup('file', playbook_dir + '/../../secrets/proxmox_api_password') }}"
-      ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+      ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     k3s-master-1:
       ansible_host: 192.168.1.200
-      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_user') }}"
-      ansible_password: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_password') }}"
+      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
+      ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     k3s-master-2:
       ansible_host: 192.168.1.201
-      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_user') }}"
-      ansible_password: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_password') }}"
+      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
+      ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     k3s-master-3:
       ansible_host: 192.168.1.202
-      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_user') }}"
-      ansible_password: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_password') }}"
+      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
+      ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     haproxy-1:
       ansible_host: 192.168.1.203
-      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_user') }}"
-      ansible_password: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_password') }}"
+      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
+      ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     haproxy-2:
       ansible_host: 192.168.1.204
-      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_user') }}"
-      ansible_password: "{{ lookup('file', playbook_dir + '/../../secrets/ansible_password') }}"
+      ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
+      ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
   children:
     k3s_masters:

@@ -1,0 +1,6 @@
+---
+- name: Configure HAProxy and Keepalived
+  hosts: haproxy_nodes
+  become: true
+  roles:
+    - ../roles/haproxy_keepalived

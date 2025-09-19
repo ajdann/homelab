@@ -15,6 +15,8 @@ variable "vms" {
     ipconfig0 = string
     disk_size = string
     template  = string
+    balloon   = optional(number, 0)
+    tags      = optional(string, "")
   }))
   default = {}
 }

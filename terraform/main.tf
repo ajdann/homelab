@@ -18,6 +18,7 @@ resource "proxmox_vm_qemu" "server" {
   boot   = "order=scsi0"
 
   ipconfig0 = each.value.ipconfig0
+  balloon   = each.value.balloon
 
   cpu {
     cores   = each.value.cores
@@ -63,4 +64,5 @@ resource "proxmox_vm_qemu" "server" {
   vga {
     type = "serial0"
   }
+  tags = each.value.tags
 }

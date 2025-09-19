@@ -9,6 +9,6 @@ alpine_cloud_image_path: "/var/lib/vz/template/qcow/generic_alpine-3.22.1-x86_64
 debian_vmid: 9000
 debian_vm_name: debian12-cloudinit
 debian_ram: 2048
-debian_cores: 2
+debian_cores: 1
 debian_cloud_image_url: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
 debian_cloud_image_path: "/var/lib/vz/template/qcow/debian-12-genericcloud-amd64.qcow2"

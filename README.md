@@ -231,4 +231,27 @@ The security stack follows defense-in-depth principles:
 **Future Integration**: Will be implemented to ensure Kubernetes cluster adheres to security best practices
 
 ## High Availability
-TODO
+
+This homelab uses HAProxy and Keepalived to provide high availability for the Kubernetes API server. This ensures that the cluster remains accessible even if one of the HAProxy servers fails.
+
+### How It Works
+
+The high availability setup is based on a floating virtual IP (VIP) address that is managed by Keepalived. Here's a step-by-step breakdown of how it works:
+
+1.  **VRRP Group:** The two HAProxy VMs, both running Keepalived, form a VRRP (Virtual Router Redundancy Protocol) group. This group is identified by a unique `virtual_router_id`.
+
+2.  **Master and Backup:** Within the VRRP group, one server is elected as the **MASTER** and the other as the **BACKUP**. This election is based on the `priority` value in the Keepalived configuration. The server with the higher priority becomes the MASTER.
+
+3.  **ARP Announcements:** The MASTER server sends out ARP (Address Resolution Protocol) announcements to the network. These announcements tell the network switch to associate the virtual IP address with the MASTER server's MAC address.
+
+4.  **Network Switch:** The network switch updates its MAC address table, and all traffic destined for the virtual IP is sent to the MASTER HAProxy VM.
+
+5.  **Health Checks:** The MASTER and BACKUP servers constantly communicate with each other. The BACKUP server listens for advertisements from the MASTER.
+
+6.  **Failover:** If the BACKUP server stops hearing from the MASTER, it assumes the MASTER is down.
+
+7.  **Taking Over:** The BACKUP server transitions to the MASTER state and sends out its own ARP announcements, claiming the virtual IP.
+
+8.  **Switch Update:** The network switch updates its MAC address table again, and all traffic for the virtual IP is sent to the new MASTER.
+
+This entire process happens automatically and very quickly, ensuring a seamless failover from the perspective of the clients accessing the Kubernetes API.
