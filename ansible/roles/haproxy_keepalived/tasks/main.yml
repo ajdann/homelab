@@ -14,6 +14,17 @@
     dest: /etc/haproxy/haproxy.cfg
   notify: restart haproxy
 
+- name: Validate HAProxy configuration
+  command: haproxy -c -f /etc/haproxy/haproxy.cfg
+  register: haproxy_validation
+  changed_when: false
+  failed_when: haproxy_validation.rc != 0
+
+- name: Show HAProxy configuration errors
+  debug:
+    var: haproxy_validation.stderr
+  when: haproxy_validation.rc != 0
+
 - name: Configure Keepalived
   template:
     src: keepalived.conf.j2

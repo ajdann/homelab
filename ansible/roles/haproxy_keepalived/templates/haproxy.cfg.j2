@@ -25,7 +25,7 @@ defaults
     errorfile 504 /etc/haproxy/errors/504.http
 
 frontend k3s_api
-    bind {{ haproxy_vip }}:{{ haproxy_port }}
+    bind {{ haproxy_vip }}:{{ haproxy_port }} transparent
     mode tcp
     option tcplog
     default_backend k3s_api_backend
