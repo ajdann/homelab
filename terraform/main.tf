@@ -18,6 +18,8 @@ resource "proxmox_vm_qemu" "server" {
   boot   = "order=scsi0"
 
   ipconfig0 = each.value.ipconfig0
+  nameserver = each.value.nameserver
+  
   balloon   = each.value.balloon
 
   cpu {

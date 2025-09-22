@@ -4,3 +4,5 @@
   become: true
   roles:
     - ../roles/k3s_server
+  vars_files:
+    - ../group_vars/all.yaml
