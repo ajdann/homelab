@@ -4,33 +4,33 @@ all:
       ansible_connection: local
 
     proxmox:
-      ansible_host: 192.168.1.157   # Proxmox node IP
+      ansible_host: 192.168.0.157   # Proxmox node IP
       ansible_user: root
       ansible_connection: ssh
       ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     k3s-master-1:
-      ansible_host: 192.168.1.200
+      ansible_host: 192.168.0.200
       ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
       ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     k3s-master-2:
-      ansible_host: 192.168.1.201
+      ansible_host: 192.168.0.201
       ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
       ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     k3s-master-3:
-      ansible_host: 192.168.1.202
+      ansible_host: 192.168.0.202
       ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
       ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     haproxy-1:
-      ansible_host: 192.168.1.203
+      ansible_host: 192.168.0.203
       ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
       ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 
     haproxy-2:
-      ansible_host: 192.168.1.204
+      ansible_host: 192.168.0.204
       ansible_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
       ansible_ssh_private_key_file: "{{ playbook_dir }}/../../secrets/vm_ssh_private_key"
 

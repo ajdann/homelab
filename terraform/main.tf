@@ -52,7 +52,7 @@ resource "proxmox_vm_qemu" "server" {
 
   # Cloud-Init settings
   ciuser     = file("../secrets/vm_user")
-  cipassword = file("../secrets/vm_password")
+  # cipassword = file("../secrets/vm_password")
   ciupgrade  = true
   sshkeys    = file("../secrets/vm_ssh_pub_key")
 
