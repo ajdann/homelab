@@ -37,3 +37,11 @@
     --disable traefik
   args:
     creates: /usr/local/bin/k3s
+
+- name: Fetch kubeconfig file
+  fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ inventory_dir }}/../../../kubeconfig"
+    flat: yes
+  become: yes
+  when: inventory_hostname == groups['k3s_masters'][0]

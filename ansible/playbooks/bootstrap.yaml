@@ -1,6 +1,6 @@
 ---
 - name: Bootstrap all nodes
-  hosts: all
+  hosts: k3s_masters
   become: true
   roles:
-    - node_bootstrap
+    - ../roles/node_bootstrap
