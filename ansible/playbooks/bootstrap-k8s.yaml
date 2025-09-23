@@ -1,7 +1,7 @@
 ---
 - name: Install Helm, Flux Operator via Helm, and Apply FluxInstance
-  hosts: all
+  hosts: k3s_masters
   connection: local
   gather_facts: false
   roles:
-    - flux_bootstrap
+    - ../roles/flux_bootstrap

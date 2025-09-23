@@ -1,6 +1,0 @@
----
-- name: Set up single-node K3s cluster
-  hosts: all
-  become: true
-  roles:
-    - k3s_server

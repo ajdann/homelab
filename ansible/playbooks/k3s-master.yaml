@@ -1,7 +1,0 @@
----
-- name: Build the complete k3s master node
-  hosts: all
-  become: true
-  roles:
-    - role: ../roles/node_bootstrap
-    - role: ../roles/k3s_server

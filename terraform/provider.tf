@@ -4,6 +4,11 @@ terraform {
       source  = "Telmate/proxmox"
       version = "3.0.2-rc04"
     }
+    helm = {
+      source = "hashicorp/helm"
+      version = "3.0.2"
+    }
+
   }
 }
 
@@ -13,4 +18,10 @@ provider "proxmox" {
   pm_password = "12345678"
   #   pm_password = trimspace(file("../secrets/proxmox_api_password"))
   pm_tls_insecure = true
+}
+
+provider "helm" {
+  kubernetes = {
+    config_path = "../kubeconfig"
+  }
 }

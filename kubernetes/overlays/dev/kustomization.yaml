@@ -1,18 +1,32 @@
----
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+# - ../../core/kured
+# - ../../core/netdata
+# - ../../core/keda
+# - ../../core/kyverno
+# - ../../core/policy-reporter
+# - ../../core/falco
+# - ../../core/prometheus
+# - ../../apps/adguard
+# - ../../core/dashboard
 resources:
-- ../../apps
-- ../../core
-- ./secrets/
+- ../../core/tailscale
+- ../../core/reloader
+- ../../apps/homepage
+- ../../apps/authentik
+# GITEA
+- ../../apps/gitea
+- ./secrets/gitea
+# NEXTCLOUD
+- ../../apps/nextcloud
+- ./secrets/nextcloud
+# WAZUH
+- ../../apps/wazuh
+- ./secrets/wazuh
 
-# images:
-# - name: ghcr.io/gethomepage/homepage
-#   newTag: v1.4.0
-
-patchesStrategicMerge:
-  - ./secrets/patches/authentik-values-patch.yaml
-
+patches:
+- path: ./secrets/patches/authentik-values-patch.yaml
 
 # patches:
 # - target:
@@ -23,7 +37,6 @@ patchesStrategicMerge:
 #     - op: replace
 #       path: /spec/chart/spec/version
 #       value: "12.0.0"
-
 # - target:
 #     kind: HelmRelease
 #     name: kubernetes-dashboard
@@ -32,7 +45,6 @@ patchesStrategicMerge:
 #     - op: replace
 #       path: /spec/chart/spec/version
 #       value: "6.0.8"
-
 # - target:
 #     kind: HelmRelease
 #     name: falco
@@ -41,7 +53,6 @@ patchesStrategicMerge:
 #     - op: replace
 #       path: /spec/chart/spec/version
 #       value: "2.0.0"
-
 # - target:
 #     kind: HelmRelease
 #     name: keda
@@ -50,7 +61,6 @@ patchesStrategicMerge:
 #     - op: replace
 #       path: /spec/chart/spec/version
 #       value: "2.14.0"
-
 # - target:
 #     kind: HelmRelease
 #     name: keda-http-addon
@@ -59,7 +69,6 @@ patchesStrategicMerge:
 #     - op: replace
 #       path: /spec/chart/spec/version
 #       value: "0.6.0"
-
 # - target:
 #     kind: HelmRelease
 #     name: kured
@@ -68,7 +77,6 @@ patchesStrategicMerge:
 #     - op: replace
 #       path: /spec/chart/spec/version
 #       value: "5.7.0"
-
 # - target:
 #     kind: HelmRelease
 #     name: kyverno
@@ -77,7 +85,6 @@ patchesStrategicMerge:
 #     - op: replace
 #       path: /spec/chart/spec/version
 #       value: "3.1.0"
-
 # - target:
 #     kind: HelmRelease
 #     name: netdata
@@ -86,7 +93,6 @@ patchesStrategicMerge:
 #     - op: replace
 #       path: /spec/chart/spec/version
 #       value: "3.7.139"
-
 # - target:
 #     kind: HelmRelease
 #     name: policy-reporter
@@ -95,7 +101,6 @@ patchesStrategicMerge:
 #     - op: replace
 #       path: /spec/chart/spec/version
 #       value: "2.0.0"
-
 # - target:
 #     kind: HelmRelease
 #     name: reloader
@@ -105,11 +110,3 @@ patchesStrategicMerge:
 #       path: /spec/chart/spec/version
 #       value: "1.0.48"
 
-# - target:
-#     kind: HelmRelease
-#     name: tailscale-operator
-#     namespace: tailscale
-#   patch: |-
-#     - op: replace
-#       path: /spec/chart/spec/version
-#       value: "1.84.2"

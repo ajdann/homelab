@@ -1,47 +1,22 @@
 ---
-- name: Ensure flux-system namespace exists
-  kubernetes.core.k8s:
-    api_version: v1
-    kind: Namespace
-    name: flux-system
-    state: present
-
-- name: Install Flux Operator using Helm
+- name: Install Flux and point to repository
   ansible.builtin.shell: |
-    helm upgrade --install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
-      --namespace flux-system \
-      --create-namespace
+    flux install --components-extra=image-reflector-controller,image-automation-controller
   args:
     executable: /bin/bash
-  register: flux_operator_result
-  changed_when: "'deployed' in flux_operator_result.stdout or 'installed' in flux_operator_result.stdout"
-  failed_when: flux_operator_result.rc != 0
+  register: flux_install_result
+  changed_when: "'Flux installed' in flux_install_result.stdout"
 
-- name: Wait for FluxInstance CRD to be ready
+- name: Apply Flux Kustomization
   ansible.builtin.shell: |
-    kubectl wait --for=condition=Established crd/fluxinstances.fluxcd.controlplane.io --timeout=60s
-  register: crd_ready
-  changed_when: false
-
-- name: Apply FluxInstance manifest
-  ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/fluxInstance.yaml
-  register: flux_instance_result
-  changed_when: "'created' in flux_instance_result.stdout or 'configured' in flux_instance_result.stdout"
-
-- name: Wait until GitRepository CRD is available
-  shell: |
-    kubectl get crd gitrepositories.source.toolkit.fluxcd.io --no-headers
-  register: gitrepository_crd_check
-  retries: 30
-  delay: 5
-  until: gitrepository_crd_check.rc == 0
-
-- name: Apply GitRepository manifest
-  ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/gitRepository.yaml
-  register: git_repository_result
-  changed_when: "'created' in git_repository_result.stdout or 'configured' in git_repository_result.stdout"
-
-- name: Apply Flux Kustomization manifest
-  ansible.builtin.command: kubectl apply -f /vagrant/kubernetes/flux/kustomization.yaml
+    flux create kustomization flux-system \
+      --source=flux-system \
+      --path="./kubernetes/flux" \
+      --prune=true \
+      --interval=10m \
+      --export > /tmp/flux-kustomization.yaml
+    kubectl apply -f /tmp/flux-kustomization.yaml
+  args:
+    executable: /bin/bash
   register: kustomization_result
-  changed_when: "'created' in kustomization_result.stdout or 'configured' in kustomization_result.stdout"
+  changed_when: "'kustomization.kustomize.toolkit.fluxcd.io/flux-system created' in kustomization_result.stdout or 'kustomization.kustomize.toolkit.fluxcd.io/flux-system configured' in kustomization_result.stdout"

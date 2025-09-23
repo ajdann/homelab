@@ -43,17 +43,3 @@
     remote_src: true
   args:
     creates: /usr/local/bin/helm
-
-- name: Download Flux install script
-  ansible.builtin.get_url:
-    url: https://fluxcd.io/install.sh
-    dest: /tmp/flux-install.sh
-    mode: '0755'
-
-- name: Install Flux CLI
-  ansible.builtin.shell: /tmp/flux-install.sh
-  args:
-    executable: /bin/bash
-  become: true
-  register: flux_install
-  changed_when: "'flux version' in flux_install.stdout"
