@@ -84,14 +84,14 @@ resource "proxmox_vm_qemu" "server" {
 
   # Run Ansible playbook
   provisioner "local-exec" {
-    command = <<-EOT
-      if [[ "${each.value.name}" == *"k3s"* ]]; then
-        ansible-playbook -i '${self.default_ipv4_address},' playbooks/k3s-ha.yaml
-        ansible-playbook -i '${self.default_ipv4_address},' playbooks/bootstrap-k8s.yaml
-      elif [[ "${each.value.name}" == *"haproxy"* ]]; then
-        ansible-playbook -i '${self.default_ipv4_address},' playbooks/haproxy.yaml
-      fi
-    EOT
+    command = join("\n", [
+      "if [[ \"${each.value.name}\" == *\"k3s\"* ]]; then",
+      "  ansible-playbook -i '${self.default_ipv4_address},' playbooks/k3s-ha.yaml",
+      "  ansible-playbook -i '${self.default_ipv4_address},' playbooks/bootstrap-k8s.yaml",
+      "elif [[ \"${each.value.name}\" == *\"haproxy\"* ]]; then",
+      "  ansible-playbook -i '${self.default_ipv4_address},' playbooks/haproxy.yaml",
+      "fi",
+    ])
     working_dir = "../ansible"
     environment = {
       ANSIBLE_REMOTE_USER           = file("../secrets/vm_user")

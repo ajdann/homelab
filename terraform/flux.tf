@@ -8,6 +8,8 @@ resource "helm_release" "flux_operator" {
   repository       = "oci://ghcr.io/controlplaneio-fluxcd/charts"
   chart            = "flux-operator"
   create_namespace = true
+
+  depends_on = [ proxmox_vm_qemu.server ]
 }
 
 resource "helm_release" "flux_instance" {
