@@ -1,4 +1,4 @@
-
+---
 - name: Install Flux Operator using Helm
   kubernetes.core.helm:
     name: flux-operator
@@ -7,8 +7,6 @@
     create_namespace: true
     kubeconfig: "{{ playbook_dir }}/../../kubeconfig"
   register: flux_operator_result
-
-
 
 - name: Find all manifest files in kubernetes/flux
   ansible.builtin.find:

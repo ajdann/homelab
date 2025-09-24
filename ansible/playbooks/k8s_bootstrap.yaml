@@ -1,0 +1,7 @@
+---
+- name: Bootstrap kubernetes cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - ../roles/k8s_bootstrap

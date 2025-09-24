@@ -1,0 +1,6 @@
+---
+- name: Tailscale configuration tasks
+  ansible.builtin.import_tasks: tailscale.yaml
+
+- name: Flux bootstrap tasks
+  ansible.builtin.import_tasks: flux.yaml
