@@ -18,9 +18,9 @@
   set_fact:
     env_vars: "{{ env_vars | default({}) | combine({item.split('=')[0].strip(): item.split('=')[1:]|join('=')|trim}) }}"
   loop: "{{ (env_file_content.content | b64decode).split('\n') }}"
-  when: 
+  when:
     - item.strip() != ''
-    - "=' in item"
+    - "'=' in item"
     - not item.strip().startswith('#')
 
 - name: Check for required Tailscale variables
