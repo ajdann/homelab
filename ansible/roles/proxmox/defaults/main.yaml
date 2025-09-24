@@ -12,3 +12,5 @@ debian_ram: 2048
 debian_cores: 1
 debian_cloud_image_url: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
 debian_cloud_image_path: "/var/lib/vz/template/qcow/debian-12-genericcloud-amd64.qcow2"
+
+alpine_lxc_template: alpine-3.22-default_20250617_amd64.tar.xz

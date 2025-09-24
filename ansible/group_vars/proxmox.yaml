@@ -7,7 +7,7 @@ proxmox_node: pve
 
 # Default VM credentials
 vm_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
-vm_password: "{{ lookup('file', playbook_dir + '/../../secrets/vm_password') }}"
+# vm_password: "{{ lookup('file', playbook_dir + '/../../secrets/vm_password') }}"
 vm_ssh_pub_key: "{{ lookup('file', playbook_dir + '/../../secrets/vm_ssh_pub_key') }}"
 
 

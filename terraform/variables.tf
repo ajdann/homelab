@@ -4,6 +4,11 @@ variable "proxmox_node" {
 }
 
 
+variable "lxc_template" {
+  description = "The LXC template to use for the Ansible control node"
+  type        = string
+}
+
 variable "vms" {
   description = "A map of VMs to create"
   type = map(object({

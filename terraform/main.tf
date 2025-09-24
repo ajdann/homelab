@@ -67,36 +67,4 @@ resource "proxmox_vm_qemu" "server" {
     type = "serial0"
   }
   tags = each.value.tags
-
-  # Wait for cloud-init to complete
-  provisioner "remote-exec" {
-    inline = [
-      "cloud-init status --wait",
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = file("../secrets/vm_user")
-      private_key = file("../secrets/vm_ssh_private_key")
-      host        = self.default_ipv4_address
-    }
-  }
-
-  # Run Ansible playbook
-  provisioner "local-exec" {
-    command = join("\n", [
-      "if [[ \"${each.value.name}\" == *\"k3s\"* ]]; then",
-      "  ansible-playbook -i '${self.default_ipv4_address},' playbooks/k3s-ha.yaml",
-      "  ansible-playbook -i '${self.default_ipv4_address},' playbooks/bootstrap-k8s.yaml",
-      "elif [[ \"${each.value.name}\" == *\"haproxy\"* ]]; then",
-      "  ansible-playbook -i '${self.default_ipv4_address},' playbooks/haproxy.yaml",
-      "fi",
-    ])
-    working_dir = "../ansible"
-    environment = {
-      ANSIBLE_REMOTE_USER           = file("../secrets/vm_user")
-      ANSIBLE_PRIVATE_KEY_FILE      = abspath("../secrets/vm_ssh_private_key")
-      ANSIBLE_HOST_KEY_CHECKING     = "False"
-    }
-  }
 }

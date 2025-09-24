@@ -12,3 +12,6 @@
 
 - name: Include Alpine tasks
   ansible.builtin.include_tasks: "alpine.yaml"
+
+- name: Include LXC tasks
+  ansible.builtin.include_tasks: "lxc.yaml"

@@ -1,0 +1,6 @@
+---
+- name: Update LXC templates
+  ansible.builtin.command: pveam update
+
+- name: Download Alpine LXC template
+  ansible.builtin.command: pveam download local {{ alpine_lxc_template }}

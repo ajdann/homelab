@@ -1,6 +1,5 @@
 - name: Create Debian 12 Cloud-Init Template on Proxmox
   hosts: proxmox
-  connection: local
   gather_facts: no
   roles:
     - role: ../roles/proxmox

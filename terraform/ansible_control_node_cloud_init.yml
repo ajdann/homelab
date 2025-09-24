@@ -1,0 +1,7 @@
+#cloud-config
+package_update: true
+packages:
+  - ansible
+  - git
+runcmd:
+  - [ git, clone, "https://github.com/ajdann/homelab.git", "/root/homelab" ]

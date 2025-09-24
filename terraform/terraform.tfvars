@@ -1,3 +1,4 @@
+lxc_template = "local:vztmpl/alpine-3.22-default_20250617_amd64.tar.xz"
 vms = {
   "k3s-master-1" = {
     name      = "k3s-master-1"

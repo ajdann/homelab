@@ -43,7 +43,7 @@
     ide:
       ide2: "{{ disk_storage }}:cloudinit"
     boot: "order=scsi0"
-    cipassword: "{{ vm_password }}"
+    # cipassword: "{{ vm_password }}"
     ciuser: "{{ vm_user }}"
     sshkeys: "{{ vm_ssh_pub_key }}"
     template: true
