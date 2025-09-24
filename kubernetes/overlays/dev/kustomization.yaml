@@ -4,28 +4,33 @@ kind: Kustomization
 # - ../../core/kured
 # - ../../core/netdata
 # - ../../core/keda
-# - ../../core/kyverno
-# - ../../core/policy-reporter
-# - ../../core/falco
 # - ../../core/prometheus
 # - ../../apps/adguard
 # - ../../core/dashboard
 resources:
 - ../../core/tailscale
 - ../../core/reloader
-- ../../core/kubescape
-- ../../core/kubebench
 - ../../apps/homepage
 - ../../apps/authentik
+
+# SECURITY TOOLS
+# wazuh
+- ../../security/wazuh
+- ./secrets/wazuh
+# ---
+- ../../security/kubescape
+- ../../security/kubebench
+- ../../security/kyverno
+- ../../security/policy-reporter
+- ../../security/falco
+
 # GITEA
 - ../../apps/gitea
 - ./secrets/gitea
 # NEXTCLOUD
 - ../../apps/nextcloud
 - ./secrets/nextcloud
-# WAZUH
-- ../../apps/wazuh
-- ./secrets/wazuh
+
 
 patches:
 - path: ./secrets/patches/authentik-values-patch.yaml
