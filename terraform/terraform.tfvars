@@ -5,7 +5,7 @@ vms = {
     vmid      = 100
     memory    = 9216
     balloon   = 1024
-    cores     = 2
+    cores     = 3
     sockets   = 1
     ipconfig0 = "ip=192.168.0.200/24,gw=192.168.0.1"
     disk_size = "32G"

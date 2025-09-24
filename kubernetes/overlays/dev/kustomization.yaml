@@ -11,7 +11,6 @@ resources:
 - ../../core/tailscale
 - ../../core/reloader
 - ../../apps/homepage
-- ../../apps/authentik
 
 # SECURITY TOOLS
 # wazuh
@@ -20,20 +19,21 @@ resources:
 # ---
 - ../../security/kubescape
 - ../../security/kubebench
-- ../../security/kyverno
-- ../../security/policy-reporter
-- ../../security/falco
+# - ../../security/kyverno
+# - ../../security/policy-reporter
+# - ../../security/falco
 
 # GITEA
-- ../../apps/gitea
-- ./secrets/gitea
+# - ../../apps/gitea
+# - ./secrets/gitea
 # NEXTCLOUD
-- ../../apps/nextcloud
-- ./secrets/nextcloud
+# - ../../apps/nextcloud
+# - ./secrets/nextcloud
 
 
-patches:
-- path: ./secrets/patches/authentik-values-patch.yaml
+# - ../../apps/authentik
+# patches:
+# - path: ./secrets/patches/authentik-values-patch.yaml
 
 # patches:
 # - target:
