@@ -14,8 +14,8 @@ resources:
 
 # SECURITY TOOLS
 # wazuh
-- ../../security/wazuh
-- ./secrets/wazuh
+# - ../../security/wazuh
+# - ./secrets/wazuh
 # ---
 - ../../security/kubescape
 - ../../security/kubebench
