@@ -13,6 +13,7 @@ kind: Kustomization
 resources:
 - ../../core/tailscale
 - ../../core/reloader
+- ../../core/kubescape
 - ../../apps/homepage
 - ../../apps/authentik
 # GITEA

@@ -6,6 +6,7 @@ resources:
 - tailscale
 - dashboard
 - reloader
+- kubescape
 # - netdata
 # - keda
 # - kyverno
