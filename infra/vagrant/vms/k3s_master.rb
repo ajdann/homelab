@@ -41,33 +41,25 @@ def configure_k3s_master(config)
 
       master.vm.provision "ansible_local" do |ansible|
         ansible.playbook = "/vagrant/ansible/playbooks/k3s-ha-vagrant.yaml"
-        ansible.install = true
         ansible.verbose = true  # Enable verbose output for debugging
-        ansible.pip_args = "-r /vagrant/ansible/requirements.txt"
-        # ansible.groups = {
-        #   "k3s_masters" => ["k3s-master-#{i+1}"]
-        # }
-        # ansible.host_vars = {
-        #   "k3s-master-#{i+1}" => {"ansible_connection" => "local"}
-        # }
-        # ansible.extra_vars = {
-        #   kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0]  # Use master IP as API endpoint
-        # }
+        ansible.groups = {
+          "k3s_masters" => ["k3s-master-#{i+1}"]
+        }
+        ansible.extra_vars = {
+          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0]  # Use master IP as API endpoint
+        }
       end
 
-      # master.vm.provision "ansible_local" do |ansible|
-      #   ansible.playbook = "/vagrant/ansible/playbooks/k8s_bootstrap.yaml"
-      #   ansible.groups = {
-      #     "k3s_masters" => ["k3s-master-#{i+1}"]
-      #   }
-      #   ansible.host_vars = {
-      #     "k3s-master-#{i+1}" => {"ansible_connection" => "local"}
-      #   }
-      #   ansible.verbose = true  # Enable verbose output for debugging
-      #   ansible.extra_vars = {
-      #     kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0]  # Use master IP as API endpoint
-      #   }
-      # end
+      master.vm.provision "ansible_local" do |ansible|
+        ansible.playbook = "/vagrant/ansible/playbooks/k8s_bootstrap.yaml"
+        ansible.verbose = true  # Enable verbose output for debugging
+        ansible.groups = {
+          "k3s_masters" => ["k3s-master-#{i+1}"]
+        }
+        ansible.extra_vars = {
+          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0]  # Use master IP as API endpoint
+        }
+      end
     end
   end
 end
