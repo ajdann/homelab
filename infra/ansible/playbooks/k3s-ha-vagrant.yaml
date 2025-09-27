@@ -1,8 +1,8 @@
 ---
 - name: Deploy K3s HA cluster
-  hosts: "localhost"
+  hosts: k3s_masters
   become: true
-  connection: "local"
+  gather_facts: true
   roles:
     - ../roles/k3s_server
   vars_files:
