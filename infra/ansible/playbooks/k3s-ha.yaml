@@ -1,7 +1,8 @@
 ---
 - name: Deploy K3s HA cluster
-  hosts: localhost
+  hosts: "{{ target_hosts | default('k3s_masters') }}"
   become: true
+  connection: "{{ 'local' if target_hosts is defined and target_hosts == 'localhost' else 'ssh' }}"
   roles:
     - ../roles/k3s_server
   vars_files:

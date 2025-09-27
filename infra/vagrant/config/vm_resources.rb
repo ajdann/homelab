@@ -1,4 +1,4 @@
-# ------------------------------------------------------
+# ----------------------------
 # Global VM resource settings
 # ------------------------------------------------------
 VM_RESOURCES = {
@@ -17,14 +17,14 @@ VM_RESOURCES = {
   "haproxy"     => { 
     cpus: 1, 
     memory: 1024, 
-    enabled: true,
+    enabled: false,
     ips: ["192.168.222.5", "192.168.222.6"]  # Array for multiple HAProxy instances
   },
   "k3s-master"  => { 
     cpus: 4, 
     memory: 9216, 
     enabled: true,
-    ip: "192.168.222.10"
+    ips: ["192.168.222.10"]  # Array for multiple master instances - add more IPs for HA setup
   },
   "k3s-worker"  => { 
     cpus: 1, 
