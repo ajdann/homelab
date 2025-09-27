@@ -1,6 +1,6 @@
 ---
 - name: Deploy K3s HA cluster
-  hosts: k3s_masters
+  hosts: localhost
   become: true
   roles:
     - ../roles/k3s_server

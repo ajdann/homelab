@@ -5,3 +5,5 @@
   gather_facts: false
   roles:
     - ../roles/k8s_bootstrap
+  vars_files:
+    - ../group_vars/all.yaml

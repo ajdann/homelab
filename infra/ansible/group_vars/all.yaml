@@ -1,1 +1,9 @@
 haproxy_vip: 192.168.0.210
+
+# Default VM credentials
+vm_user: "{{ lookup('file', playbook_dir + '/../../../secrets/vm_user') }}"
+# vm_password: "{{ lookup('file', playbook_dir + '/../../../secrets/vm_password') }}"
+vm_ssh_pub_key: "{{ lookup('file', playbook_dir + '/../../../secrets/vm_ssh_pub_key') }}"
+
+env_file_path: "{{ playbook_dir }}/../../../secrets/.env"
+
