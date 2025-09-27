@@ -22,7 +22,7 @@
     sh /tmp/install-k3s.sh 
     --cluster-init 
     --token {{ k3s_cluster_token }} 
-    --tls-san {{ haproxy_vip }}
+    --tls-san {{ kubernetes_vip }}
     --disable traefik
   args:
     creates: /usr/local/bin/k3s
@@ -31,9 +31,9 @@
   when: inventory_hostname != groups['k3s_masters'][0]
   command: >
     sh /tmp/install-k3s.sh 
-    --server https://{{ haproxy_vip }}:6443 
+    --server https://{{ kubernetes_vip }}:6443 
     --token {{ k3s_cluster_token }} 
-    --tls-san {{ haproxy_vip }}
+    --tls-san {{ kubernetes_vip }}
     --disable traefik
   args:
     creates: /usr/local/bin/k3s
@@ -50,7 +50,7 @@
   replace:
     path: "{{ inventory_dir }}/../../kubeconfig"
     regexp: 'server: https://.*:6443'
-    replace: "server: https://{{ haproxy_vip }}:6443"
+    replace: "server: https://{{ kubernetes_vip }}:6443"
   delegate_to: localhost
   run_once: true
   when: inventory_hostname == groups['k3s_masters'][0]

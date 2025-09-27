@@ -30,7 +30,7 @@ VM_RESOURCES = {
     cpus: 1, 
     memory: 1024, 
     enabled: false,
-    ip_base: "192.168.222.1"  # Base IP for workers (will be 192.168.222.11, 192.168.222.12, etc.)
+    ips: ["192.168.222.11", "192.168.222.12", "192.168.222.13"]  # Array for multiple worker instances
   },
 }
 

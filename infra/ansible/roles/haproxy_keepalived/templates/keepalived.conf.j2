@@ -11,7 +11,7 @@ vrrp_instance VI_1 {
     priority 101
 
     virtual_ipaddress {
-        {{ haproxy_vip }}
+        {{ kubernetes_vip }}
     }
 
     track_script {
