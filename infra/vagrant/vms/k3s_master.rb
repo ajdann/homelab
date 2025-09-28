@@ -40,7 +40,8 @@ def configure_k3s_master(config)
       SHELL
 
       master.vm.provision "ansible_local" do |ansible|
-        ansible.playbook = "/vagrant/ansible/playbooks/k3s-ha-vagrant.yaml"
+        ansible.playbook = "/vagrant/infra/ansible/playbooks/k3s-ha-vagrant.yaml"
+        ansible.pip_args = "-r /vagrant/infra/ansible/requirements.txt"
         ansible.verbose = true  # Enable verbose output for debugging
         ansible.groups = {
           "k3s_masters" => ["k3s-master-#{i+1}"]
@@ -51,8 +52,9 @@ def configure_k3s_master(config)
       end
 
       master.vm.provision "ansible_local" do |ansible|
-        ansible.playbook = "/vagrant/ansible/playbooks/k8s_bootstrap.yaml"
+        ansible.playbook = "/vagrant/infra/ansible/playbooks/k8s-bootstrap.yaml"
         ansible.verbose = true  # Enable verbose output for debugging
+        ansible.pip_args = "-r /vagrant/infra/ansible/requirements.txt"
         ansible.groups = {
           "k3s_masters" => ["k3s-master-#{i+1}"]
         }

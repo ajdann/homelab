@@ -6,6 +6,9 @@ require_relative 'vagrant/lib/helpers'
 Dir[File.join(File.dirname(__FILE__), 'vagrant/vms/*.rb')].each { |file| require file }
 
 Vagrant.configure("2") do |config|
+  # Mount the parent homelab directory for access to entire project
+  config.vm.synced_folder "..", "/vagrant", type: "virtualbox"
+
   # Configure each VM type
   configure_pfsense(config)
   configure_nessus(config)

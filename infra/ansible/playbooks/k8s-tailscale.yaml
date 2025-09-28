@@ -1,6 +1,0 @@
----
-- name: Create Tailscale Kubernetes secret from .env file
-  hosts: all
-  gather_facts: false
-  roles:
-    - tailscale_config
