@@ -34,16 +34,72 @@
     state: present
     src: "https://github.com/controlplaneio-fluxcd/flux-operator/releases/latest/download/install.yaml"
 
+- name: Wait for Flux Operator to be ready
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_dest_path }}"
+    api_version: apps/v1
+    kind: Deployment
+    name: flux-operator
+    namespace: flux-operator-system
+    wait: true
+    wait_condition:
+      type: Available
+      status: "True"
+    wait_timeout: 300
+
+- name: Wait for FluxInstance CRD to be available
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_dest_path }}"
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: fluxinstances.fluxcd.controlplane.io
+    wait: true
+    wait_condition:
+      type: Established
+      status: "True"
+    wait_timeout: 120
+
 - name: Find all manifest files in kubernetes/flux
   ansible.builtin.find:
     paths: "{{ flux_components_path}}"
     patterns: "*.yaml"
   register: flux_manifests
 
-- name: Apply each Flux manifest
+- name: Apply FluxInstance first
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig_dest_path }}"
     state: present
     src: "{{ item.path }}"
   loop: "{{ flux_manifests.files }}"
+  when: "'fluxInstance' in item.path"
+  register: flux_instance_result
+
+- name: Wait for Flux controllers to be deployed by FluxInstance
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_dest_path }}"
+    api_version: apps/v1
+    kind: Deployment
+    namespace: flux-system
+    wait: true
+    wait_condition:
+      type: Available
+      status: "True"
+    wait_timeout: 300
+  loop:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+  loop_control:
+    loop_var: controller_name
+  vars:
+    name: "{{ controller_name }}"
+
+- name: Apply remaining Flux manifests
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_dest_path }}"
+    state: present
+    src: "{{ item.path }}"
+  loop: "{{ flux_manifests.files }}"
+  when: "'fluxInstance' not in item.path"
   register: flux_resources_apply_result
