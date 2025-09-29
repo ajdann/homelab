@@ -38,6 +38,7 @@
     api_version: v1
     kind: Namespace
     state: present
+    kubeconfig: "{{ kubeconfig_dest_path }}"
 
 - name: Create Tailscale operator OAuth secret
   kubernetes.core.k8s:
@@ -54,6 +55,7 @@
         client_id: "{{ env_vars.TAILSCALE_CLIENT_ID }}"
         client_secret: "{{ env_vars.TAILSCALE_CLIENT_SECRET }}"
     state: present
+    kubeconfig: "{{ kubeconfig_dest_path }}"
 
 - name: Create flux-system namespace
   kubernetes.core.k8s:
@@ -61,6 +63,7 @@
     api_version: v1
     kind: Namespace
     state: present
+    kubeconfig: "{{ kubeconfig_dest_path }}"
 
 - name: Create Tailscale Domain ConfigMap
   kubernetes.core.k8s:
@@ -75,6 +78,7 @@
           app.kubernetes.io/managed-by: ansible
       data:
         DOMAIN: "{{ env_vars.TAILSCALE_DOMAIN }}"
+    kubeconfig: "{{ kubeconfig_dest_path }}"
         
 - name: Display success message
   debug:

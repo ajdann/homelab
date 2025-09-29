@@ -5,4 +5,6 @@ vm_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
 vm_password: "{{ lookup('file', playbook_dir + '/../../../secrets/vm_password') }}"
 vm_ssh_pub_key: "{{ lookup('file', playbook_dir + '/../../secrets/vm_ssh_pub_key') }}"
 env_file_path: "{{ playbook_dir }}/../../../secrets/.env"
+kubeconfig_dest_path: "{{ playbook_dir }}/../../../secrets/kubeconfig"
+flux_components_path: "{{ playbook_dir }}/../../../kubernetes/flux"
 

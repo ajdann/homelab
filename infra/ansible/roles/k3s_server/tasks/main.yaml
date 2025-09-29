@@ -38,17 +38,30 @@
   args:
     creates: /usr/local/bin/k3s
 
+- name: Resolve absolute kubeconfig destination path
+  set_fact:
+    kubeconfig_absolute_path: "{{ kubeconfig_dest_path | realpath }}"
+  delegate_to: localhost
+  run_once: true
+  when: inventory_hostname == groups['k3s_masters'][0]
+
 - name: Fetch kubeconfig file
   fetch:
     src: /etc/rancher/k3s/k3s.yaml
-    dest: "{{ inventory_dir }}/../../kubeconfig"
+    dest: "{{ kubeconfig_dest_path }}"
     flat: yes
   become: yes
   when: inventory_hostname == groups['k3s_masters'][0]
 
-- name: Update kubeconfig with HAProxy VIP
+- name: Display kubeconfig file path
+  debug:
+    msg: "Kubeconfig file saved to absolute path: {{ kubeconfig_absolute_path }}"
+  delegate_to: localhost
+  when: inventory_hostname == groups['k3s_masters'][0]
+
+- name: Update kubeconfig with Kubernetes VIP
   replace:
-    path: "{{ inventory_dir }}/../../kubeconfig"
+    path: "{{ kubeconfig_dest_path }}"
     regexp: 'server: https://.*:6443'
     replace: "server: https://{{ kubernetes_vip }}:6443"
   delegate_to: localhost

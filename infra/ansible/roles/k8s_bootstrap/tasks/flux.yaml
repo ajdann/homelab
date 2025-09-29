@@ -1,22 +1,48 @@
 ---
-- name: Install Flux Operator using Helm
-  kubernetes.core.helm:
-    name: flux-operator
-    chart_ref: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
-    namespace: flux-system
-    create_namespace: true
-    kubeconfig: "{{ playbook_dir }}/../../kubeconfig"
-  register: flux_operator_result
+
+### --- Helm-based installation (commented out) ---
+# - name: Download and install Helm
+#   shell: |
+#     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+#   args:
+#     creates: /usr/local/bin/helm
+#   become: true
+
+# - name: Install Flux Operator using Helm
+#   kubernetes.core.helm:
+#     name: flux-operator
+#     chart_ref: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
+#     namespace: flux-system
+#     create_namespace: true
+#     kubeconfig: "{{ kubeconfig_dest_path }}"
+#   register: flux_operator_result
+
+
+# - name: Create flux-system namespace
+#   kubernetes.core.k8s:
+#     kubeconfig: "{{ kubeconfig_dest_path }}"
+#     state: present
+#     definition:
+#       apiVersion: v1
+#       kind: Namespace
+#       metadata:
+#         name: flux-system
+
+- name: Apply Flux Operator installation manifests
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_dest_path }}"
+    state: present
+    src: "https://github.com/controlplaneio-fluxcd/flux-operator/releases/latest/download/install.yaml"
 
 - name: Find all manifest files in kubernetes/flux
   ansible.builtin.find:
-    paths: "{{ playbook_dir }}/../../kubernetes/flux"
+    paths: "{{ flux_components_path}}"
     patterns: "*.yaml"
   register: flux_manifests
 
 - name: Apply each Flux manifest
   kubernetes.core.k8s:
-    kubeconfig: "{{ playbook_dir }}/../../kubeconfig"
+    kubeconfig: "{{ kubeconfig_dest_path }}"
     state: present
     src: "{{ item.path }}"
   loop: "{{ flux_manifests.files }}"

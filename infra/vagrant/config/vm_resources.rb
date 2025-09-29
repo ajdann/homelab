@@ -22,7 +22,7 @@ VM_RESOURCES = {
   },
   "k3s-master"  => { 
     cpus: 4, 
-    memory: 9216, 
+    memory: 8000, 
     enabled: true,
     ips: ["192.168.222.10"]  # Array for multiple master instances - add more IPs for HA setup
   },
