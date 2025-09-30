@@ -1,4 +1,9 @@
 ---
+# Enable fail-fast behavior - stop all hosts if any task fails
+- name: Enable fail-fast behavior
+  set_fact:
+    any_errors_fatal: true
+
 - name: Tailscale configuration tasks
   ansible.builtin.import_tasks: tailscale.yaml
 

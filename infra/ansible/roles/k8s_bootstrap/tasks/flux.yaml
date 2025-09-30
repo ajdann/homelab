@@ -1,4 +1,8 @@
 ---
+# Enable fail-fast behavior for this task file
+- name: Enable fail-fast behavior
+  set_fact:
+    any_errors_fatal: true
 
 ### --- Helm-based installation (commented out) ---
 # - name: Download and install Helm
@@ -33,6 +37,8 @@
     kubeconfig: "{{ kubeconfig_dest_path }}"
     state: present
     src: "https://github.com/controlplaneio-fluxcd/flux-operator/releases/latest/download/install.yaml"
+  register: flux_operator_install_result
+  failed_when: flux_operator_install_result.failed
 
 - name: Wait for Flux Operator to be ready
   kubernetes.core.k8s_info:
@@ -46,6 +52,10 @@
       type: Available
       status: "True"
     wait_timeout: 300
+  register: flux_operator_ready_result
+  failed_when: 
+    - flux_operator_ready_result.failed
+    - flux_operator_ready_result.resources | length == 0
 
 - name: Wait for FluxInstance CRD to be available
   kubernetes.core.k8s_info:
@@ -58,6 +68,10 @@
       type: Established
       status: "True"
     wait_timeout: 120
+  register: fluxinstance_crd_result
+  failed_when: 
+    - fluxinstance_crd_result.failed
+    - fluxinstance_crd_result.resources | length == 0
 
 - name: Find all manifest files in kubernetes/flux
   ansible.builtin.find:
@@ -73,6 +87,7 @@
   loop: "{{ flux_manifests.files }}"
   when: "'fluxInstance' in item.path"
   register: flux_instance_result
+  failed_when: flux_instance_result.failed
 
 - name: Wait for Flux controllers to be deployed by FluxInstance
   kubernetes.core.k8s_info:
@@ -94,6 +109,31 @@
     loop_var: controller_name
   vars:
     name: "{{ controller_name }}"
+  register: flux_controllers_result
+  failed_when: 
+    - flux_controllers_result.failed
+    - flux_controllers_result.resources | length == 0
+
+- name: Wait for Flux Toolkit CRDs to be available
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_dest_path }}"
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: "{{ item }}"
+    wait: true
+    wait_condition:
+      type: Established
+      status: "True"
+    wait_timeout: 180
+  loop:
+    - gitrepositories.source.toolkit.fluxcd.io
+    - kustomizations.kustomize.toolkit.fluxcd.io
+    - helmrepositories.source.toolkit.fluxcd.io
+    - helmreleases.helm.toolkit.fluxcd.io
+  register: flux_crds_result
+  failed_when: 
+    - flux_crds_result.failed
+    - flux_crds_result.resources | length == 0
 
 - name: Apply remaining Flux manifests
   kubernetes.core.k8s:
@@ -103,3 +143,24 @@
   loop: "{{ flux_manifests.files }}"
   when: "'fluxInstance' not in item.path"
   register: flux_resources_apply_result
+  failed_when: flux_resources_apply_result.failed
+
+- name: Verify all Flux components are healthy
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_dest_path }}"
+    api_version: apps/v1
+    kind: Deployment
+    namespace: flux-system
+  register: flux_final_check
+  failed_when: >
+    flux_final_check.resources | length == 0 or
+    flux_final_check.resources | 
+    selectattr('status.readyReplicas', 'undefined') | 
+    list | length > 0
+
+- name: Display Flux deployment status
+  debug:
+    msg: 
+      - "Flux deployments found: {{ flux_final_check.resources | length }}"
+      - "Ready deployments: {{ flux_final_check.resources | selectattr('status.readyReplicas', 'defined') | list | length }}"
+      - "Deployment names: {{ flux_final_check.resources | map(attribute='metadata.name') | list }}"

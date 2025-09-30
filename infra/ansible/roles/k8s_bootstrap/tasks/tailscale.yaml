@@ -1,8 +1,14 @@
 ---
+# Enable fail-fast behavior for this task file
+- name: Enable fail-fast behavior
+  set_fact:
+    any_errors_fatal: true
+
 - name: Check if .env file exists
   stat:
     path: "{{ env_file_path }}"
   register: env_file_stat
+  failed_when: false  # Don't fail here, we check in next task
 
 - name: Fail if .env file doesn't exist
   fail:
@@ -39,6 +45,8 @@
     kind: Namespace
     state: present
     kubeconfig: "{{ kubeconfig_dest_path }}"
+  register: tailscale_namespace_result
+  failed_when: tailscale_namespace_result.failed
 
 - name: Create Tailscale operator OAuth secret
   kubernetes.core.k8s:
@@ -56,6 +64,8 @@
         client_secret: "{{ env_vars.TAILSCALE_CLIENT_SECRET }}"
     state: present
     kubeconfig: "{{ kubeconfig_dest_path }}"
+  register: tailscale_secret_result
+  failed_when: tailscale_secret_result.failed
 
 - name: Create flux-system namespace
   kubernetes.core.k8s:
@@ -64,6 +74,8 @@
     kind: Namespace
     state: present
     kubeconfig: "{{ kubeconfig_dest_path }}"
+  register: flux_namespace_result
+  failed_when: flux_namespace_result.failed
 
 - name: Create Tailscale Domain ConfigMap
   kubernetes.core.k8s:
@@ -79,6 +91,8 @@
       data:
         DOMAIN: "{{ env_vars.TAILSCALE_DOMAIN }}"
     kubeconfig: "{{ kubeconfig_dest_path }}"
+  register: tailscale_configmap_result
+  failed_when: tailscale_configmap_result.failed
         
 - name: Display success message
   debug:
