@@ -14,14 +14,14 @@ resources:
 
 # SECURITY TOOLS
 # wazuh
-# - ../../security/wazuh
-# - ./secrets/wazuh
+- ../../security/wazuh
+- ./secrets/wazuh
 # ---
 - ../../security/kubescape
 - ../../security/kubebench
-# - ../../security/kyverno
-# - ../../security/policy-reporter
-# - ../../security/falco
+- ../../security/kyverno
+- ../../security/policy-reporter
+- ../../security/falco
 
 # GITEA
 # - ../../apps/gitea
