@@ -9,7 +9,7 @@ metadata:
     gethomepage.dev/enabled: 'true'
     gethomepage.dev/name: 'Wazuh Dashboard'
     gethomepage.dev/description: 'Wazuh Dashboard for security monitoring'
-    gethomepage.dev/group: 'Monitoring'
+    gethomepage.dev/group: 'Security'
     gethomepage.dev/icon: 'policycontroller.png'
     gethomepage.dev/href: 'https://wazuh.${DOMAIN}'
     # gethomepage.dev/widget.type: 'wazuh'

@@ -9,7 +9,7 @@ metadata:
     gethomepage.dev/enabled: 'true'
     gethomepage.dev/name: 'Policy Reporter'
     gethomepage.dev/description: 'Kyverno policy results dashboard'
-    gethomepage.dev/group: 'Monitoring'
+    gethomepage.dev/group: 'Security'
     gethomepage.dev/icon: 'policycontroller.png'
     gethomepage.dev/href: 'https://policy-reporter.${DOMAIN}'
     # gethomepage.dev/widget.type: 'policy-reporter'
