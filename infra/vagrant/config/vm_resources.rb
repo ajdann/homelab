@@ -21,7 +21,7 @@ VM_RESOURCES = {
     ips: ["192.168.222.5", "192.168.222.6"]  # Array for multiple HAProxy instances
   },
   "k3s-master"  => { 
-    cpus: 4, 
+    cpus: 6, 
     memory: 8000, 
     enabled: true,
     ips: ["192.168.222.10"]  # Array for multiple master instances - add more IPs for HA setup
