@@ -14,14 +14,21 @@ def configure_k3s_master(config)
       master.vm.hostname = "k3s-master-#{i+1}"
       master.disksize.size = "60GB"
 
-      # Only forward port 6443 if single master and no haproxy
-      if should_expose_port && i == 0
+      # Port forwarding for accessing K3s API via localhost
+      if i == 0  # Only for first master
         master.vm.network "forwarded_port", guest: 6443, host: 6443
       end
-
+      
+      # Use private network (internal VirtualBox network)
       master.vm.network "private_network",
         ip: ip,
         virtualbox__intnet: NETWORK_CONFIG[:virtualbox_intnet]
+
+      # Public network configuration (commented out)
+      # master.vm.network "public_network", 
+      #   ip: ip,  # Uses the IP from vm_resources.rb but you need to change it to your network range
+      #   bridge: "auto"  # Automatically select the network adapter
+      
 
       master.vm.provider "virtualbox" do |vb|
         vb.name   = "k3s-master-#{i+1}"
@@ -31,12 +38,6 @@ def configure_k3s_master(config)
 
       # configure_netplan(master, ip)
       master.vm.provision "shell", inline: <<-SHELL
-        # sudo apt update
-        # sudo apt install -y software-properties-common python3 python3-pip python3-venv
-        # sudo add-apt-repository --yes --update ppa:ansible/ansible
-        # sudo apt install -y ansible
-        # sudo pip3 install -r /vagrant/ansible/requirements.txt
-        # sudo ansible-galaxy install -r /vagrant/ansible/requirements.yaml
       SHELL
 
       master.vm.provision "ansible_local" do |ansible|
@@ -48,7 +49,13 @@ def configure_k3s_master(config)
           "k3s_masters" => ["k3s-master-#{i+1}"]
         }
         ansible.extra_vars = {
-          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0]  # Use master IP as API endpoint
+          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0],  # Use master IP as API endpoint
+          kubernetes_tls_sans: [
+            VM_RESOURCES["k3s-master"][:ips][0],  # VM IP address
+            "localhost",                          # For port forwarding access
+            "127.0.0.1"                          # For port forwarding access
+          ].join(","),  # K3s expects comma-separated TLS SANs
+          kubeconfig_server: "localhost"        # Use localhost for port forwarding
         }
       end
 
@@ -62,7 +69,13 @@ def configure_k3s_master(config)
           "k3s_masters" => ["k3s-master-#{i+1}"]
         }
         ansible.extra_vars = {
-          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0]  # Use master IP as API endpoint
+          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0],  # Use master IP as API endpoint
+          kubernetes_tls_sans: [
+            VM_RESOURCES["k3s-master"][:ips][0],  # VM IP address
+            "localhost",                          # For port forwarding access
+            "127.0.0.1"                          # For port forwarding access
+          ].join(","),  # K3s expects comma-separated TLS SANs
+          kubeconfig_server: "localhost"        # Use localhost for port forwarding
         }
       end
     end

@@ -1,125 +1,19 @@
 ---
-# Enable fail-fast behavior - stop all hosts if any task fails
-- name: Enable fail-fast behavior
-  set_fact:
-    any_errors_fatal: true
+# K3s Server Role - Main Tasks
+# This role installs and configures K3s in server mode with proper clustering support
 
-- name: Download K3s install script
-  get_url:
-    url: https://get.k3s.io
-    dest: /tmp/install-k3s.sh
-    mode: '0755'
-  register: k3s_download_result
-  failed_when: k3s_download_result.failed
+- name: Validate prerequisites and input parameters
+  ansible.builtin.import_tasks: validate.yaml
+  tags: ['k3s', 'k3s-validate']
 
-- name: Generate K3s cluster token
-  run_once: true
-  shell: "openssl rand -hex 16"
-  register: k3s_cluster_token_raw
-  delegate_to: localhost
+- name: Install K3s server
+  ansible.builtin.import_tasks: install.yaml
+  tags: ['k3s', 'k3s-install']
 
-- name: Store K3s cluster token
-  run_once: true
-  set_fact:
-    k3s_cluster_token: "{{ k3s_cluster_token_raw.stdout }}"
+- name: Manage kubeconfig
+  ansible.builtin.import_tasks: kubeconfig.yaml
+  tags: ['k3s', 'k3s-kubeconfig']
 
-- name: Run K3s install script (first master)
-  when: inventory_hostname == groups['k3s_masters'][0]
-  command: >
-    sh /tmp/install-k3s.sh 
-    --cluster-init 
-    --token {{ k3s_cluster_token }} 
-    --tls-san {{ kubernetes_vip }}
-    --disable traefik
-  args:
-    creates: /usr/local/bin/k3s
-  register: k3s_first_master_install
-  failed_when: k3s_first_master_install.rc != 0
-
-- name: Run K3s install script (other masters)
-  when: inventory_hostname != groups['k3s_masters'][0]
-  command: >
-    sh /tmp/install-k3s.sh 
-    --server https://{{ kubernetes_vip }}:6443 
-    --token {{ k3s_cluster_token }} 
-    --tls-san {{ kubernetes_vip }}
-    --disable traefik
-  args:
-    creates: /usr/local/bin/k3s
-  register: k3s_other_masters_install
-  failed_when: k3s_other_masters_install.rc != 0
-
-- name: Resolve absolute kubeconfig destination path
-  set_fact:
-    kubeconfig_absolute_path: "{{ kubeconfig_dest_path | realpath }}"
-  delegate_to: localhost
-  run_once: true
-  when: inventory_hostname == groups['k3s_masters'][0]
-
-- name: Fetch kubeconfig file
-  fetch:
-    src: /etc/rancher/k3s/k3s.yaml
-    dest: "{{ kubeconfig_dest_path }}"
-    flat: yes
-  become: yes
-  when: inventory_hostname == groups['k3s_masters'][0]
-  register: kubeconfig_fetch_result
-  failed_when: kubeconfig_fetch_result.failed
-
-- name: Display kubeconfig file path
-  debug:
-    msg: "Kubeconfig file saved to absolute path: {{ kubeconfig_absolute_path }}"
-  delegate_to: localhost
-  when: inventory_hostname == groups['k3s_masters'][0]
-
-- name: Update kubeconfig with Kubernetes VIP
-  replace:
-    path: "{{ kubeconfig_dest_path }}"
-    regexp: 'server: https://.*:6443'
-    replace: "server: https://{{ kubernetes_vip }}:6443"
-  delegate_to: localhost
-  run_once: true
-  when: inventory_hostname == groups['k3s_masters'][0]
-  register: kubeconfig_update_result
-  failed_when: kubeconfig_update_result.failed
-
-- name: Verify K3s service is running
-  service:
-    name: k3s
-    state: started
-    enabled: yes
-  become: yes
-  register: k3s_service_result
-  failed_when: k3s_service_result.failed
-
-- name: Wait for K3s to be fully ready
-  wait_for:
-    port: 6443
-    host: "{{ kubernetes_vip }}"
-    timeout: 300
-  when: inventory_hostname == groups['k3s_masters'][0]
-
-- name: Verify K3s cluster is accessible using k3s kubectl
-  command: k3s kubectl get nodes
-  register: k3s_cluster_check
-  failed_when: k3s_cluster_check.rc != 0
-  when: inventory_hostname == groups['k3s_masters'][0]
-  retries: 10
-  delay: 15
-  become: yes
-
-- name: Verify K3s cluster has ready nodes
-  command: k3s kubectl get nodes --no-headers
-  register: k3s_nodes_check
-  failed_when: "'Ready' not in k3s_nodes_check.stdout"
-  when: inventory_hostname == groups['k3s_masters'][0]
-  become: yes
-
-- name: Display K3s cluster status
-  debug:
-    msg: 
-      - "K3s cluster is ready!"
-      - "Nodes: {{ k3s_cluster_check.stdout_lines }}"
-  when: 
-    - inventory_hostname == groups['k3s_masters'][0]
-    - k3s_cluster_check is defined
+- name: Verify K3s installation
+  ansible.builtin.import_tasks: verify.yaml
+  tags: ['k3s', 'k3s-verify']

@@ -1,0 +1,17 @@
+---
+# K3s Server Role Variables
+# These are computed variables that depend on facts or other variables
+
+# Determine if this is the first master node
+is_first_master: "{{ inventory_hostname == groups['k3s_masters'][0] }}"
+
+# Build the full K3s install command arguments
+k3s_install_args_base:
+  - "--token {{ k3s_cluster_token }}"
+  - "--tls-san {{ k3s_tls_san_list }}"
+
+k3s_first_master_args: "{{ k3s_install_args_base + ['--cluster-init'] }}"
+k3s_other_master_args: "{{ k3s_install_args_base + ['--server https://' + kubernetes_vip + ':6443'] }}"
+
+# Service disable arguments
+k3s_disable_args: "{{ k3s_disable_services | map('regex_replace', '^(.*)$', '--disable \\1') | list }}"

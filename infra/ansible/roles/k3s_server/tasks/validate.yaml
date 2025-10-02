@@ -1,0 +1,34 @@
+---
+# Input Validation and Prerequisite Tasks
+
+- name: Enable fail-fast behavior
+  set_fact:
+    any_errors_fatal: "{{ k3s_any_errors_fatal }}"
+
+- name: Validate required variables
+  assert:
+    that:
+      - groups['k3s_masters'] is defined
+      - groups['k3s_masters'] | length > 0
+      - kubernetes_vip is defined
+      - kubeconfig_dest_path is defined
+    fail_msg: "Required variables are not properly defined"
+    success_msg: "All required variables are present"
+
+- name: Validate kubeconfig destination directory
+  file:
+    path: "{{ kubeconfig_dest_path | dirname }}"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  run_once: true
+  when: inventory_hostname == groups['k3s_masters'][0]
+
+- name: Check if K3s is already installed
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary_exists
+
+- name: Display installation status
+  debug:
+    msg: "K3s {{ 'is already installed' if k3s_binary_exists.stat.exists else 'will be installed' }}"

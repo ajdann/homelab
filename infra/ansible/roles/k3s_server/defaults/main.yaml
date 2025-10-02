@@ -1,2 +1,28 @@
 ---
+# K3s Server Role Defaults
+
+# Kubeconfig configuration
 kubeconfig_dest_path: "{{ playbook_dir }}/../../../secrets/kubeconfig"
+kubeconfig_server_default: "localhost"
+kubeconfig_fetch_timeout: 300
+
+# K3s configuration
+k3s_install_url: "https://get.k3s.io"
+k3s_install_script_path: "/tmp/install-k3s.sh"
+k3s_disable_services:
+  - traefik
+
+# Cluster configuration
+k3s_cluster_token_length: 16
+
+# TLS configuration
+k3s_tls_sans: []
+k3s_default_tls_san: "{{ kubernetes_vip | default(ansible_default_ipv4.address) }}"
+
+# Service verification
+k3s_service_start_timeout: 300
+k3s_api_check_retries: 10
+k3s_api_check_delay: 15
+
+# Fail-fast behavior
+k3s_any_errors_fatal: true
