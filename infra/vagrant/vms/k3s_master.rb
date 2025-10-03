@@ -61,7 +61,7 @@ def configure_k3s_master(config)
 
       master.vm.provision "ansible_local" do |ansible|
         ansible.playbook = "/vagrant/infra/ansible/playbooks/k8s-bootstrap.yaml"
-        ansible.verbose = true  # Enable verbose output for debugging
+        ansible.verbose = false  
         ansible.install_mode = "pip"
         ansible.galaxy_role_file = "/vagrant/infra/ansible/requirements.yaml"
         ansible.pip_args = "-r /vagrant/infra/ansible/requirements.txt"
