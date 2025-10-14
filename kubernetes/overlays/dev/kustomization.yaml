@@ -22,6 +22,7 @@ resources:
 - ../../security/kyverno
 - ../../security/policy-reporter
 - ../../security/falco
+- ../../security/falcosidekick
 
 # GITEA
 # - ../../apps/gitea
