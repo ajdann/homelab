@@ -1,0 +1,201 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: loki-stack
+  namespace: monitoring
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: loki-stack
+      version: "2.10.2"
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: monitoring
+  values:
+    # Loki configuration
+    loki:
+      enabled: true
+      replicas: 1
+
+      # Persistence for Loki
+      persistence:
+        enabled: true
+        size: 10Gi
+
+      # Security context
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+
+      # Resource limits
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 512Mi
+
+      # Service configuration
+      service:
+        type: ClusterIP
+        port: 3100
+
+    # Promtail configuration - log collector
+    promtail:
+      enabled: true
+
+      # Security context
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 0  # Needs root to read logs
+        runAsGroup: 0
+        seccompProfile:
+          type: RuntimeDefault
+
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+
+      # Resource limits
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+
+    # Grafana configuration
+    grafana:
+      enabled: true
+      replicas: 1
+
+      # Pin Grafana to latest version
+      image:
+        repository: grafana/grafana
+        tag: "11.3.0"  # Latest stable version as of deployment
+        pullPolicy: IfNotPresent
+
+      # Security context
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 472
+        runAsGroup: 472
+        fsGroup: 472
+        seccompProfile:
+          type: RuntimeDefault
+
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: false  # Grafana needs write access for plugins
+
+      # Resource limits
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+
+      # Persistence for Grafana
+      persistence:
+        enabled: true
+        type: pvc
+        size: 5Gi
+
+      # Service configuration
+      service:
+        type: ClusterIP
+        port: 80
+        targetPort: 3000
+
+      # Admin credentials - using default for initial setup
+      # Should be changed via Grafana UI after deployment
+      adminUser: admin
+      adminPassword: admin
+
+      # Datasources - auto-configure Loki
+      datasources:
+        datasources.yaml:
+          apiVersion: 1
+          datasources:
+            - name: Loki
+              type: loki
+              access: proxy
+              url: http://loki-stack:3100
+              isDefault: true
+              jsonData:
+                maxLines: 1000
+
+      # Ingress configuration for Grafana with Tailscale
+      ingress:
+        enabled: true
+        ingressClassName: tailscale
+        annotations:
+          tailscale.com/tags: tag:k8s-operator
+          gethomepage.dev/enabled: 'true'
+          gethomepage.dev/name: 'Grafana'
+          gethomepage.dev/description: 'Metrics and Logs Dashboard'
+          gethomepage.dev/group: 'Monitoring'
+          gethomepage.dev/icon: 'grafana.png'
+          gethomepage.dev/href: 'https://grafana.${DOMAIN}'
+        hosts:
+          - host: grafana
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - grafana
+
+      # Grafana.ini configuration
+      grafana.ini:
+        server:
+          root_url: https://grafana.${DOMAIN}/
+          serve_from_sub_path: false
+        security:
+          admin_user: admin
+          admin_password: admin
+        analytics:
+          reporting_enabled: false
+          check_for_updates: false
+        log:
+          mode: console
+          level: info
+
+    # Fluent Bit - optional, disabled by default
+    fluent-bit:
+      enabled: false
+
+    # Log gateway - optional, disabled by default
+    logstash:
+      enabled: false
+
+    # File store - optional, disabled by default
+    filebeat:
+      enabled: false

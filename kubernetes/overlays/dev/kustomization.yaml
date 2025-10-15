@@ -12,6 +12,9 @@ resources:
 - ../../core/reloader
 - ../../apps/homepage
 
+# MONITORING
+# - ../../monitoring/loki-stack
+
 # SECURITY TOOLS
 # wazuh
 - ../../security/wazuh
