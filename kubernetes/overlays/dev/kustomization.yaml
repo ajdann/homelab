@@ -27,6 +27,8 @@ resources:
 - ../../security/falco
 - ../../security/falcosidekick
 
+- ../../monitoring/
+
 # GITEA
 # - ../../apps/gitea
 # - ./secrets/gitea
