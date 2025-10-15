@@ -176,7 +176,7 @@ spec:
       # Grafana.ini configuration
       grafana.ini:
         server:
-          root_url: https://grafana.${DOMAIN}/
+          root_url: "https://grafana.${DOMAIN}/"
           serve_from_sub_path: false
         security:
           admin_user: admin
