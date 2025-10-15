@@ -73,11 +73,11 @@
     -P "{{ wazuh_registration_password }}"
   register: auth_result
   changed_when: >
-    "'Agent ID' in auth_result.stderr or
-     'Waiting for server reply' in auth_result.stderr"
+    'Agent ID' in auth_result.stderr or
+    'Valid key received' in auth_result.stderr
   failed_when: >
-    "auth_result.rc != 0 and
-     'Duplicate agent name' not in auth_result.stderr and
-     'already exists' not in auth_result.stderr"
+    auth_result.rc != 0 and
+    'Duplicate agent name' not in auth_result.stderr and
+    'already exists' not in auth_result.stderr
   # when: not agent_keys.stat.exists
   # no_log: true

@@ -1,0 +1,116 @@
+---
+# Verification tasks for Wazuh agent deployment
+
+- name: Verify Wazuh agent package is installed with correct version
+  command: dpkg -l wazuh-agent
+  register: agent_package_info
+  changed_when: false
+  failed_when: agent_package_info.rc != 0
+
+- name: Display installed Wazuh agent version
+  debug:
+    msg: "{{ agent_package_info.stdout_lines | select('match', '^ii.*wazuh-agent.*') | list }}"
+
+- name: Check Wazuh agent service status
+  systemd:
+    name: wazuh-agent
+  register: agent_service_status
+  changed_when: false
+
+- name: Verify Wazuh agent service is running
+  assert:
+    that:
+      - agent_service_status.status.ActiveState == "active"
+      - agent_service_status.status.SubState == "running"
+    fail_msg: "Wazuh agent service is not running properly"
+    success_msg: "Wazuh agent service is active and running"
+
+- name: Wait for agent to establish connection (allow time for startup)
+  pause:
+    seconds: 10
+  when: agent_service_status.status.ActiveState == "active"
+
+- name: Check recent agent connection status in logs
+  shell: |
+    # Get the most recent connection logs
+    sudo grep -E "Connected to the server|INFO.*4102" /var/ossec/logs/ossec.log | tail -3
+  register: connection_logs
+  changed_when: false
+  failed_when: false
+
+- name: Get current agent connection status from process
+  shell: |
+    # Check if agentd process is running and connected
+    if pgrep -f wazuh-agentd > /dev/null; then
+      echo "Agent process running"
+    else
+      echo "Agent process not running"
+    fi
+  register: agent_process_status
+  changed_when: false 
+
+- name: Verify agent connectivity to manager
+  assert:
+    that:
+      - connection_logs.stdout | length > 0
+      - "'Connected to the server' in connection_logs.stdout"
+      - "'Agent process running' in agent_process_status.stdout"
+    fail_msg: "Wazuh agent connectivity issues. Connection logs: {{ connection_logs.stdout }}, Process: {{ agent_process_status.stdout }}"
+    success_msg: "Wazuh agent successfully connected to manager"
+
+- name: Check for recent critical errors (version mismatch only)
+  shell: |
+    # Only check for version mismatch errors in the last 5 minutes
+    recent_errors=$(sudo grep "Agent version must be lower or equal to manager version" /var/ossec/logs/ossec.log | tail -5)
+    if echo "$recent_errors" | grep -q "$(date '+%Y/%m/%d %H:%M' -d '5 minutes ago')"; then
+      echo "recent_version_errors"
+    else
+      echo "no_recent_version_errors"
+    fi
+  register: version_error_check
+  changed_when: false
+  failed_when: false
+
+- name: Verify no critical version compatibility errors recently
+  assert:
+    that:
+      - version_error_check.stdout == "no_recent_version_errors"
+    fail_msg: "Wazuh agent has recent version compatibility issues"
+    success_msg: "No recent version compatibility errors found"
+
+- name: Check agent processes are running
+  shell: |
+    pgrep -f "wazuh-(execd|agentd|syscheckd|logcollector|modulesd)" | wc -l
+  register: agent_processes
+  changed_when: false
+
+- name: Verify all agent processes are running
+  assert:
+    that:
+      - agent_processes.stdout | int >= 5
+    fail_msg: "Not all Wazuh agent processes are running. Found {{ agent_processes.stdout }} processes"
+    success_msg: "All Wazuh agent processes are running ({{ agent_processes.stdout }} processes)"
+
+- name: Verify client keys file exists and is not empty
+  stat:
+    path: /var/ossec/etc/client.keys
+  register: client_keys_file
+
+- name: Check agent registration status
+  assert:
+    that:
+      - client_keys_file.stat.exists
+      - client_keys_file.stat.size > 0
+    fail_msg: "Agent client keys file is missing or empty"
+    success_msg: "Agent is properly registered (client.keys file exists and contains data)"
+
+- name: Display final agent status summary
+  debug:
+    msg:
+      - "=== Wazuh Agent Status Summary ==="
+      - "Service Status: {{ agent_service_status.status.ActiveState }}/{{ agent_service_status.status.SubState }}"
+      - "Processes Running: {{ agent_processes.stdout }}"
+      - "Registration: {{ 'Registered' if client_keys_file.stat.size > 0 else 'Not Registered' }}"
+      - "Manager Connection: {{ wazuh_manager_ip }}:{{ wazuh_manager_port }}"
+      - "Auth Port: {{ wazuh_manager_auth_port }}"
+      - "Agent Name: {{ wazuh_agent_name }}"

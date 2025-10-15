@@ -1,9 +1,0 @@
----
-- name: Deploy K3s HA cluster
-  hosts: k3s_masters
-  become: true
-  gather_facts: true
-  roles:
-    - ../roles/k3s_server
-  vars_files:
-    - ../group_vars/all.yaml

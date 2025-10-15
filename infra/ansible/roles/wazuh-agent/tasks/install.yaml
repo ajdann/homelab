@@ -10,8 +10,9 @@
     state: present
     filename: wazuh
 
-- name: Install Wazuh agent
+- name: Install Wazuh agent (specific version to match manager)
   apt:
-    name: wazuh-agent
+    name: "wazuh-agent=4.12.0-1"
     state: present
     update_cache: yes
+    allow_downgrade: yes

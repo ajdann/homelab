@@ -41,7 +41,7 @@ def configure_k3s_master(config)
       SHELL
 
       master.vm.provision "ansible_local" do |ansible|
-        ansible.playbook = "/vagrant/infra/ansible/playbooks/k3s-ha-vagrant.yaml"
+        ansible.playbook = "/vagrant/infra/ansible/playbooks/k8s-server.yaml"
         ansible.install_mode = "pip"
         ansible.pip_args = "-r /vagrant/infra/ansible/requirements.txt"
         # ansible.verbose = true  # Enable verbose output for debugging
@@ -76,6 +76,24 @@ def configure_k3s_master(config)
             "127.0.0.1"                          # For port forwarding access
           ].join(","),  # K3s expects comma-separated TLS SANs
           kubeconfig_server: "localhost"        # Use localhost for port forwarding
+        }
+      end
+
+      # Install and configure Wazuh agent to connect to Kubernetes Wazuh manager
+      master.vm.provision "ansible_local" do |ansible|
+        ansible.playbook = "/vagrant/infra/ansible/playbooks/wazuh-agent.yaml"
+        ansible.verbose = false
+        ansible.install_mode = "pip"
+        ansible.pip_args = "-r /vagrant/infra/ansible/requirements.txt"
+        ansible.groups = {
+          "k3s_masters" => ["k3s-master-#{i+1}"]
+        }
+        ansible.extra_vars = {
+          # Connect to Wazuh manager running in Kubernetes via NodePort services
+          wazuh_manager_ip: VM_RESOURCES["k3s-master"][:ips][0],  # K3s master node IP
+          wazuh_manager_port: 31514,        # NodePort for agent events (wazuh-workers service)
+          wazuh_manager_auth_port: 31515,   # NodePort for agent registration (wazuh master service)
+          wazuh_agent_name: "k3s-master-#{i+1}"  # Unique agent name per VM
         }
       end
     end

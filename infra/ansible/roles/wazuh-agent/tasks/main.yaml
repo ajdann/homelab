@@ -3,3 +3,4 @@
 - import_tasks: configure.yaml
 - import_tasks: registration.yaml
 - import_tasks: service.yaml
+- import_tasks: verify.yaml

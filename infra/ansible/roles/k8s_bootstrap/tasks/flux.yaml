@@ -51,7 +51,7 @@
     wait_condition:
       type: Available
       status: "True"
-    wait_timeout: 300
+    wait_timeout: 30
   register: flux_operator_ready_result
   failed_when: 
     - flux_operator_ready_result.failed
