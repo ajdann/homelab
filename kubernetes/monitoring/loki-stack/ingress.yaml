@@ -1,0 +1,30 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: monitoring
+  annotations:
+    tailscale.com/tags: tag:k8s-operator
+    gethomepage.dev/enabled: 'true'
+    gethomepage.dev/name: 'Grafana'
+    gethomepage.dev/description: 'Metrics and Logs Dashboard'
+    gethomepage.dev/group: 'Monitoring'
+    gethomepage.dev/icon: 'grafana.png'
+    gethomepage.dev/href: 'https://grafana.${DOMAIN}'
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: grafana
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: loki-stack-grafana
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - grafana

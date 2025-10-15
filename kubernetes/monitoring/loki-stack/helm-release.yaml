@@ -152,26 +152,9 @@ spec:
               jsonData:
                 maxLines: 1000
 
-      # Ingress configuration for Grafana with Tailscale
+      # Ingress disabled - using separate ingress resource
       ingress:
-        enabled: true
-        ingressClassName: tailscale
-        annotations:
-          tailscale.com/tags: tag:k8s-operator
-          gethomepage.dev/enabled: 'true'
-          gethomepage.dev/name: 'Grafana'
-          gethomepage.dev/description: 'Metrics and Logs Dashboard'
-          gethomepage.dev/group: 'Monitoring'
-          gethomepage.dev/icon: 'grafana.png'
-          gethomepage.dev/href: 'https://grafana.${DOMAIN}'
-        hosts:
-          - host: grafana
-            paths:
-              - path: /
-                pathType: Prefix
-        tls:
-          - hosts:
-              - grafana
+        enabled: false
 
       # Grafana.ini configuration
       grafana.ini:
