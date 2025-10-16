@@ -58,9 +58,9 @@ spec:
       #   webhookurl: ""
       #   minimumpriority: ""
       #
-      # loki:
-      #   hostport: "http://loki:3100"
-      #   minimumpriority: ""
+      loki:
+        hostport: "http://loki.monitoring.svc.cluster.local:3100"
+        minimumpriority: ""
       #
       # elasticsearch:
       #   hostport: "http://elasticsearch:9200"
