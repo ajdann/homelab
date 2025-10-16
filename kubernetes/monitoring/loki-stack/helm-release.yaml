@@ -165,7 +165,16 @@ spec:
           enabled: true
           label: grafana_dashboard
           folder: /var/lib/grafana/dashboards/falco
-          
+
+      extraVolumes:
+        - name: falco-dashboards
+          emptyDir: {}
+
+      extraVolumeMounts:
+        - name: falco-dashboards
+          mountPath: /var/lib/grafana/dashboards/falco
+          readOnly: true
+
     # Fluent Bit - optional, disabled by default
     fluent-bit:
       enabled: false
