@@ -15,3 +15,7 @@ spec:
         name: falco
         namespace: falco
   values:
+    json_output: true
+    http_output:
+      enabled: true
+      url: http://falcosidekick.falcosidekick.svc.cluster.local:2801/
