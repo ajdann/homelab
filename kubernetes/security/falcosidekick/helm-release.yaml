@@ -48,7 +48,7 @@ spec:
       # Debug mode
       debug: true
       loki:
-        hostport: "http://loki.monitoring.svc.cluster.local:3100"
+        hostport: "http://loki-stack.monitoring.svc.cluster.local:3100"
         minimumpriority: info
 
       # Falco event forwarding endpoint
