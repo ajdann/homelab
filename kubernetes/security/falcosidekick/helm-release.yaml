@@ -46,7 +46,7 @@ spec:
 
     config:
       # Debug mode
-      debug: false
+      debug: true
 
       # Falco event forwarding endpoint
       # This is the webhook URL where Falco will send events
@@ -60,7 +60,7 @@ spec:
       #
       loki:
         hostport: "http://loki.monitoring.svc.cluster.local:3100"
-        minimumpriority: ""
+        minimumpriority: info
       #
       # elasticsearch:
       #   hostport: "http://elasticsearch:9200"
