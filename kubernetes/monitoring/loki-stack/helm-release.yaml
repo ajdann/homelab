@@ -139,18 +139,7 @@ spec:
       adminUser: admin
       adminPassword: admin
 
-      # Datasources - auto-configure Loki
       datasources:
-        datasources.yaml:
-          apiVersion: 1
-          datasources:
-            - name: Loki
-              type: loki
-              access: proxy
-              url: http://loki-stack:3100
-              isDefault: true
-              jsonData:
-                maxLines: 1000
 
       # Ingress disabled - using separate ingress resource
       ingress:
