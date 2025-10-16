@@ -160,6 +160,12 @@ spec:
           mode: console
           level: info
 
+      sidecar:
+        dashboards:
+          enabled: true
+          label: grafana_dashboard
+          folder: /var/lib/grafana/dashboards/falco
+          
     # Fluent Bit - optional, disabled by default
     fluent-bit:
       enabled: false
