@@ -13,8 +13,8 @@
 - name: Wait for K3s API to be ready
   wait_for:
     port: 6443
-    host: "{{ kubernetes_vip }}"
-    timeout: "{{ k3s_service_start_timeout }}"
+    host: '{{ kubernetes_vip }}'
+    timeout: '{{ k3s_service_start_timeout }}'
   when: inventory_hostname == groups['k3s_masters'][0]
 
 - name: Verify K3s cluster is accessible using k3s kubectl
@@ -22,8 +22,8 @@
   register: k3s_cluster_check
   failed_when: k3s_cluster_check.rc != 0
   when: inventory_hostname == groups['k3s_masters'][0]
-  retries: "{{ k3s_api_check_retries }}"
-  delay: "{{ k3s_api_check_delay }}"
+  retries: '{{ k3s_api_check_retries }}'
+  delay: '{{ k3s_api_check_delay }}'
   become: true
 
 - name: Verify K3s cluster has ready nodes
@@ -35,10 +35,10 @@
 
 - name: Display K3s cluster status
   debug:
-    msg: 
-      - "K3s cluster is ready!"
-      - "Cluster nodes:"
-      - "{{ k3s_cluster_check.stdout_lines }}"
-  when: 
+    msg:
+      - 'K3s cluster is ready!'
+      - 'Cluster nodes:'
+      - '{{ k3s_cluster_check.stdout_lines }}'
+  when:
     - inventory_hostname == groups['k3s_masters'][0]
     - k3s_cluster_check is defined

@@ -9,7 +9,7 @@ metadata:
     policies.kyverno.io/severity: high
     kyverno.io/kyverno-version: 1.8.0
     policies.kyverno.io/minversion: 1.8.0
-    kyverno.io/kubernetes-version: "1.24"
+    kyverno.io/kubernetes-version: '1.24'
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
       Automatically adds security context settings to pods and containers that are missing them, and removes privileged settings from containers. This ensures all pods run with proper security settings even if the original manifests don't specify them.
@@ -17,81 +17,81 @@ spec:
   background: false
   validationFailureAction: Enforce
   rules:
-  - name: add-pod-security-context
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    mutate:
-      patchStrategicMerge:
-        spec:
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1001
-            runAsGroup: 1001
-            fsGroup: 1001
-            seccompProfile:
-              type: RuntimeDefault
-  - name: add-container-security-context-and-remove-privileged
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    mutate:
-      foreach:
-      - list: request.object.spec.containers
+    - name: add-pod-security-context
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      mutate:
         patchStrategicMerge:
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1001
-            runAsGroup: 1001
-            allowPrivilegeEscalation: false
-            privileged: false
-            capabilities:
-              drop:
-              - ALL
-            readOnlyRootFilesystem: true
-            seccompProfile:
-              type: RuntimeDefault
-  - name: add-deployment-pod-security-context
-    match:
-      any:
-      - resources:
-          kinds:
-          - Deployment
-    mutate:
-      patchStrategicMerge:
-        spec:
-          template:
-            spec:
+          spec:
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 1001
+              runAsGroup: 1001
+              fsGroup: 1001
+              seccompProfile:
+                type: RuntimeDefault
+    - name: add-container-security-context-and-remove-privileged
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      mutate:
+        foreach:
+          - list: request.object.spec.containers
+            patchStrategicMerge:
               securityContext:
                 runAsNonRoot: true
                 runAsUser: 1001
                 runAsGroup: 1001
-                fsGroup: 1001
+                allowPrivilegeEscalation: false
+                privileged: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
                 seccompProfile:
                   type: RuntimeDefault
-  - name: add-deployment-container-security-context-and-remove-privileged
-    match:
-      any:
-      - resources:
-          kinds:
-          - Deployment
-    mutate:
-      foreach:
-      - list: request.object.spec.template.spec.containers
+    - name: add-deployment-pod-security-context
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      mutate:
         patchStrategicMerge:
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1001
-            runAsGroup: 1001
-            allowPrivilegeEscalation: false
-            privileged: false
-            capabilities:
-              drop:
-              - ALL
-            readOnlyRootFilesystem: true
-            seccompProfile:
-              type: RuntimeDefault
+          spec:
+            template:
+              spec:
+                securityContext:
+                  runAsNonRoot: true
+                  runAsUser: 1001
+                  runAsGroup: 1001
+                  fsGroup: 1001
+                  seccompProfile:
+                    type: RuntimeDefault
+    - name: add-deployment-container-security-context-and-remove-privileged
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      mutate:
+        foreach:
+          - list: request.object.spec.template.spec.containers
+            patchStrategicMerge:
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 1001
+                runAsGroup: 1001
+                allowPrivilegeEscalation: false
+                privileged: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                seccompProfile:
+                  type: RuntimeDefault

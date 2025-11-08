@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: keda
-      version: "2.13.0"
+      version: '2.13.0'
       sourceRef:
         kind: HelmRepository
         name: kedacore
@@ -35,7 +35,7 @@ spec:
         readOnlyRootFilesystem: true
         capabilities:
           drop:
-          - ALL
+            - ALL
         seccompProfile:
           type: RuntimeDefault
     # Enable webhooks
@@ -56,16 +56,16 @@ spec:
         readOnlyRootFilesystem: true
         capabilities:
           drop:
-          - ALL
+            - ALL
         seccompProfile:
           type: RuntimeDefault
     # Enable all scalers
     operator:
       extraArgs:
-      - --enable-scalers=http
-      - --enable-scalers=cron
-      - --enable-scalers=cpu
-      - --enable-scalers=memory
+        - --enable-scalers=http
+        - --enable-scalers=cron
+        - --enable-scalers=cpu
+        - --enable-scalers=memory
       resources:
         limits:
           cpu: 200m
@@ -81,6 +81,6 @@ spec:
         readOnlyRootFilesystem: true
         capabilities:
           drop:
-          - ALL
+            - ALL
         seccompProfile:
           type: RuntimeDefault

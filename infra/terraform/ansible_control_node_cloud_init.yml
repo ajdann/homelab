@@ -4,4 +4,4 @@ packages:
   - ansible
   - git
 runcmd:
-  - [ git, clone, "https://github.com/ajdann/homelab.git", "/root/homelab" ]
+  - [git, clone, 'https://github.com/ajdann/homelab.git', '/root/homelab']

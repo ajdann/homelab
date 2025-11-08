@@ -1,5 +1,4 @@
 ---
-
 - name: Install HAProxy and Keepalived
   apt:
     name:

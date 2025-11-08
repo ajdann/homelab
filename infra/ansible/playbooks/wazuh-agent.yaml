@@ -3,9 +3,9 @@
   hosts: all
   become: true
   vars:
-    wazuh_manager_ip: "192.168.222.10"
-    wazuh_manager_port: 31514  # Agent-manager communication port
-    wazuh_manager_auth_port: 31515  # Custom enrollment port
-    wazuh_agent_name: "k3s-master"
+    wazuh_manager_ip: '192.168.222.10'
+    wazuh_manager_port: 31514 # Agent-manager communication port
+    wazuh_manager_auth_port: 31515 # Custom enrollment port
+    wazuh_agent_name: 'k3s-master'
   roles:
     - ../roles/wazuh-agent

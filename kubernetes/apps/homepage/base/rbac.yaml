@@ -14,21 +14,22 @@ metadata:
   labels:
     app.kubernetes.io/name: homepage
 rules:
-- apiGroups: [ "" ]
-  resources: [ "namespaces", "pods", "nodes", "services", "configmaps", "secrets" ]
-  verbs: [ "get", "list" ]
-- apiGroups: [ "apps" ]
-  resources: [ "deployments", "replicasets", "statefulsets", "daemonsets" ]
-  verbs: [ "get", "list" ]
-- apiGroups: [ "extensions", "networking.k8s.io" ]
-  resources: [ "ingresses" ]
-  verbs: [ "get", "list" ]
-- apiGroups: [ "metrics.k8s.io" ]
-  resources: [ "nodes", "pods" ]
-  verbs: [ "get", "list" ]
-- apiGroups: [ "helm.toolkit.fluxcd.io" ]
-  resources: [ "helmreleases" ]
-  verbs: [ "get", "list" ]
+  - apiGroups: ['']
+    resources:
+      ['namespaces', 'pods', 'nodes', 'services', 'configmaps', 'secrets']
+    verbs: ['get', 'list']
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets', 'statefulsets', 'daemonsets']
+    verbs: ['get', 'list']
+  - apiGroups: ['extensions', 'networking.k8s.io']
+    resources: ['ingresses']
+    verbs: ['get', 'list']
+  - apiGroups: ['metrics.k8s.io']
+    resources: ['nodes', 'pods']
+    verbs: ['get', 'list']
+  - apiGroups: ['helm.toolkit.fluxcd.io']
+    resources: ['helmreleases']
+    verbs: ['get', 'list']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -41,6 +42,6 @@ roleRef:
   kind: ClusterRole
   name: homepage
 subjects:
-- kind: ServiceAccount
-  name: homepage
-  namespace: homepage
+  - kind: ServiceAccount
+    name: homepage
+    namespace: homepage

@@ -74,9 +74,9 @@ Falcosidekick supports numerous output integrations. Configure them in the `conf
 ```yaml
 config:
   slack:
-    webhookurl: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
-    minimumpriority: "warning"
-    outputformat: "text"
+    webhookurl: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL'
+    minimumpriority: 'warning'
+    outputformat: 'text'
 ```
 
 #### Example: Loki Integration
@@ -84,8 +84,8 @@ config:
 ```yaml
 config:
   loki:
-    hostport: "http://loki.monitoring.svc.cluster.local:3100"
-    minimumpriority: "debug"
+    hostport: 'http://loki.monitoring.svc.cluster.local:3100'
+    minimumpriority: 'debug'
 ```
 
 #### Example: Elasticsearch Integration
@@ -93,10 +93,10 @@ config:
 ```yaml
 config:
   elasticsearch:
-    hostport: "http://elasticsearch.logging.svc.cluster.local:9200"
-    index: "falco"
-    type: "_doc"
-    minimumpriority: "warning"
+    hostport: 'http://elasticsearch.logging.svc.cluster.local:9200'
+    index: 'falco'
+    type: '_doc'
+    minimumpriority: 'warning'
 ```
 
 #### Example: AlertManager Integration
@@ -104,8 +104,8 @@ config:
 ```yaml
 config:
   alertmanager:
-    hostport: "http://alertmanager.monitoring.svc.cluster.local:9093"
-    minimumpriority: "error"
+    hostport: 'http://alertmanager.monitoring.svc.cluster.local:9093'
+    minimumpriority: 'error'
 ```
 
 #### Example: Prometheus Metrics
@@ -132,17 +132,17 @@ You can enable multiple outputs simultaneously:
 ```yaml
 config:
   slack:
-    webhookurl: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
-    minimumpriority: "warning"
-  
+    webhookurl: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL'
+    minimumpriority: 'warning'
+
   loki:
-    hostport: "http://loki.monitoring.svc.cluster.local:3100"
-    minimumpriority: "debug"
-  
+    hostport: 'http://loki.monitoring.svc.cluster.local:3100'
+    minimumpriority: 'debug'
+
   elasticsearch:
-    hostport: "http://elasticsearch.logging.svc.cluster.local:9200"
-    index: "falco"
-    minimumpriority: "warning"
+    hostport: 'http://elasticsearch.logging.svc.cluster.local:9200'
+    index: 'falco'
+    minimumpriority: 'warning'
 ```
 
 ## Supported Outputs
@@ -150,6 +150,7 @@ config:
 Falcosidekick supports a wide range of outputs:
 
 ### Chat & Collaboration
+
 - Slack
 - Microsoft Teams
 - Discord
@@ -159,6 +160,7 @@ Falcosidekick supports a wide range of outputs:
 - Telegram
 
 ### Metrics & Observability
+
 - Prometheus
 - Datadog
 - Grafana
@@ -167,18 +169,21 @@ Falcosidekick supports a wide range of outputs:
 - Dynatrace
 
 ### Logging
+
 - Elasticsearch
 - Loki
 - AWS CloudWatch Logs
 - Syslog
 
 ### Alerting
+
 - AlertManager
 - Opsgenie
 - PagerDuty
 - Grafana OnCall
 
 ### Message Queues
+
 - Kafka
 - RabbitMQ
 - NATS
@@ -187,12 +192,14 @@ Falcosidekick supports a wide range of outputs:
 - GCP Pub/Sub
 
 ### Databases
+
 - PostgreSQL
 - MySQL
 - Redis
 - TimescaleDB
 
 ### Cloud Storage
+
 - AWS S3
 - GCP Storage
 - Azure Blob Storage
@@ -244,7 +251,7 @@ serviceMonitor:
   enabled: true
   additionalLabels:
     release: prometheus
-  interval: "30s"
+  interval: '30s'
 ```
 
 ### Grafana Dashboards
@@ -298,9 +305,10 @@ This deployment integrates with the homelab security stack:
 - **Kyverno**: Policy enforcement (complements runtime monitoring)
 
 Example integration flow:
+
 ```
-Falco detects suspicious activity → 
-Falcosidekick receives event → 
+Falco detects suspicious activity →
+Falcosidekick receives event →
 Forwards to Slack (immediate alert) + Loki (logging) + Wazuh (SIEM)
 ```
 

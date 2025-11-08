@@ -14,37 +14,37 @@ spec:
   validationFailureAction: audit
   background: true
   rules:
-  - name: check-resource-limits
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    validate:
-      message: "Resource limits and requests are required for all containers"
-      pattern:
-        spec:
-          containers:
+    - name: check-resource-limits
+      match:
+        any:
           - resources:
-              limits:
-                memory: "?*"
-                cpu: "?*"
-              requests:
-                memory: "?*"
-                cpu: "?*"
-          =(ephemeralContainers):
-          - resources:
-              limits:
-                memory: "?*"
-                cpu: "?*"
-              requests:
-                memory: "?*"
-                cpu: "?*"
-          =(initContainers):
-          - resources:
-              limits:
-                memory: "?*"
-                cpu: "?*"
-              requests:
-                memory: "?*"
-                cpu: "?*"
+              kinds:
+                - Pod
+      validate:
+        message: 'Resource limits and requests are required for all containers'
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    memory: '?*'
+                    cpu: '?*'
+                  requests:
+                    memory: '?*'
+                    cpu: '?*'
+            =(ephemeralContainers):
+              - resources:
+                  limits:
+                    memory: '?*'
+                    cpu: '?*'
+                  requests:
+                    memory: '?*'
+                    cpu: '?*'
+            =(initContainers):
+              - resources:
+                  limits:
+                    memory: '?*'
+                    cpu: '?*'
+                  requests:
+                    memory: '?*'
+                    cpu: '?*'

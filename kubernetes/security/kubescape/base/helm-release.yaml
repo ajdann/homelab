@@ -14,6 +14,6 @@ spec:
         name: kubescape
         namespace: kubescape
   values:
-    clusterName: "homelab"
+    clusterName: 'homelab'
     capabilities:
-      continuousScan: "enable"
+      continuousScan: 'enable'

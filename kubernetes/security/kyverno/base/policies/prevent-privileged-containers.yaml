@@ -14,22 +14,22 @@ spec:
   validationFailureAction: audit
   background: true
   rules:
-  - name: check-privileged
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    validate:
-      message: "Privileged containers are not allowed. Note: Kured is exempted as it requires system access for node reboots."
-      pattern:
-        spec:
-          containers:
-          - securityContext:
-              privileged: false
-          =(ephemeralContainers):
-          - securityContext:
-              privileged: false
-          =(initContainers):
-          - securityContext:
-              privileged: false
+    - name: check-privileged
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: 'Privileged containers are not allowed. Note: Kured is exempted as it requires system access for node reboots.'
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  privileged: false
+            =(ephemeralContainers):
+              - securityContext:
+                  privileged: false
+            =(initContainers):
+              - securityContext:
+                  privileged: false

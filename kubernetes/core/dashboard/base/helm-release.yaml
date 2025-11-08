@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: kubernetes-dashboard
-      version: "6.0.8"
+      version: '6.0.8'
       sourceRef:
         kind: HelmRepository
         name: kubernetes-dashboard
@@ -35,11 +35,11 @@ spec:
       create: false
       name: dashboard-admin
     extraArgs:
-    - --enable-skip-login
-    - --enable-insecure-login
-    - --insecure-bind-address=0.0.0.0
-    - --insecure-port=9090
-    - --token-ttl=0
+      - --enable-skip-login
+      - --enable-insecure-login
+      - --insecure-bind-address=0.0.0.0
+      - --insecure-port=9090
+      - --token-ttl=0
     resources:
       limits:
         cpu: 200m
@@ -55,7 +55,7 @@ spec:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-        - ALL
+          - ALL
       readOnlyRootFilesystem: true
       seccompProfile:
         type: RuntimeDefault

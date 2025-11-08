@@ -81,7 +81,7 @@ spec:
                   name: dashboard-cred
                   key: password
             - name: SERVER_SSL_ENABLED
-              value: "true"
+              value: 'true'
             - name: SERVER_SSL_CERTIFICATE
               value: /usr/share/wazuh-dashboard/certs/cert.pem
             - name: SERVER_SSL_KEY

@@ -1,4 +1,3 @@
 ---
-kubeconfig_dest_path: "{{ playbook_dir }}/../../../secrets/kubeconfig"
-flux_components_path: "{{ playbook_dir }}/../../../kubernetes/flux"
-
+kubeconfig_dest_path: '{{ playbook_dir }}/../../../secrets/kubeconfig'
+flux_components_path: '{{ playbook_dir }}/../../../kubernetes/flux'

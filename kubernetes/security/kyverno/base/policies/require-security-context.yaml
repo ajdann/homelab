@@ -14,26 +14,26 @@ spec:
   validationFailureAction: audit
   background: true
   rules:
-  - name: check-security-context
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    validate:
-      message: "Security context is required for all containers"
-      pattern:
-        spec:
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: "?*"
-            fsGroup: "?*"
-          containers:
-          - securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
+    - name: check-security-context
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: 'Security context is required for all containers'
+        pattern:
+          spec:
+            securityContext:
               runAsNonRoot: true
-              runAsUser: "?*"
-              capabilities:
-                drop:
-                - ALL
+              runAsUser: '?*'
+              fsGroup: '?*'
+            containers:
+              - securityContext:
+                  allowPrivilegeEscalation: false
+                  readOnlyRootFilesystem: true
+                  runAsNonRoot: true
+                  runAsUser: '?*'
+                  capabilities:
+                    drop:
+                      - ALL

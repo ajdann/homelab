@@ -1,51 +1,50 @@
 ---
 - name: Destroy old template to ensure a clean slate
   community.general.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    node: "{{ proxmox_node }}"
-    vmid: "{{ debian_vmid }}"
+    api_user: '{{ proxmox_api_user }}'
+    api_password: '{{ proxmox_api_password }}'
+    api_host: '{{ proxmox_api_host }}'
+    node: '{{ proxmox_node }}'
+    vmid: '{{ debian_vmid }}'
     state: absent
   delegate_to: localhost
   ignore_errors: true
 
 - name: Download Debian 12 cloud image
   ansible.builtin.get_url:
-    url: "{{ debian_cloud_image_url }}"
-    dest: "{{ debian_cloud_image_path }}"
+    url: '{{ debian_cloud_image_url }}'
+    dest: '{{ debian_cloud_image_path }}'
     mode: '0644'
   register: download_status
   until: download_status is succeeded
   retries: 5
   delay: 10
 
-
 - name: Create Debian 12 VM for template
   community.general.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    node: "{{ proxmox_node }}"
-    vmid: "{{ debian_vmid }}"
-    name: "{{ debian_vm_name }}"
+    api_user: '{{ proxmox_api_user }}'
+    api_password: '{{ proxmox_api_password }}'
+    api_host: '{{ proxmox_api_host }}'
+    node: '{{ proxmox_node }}'
+    vmid: '{{ debian_vmid }}'
+    name: '{{ debian_vm_name }}'
     agent: 1
-    memory: "{{ debian_ram }}"
-    cores: "{{ debian_cores }}"
+    memory: '{{ debian_ram }}'
+    cores: '{{ debian_cores }}'
     net:
-      net0: "virtio,bridge={{ net_bridge }}"
+      net0: 'virtio,bridge={{ net_bridge }}'
     serial:
       serial0: socket
     vga: serial0
-    scsihw: "virtio-scsi-pci"
+    scsihw: 'virtio-scsi-pci'
     scsi:
-      scsi0: "{{ disk_storage }}:0,import-from={{ debian_cloud_image_path }}"
+      scsi0: '{{ disk_storage }}:0,import-from={{ debian_cloud_image_path }}'
     ide:
-      ide2: "{{ disk_storage }}:cloudinit"
-    boot: "order=scsi0"
+      ide2: '{{ disk_storage }}:cloudinit'
+    boot: 'order=scsi0'
     # cipassword: "{{ vm_password }}"
-    ciuser: "{{ vm_user }}"
-    sshkeys: "{{ vm_ssh_pub_key }}"
+    ciuser: '{{ vm_user }}'
+    sshkeys: '{{ vm_ssh_pub_key }}'
     template: true
     timeout: 600
   delegate_to: localhost

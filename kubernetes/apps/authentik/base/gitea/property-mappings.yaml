@@ -22,6 +22,3 @@ data:
             return {
                 "gitea": [g.name for g in request.user.ak_groups.filter(name__in=["gitadmin", "gitrestricted"])]
             }
-
-
-

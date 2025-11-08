@@ -13,7 +13,7 @@ spec:
   chart:
     spec:
       chart: kyverno
-      version: "3.1.0"
+      version: '3.1.0'
       sourceRef:
         kind: HelmRepository
         name: kyverno
@@ -24,7 +24,7 @@ spec:
     replicaCount: 1
     resources:
       limits:
-        cpu: 1000m 
+        cpu: 1000m
         memory: 512Mi
       requests:
         cpu: 100m
@@ -35,8 +35,8 @@ spec:
       enabled: true
       service:
         annotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "8000"
+          prometheus.io/scrape: 'true'
+          prometheus.io/port: '8000'
 
     # Security settings
     securityContext:

@@ -36,4 +36,3 @@ data:
                 # To connect an existing Nextcloud user, set "nextcloud_user_id" to the Nextcloud username.
                 "user_id": user.attributes.get("nextcloud_user_id", str(user.uuid)),
             }
-

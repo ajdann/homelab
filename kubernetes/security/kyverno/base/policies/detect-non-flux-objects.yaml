@@ -14,53 +14,53 @@ spec:
   validationFailureAction: audit
   background: true
   rules:
-  - name: check-flux-labels
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-          - Deployment
-          - Service
-          - ConfigMap
-          - Secret
-          - Ingress
-          - PersistentVolumeClaim
-    exclude:
-      any:
-      - resources:
-          namespaces:
-          - kube-system
-          - default
-          - kube-public
-          - kube-node-lease
-      - resources:
-          namespaces:
-          - flux-system
-    validate:
-      message: "Object may not have been created by Flux. Consider using Flux for GitOps management."
-      anyPattern:
-      - metadata:
-          labels:
-            kustomize.toolkit.fluxcd.io/name: "?*"
-      - metadata:
-          labels:
-            kustomize.toolkit.fluxcd.io/namespace: "?*"
-      - metadata:
-          labels:
-            helm.toolkit.fluxcd.io/name: "?*"
-      - metadata:
-          labels:
-            helm.toolkit.fluxcd.io/namespace: "?*"
-      - metadata:
-          labels:
-            source.toolkit.fluxcd.io/name: "?*"
-      - metadata:
-          labels:
-            source.toolkit.fluxcd.io/namespace: "?*"
-      - metadata:
-          annotations:
-            fluxcd.io/automated: "?*"
-      - metadata:
-          annotations:
-            fluxcd.io/sync-checksum: "?*"
+    - name: check-flux-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+                - Deployment
+                - Service
+                - ConfigMap
+                - Secret
+                - Ingress
+                - PersistentVolumeClaim
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - default
+                - kube-public
+                - kube-node-lease
+          - resources:
+              namespaces:
+                - flux-system
+      validate:
+        message: 'Object may not have been created by Flux. Consider using Flux for GitOps management.'
+        anyPattern:
+          - metadata:
+              labels:
+                kustomize.toolkit.fluxcd.io/name: '?*'
+          - metadata:
+              labels:
+                kustomize.toolkit.fluxcd.io/namespace: '?*'
+          - metadata:
+              labels:
+                helm.toolkit.fluxcd.io/name: '?*'
+          - metadata:
+              labels:
+                helm.toolkit.fluxcd.io/namespace: '?*'
+          - metadata:
+              labels:
+                source.toolkit.fluxcd.io/name: '?*'
+          - metadata:
+              labels:
+                source.toolkit.fluxcd.io/namespace: '?*'
+          - metadata:
+              annotations:
+                fluxcd.io/automated: '?*'
+          - metadata:
+              annotations:
+                fluxcd.io/sync-checksum: '?*'

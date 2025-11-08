@@ -6,18 +6,18 @@
 
 - name: Check if .env file exists
   stat:
-    path: "{{ env_file_path }}"
+    path: '{{ env_file_path }}'
   register: env_file_stat
-  failed_when: false  # Don't fail here, we check in next task
+  failed_when: false # Don't fail here, we check in next task
 
 - name: Fail if .env file doesn't exist
   fail:
-    msg: ".env file not found at {{ env_file_path }}"
+    msg: '.env file not found at {{ env_file_path }}'
   when: not env_file_stat.stat.exists
 
 - name: Read .env file
   slurp:
-    src: "{{ env_file_path }}"
+    src: '{{ env_file_path }}'
   register: env_file_content
 
 - name: Parse environment variables
@@ -31,7 +31,7 @@
 
 - name: Check for required Tailscale variables
   fail:
-    msg: "Missing {{ item }} in .env file"
+    msg: 'Missing {{ item }} in .env file'
   when: item not in env_vars
   loop:
     - TAILSCALE_CLIENT_ID
@@ -44,7 +44,7 @@
     api_version: v1
     kind: Namespace
     state: present
-    kubeconfig: "{{ kubeconfig_dest_path }}"
+    kubeconfig: '{{ kubeconfig_dest_path }}'
   register: tailscale_namespace_result
   failed_when: tailscale_namespace_result.failed
 
@@ -60,10 +60,10 @@
           app.kubernetes.io/managed-by: ansible
       type: Opaque
       stringData:
-        client_id: "{{ env_vars.TAILSCALE_CLIENT_ID }}"
-        client_secret: "{{ env_vars.TAILSCALE_CLIENT_SECRET }}"
+        client_id: '{{ env_vars.TAILSCALE_CLIENT_ID }}'
+        client_secret: '{{ env_vars.TAILSCALE_CLIENT_SECRET }}'
     state: present
-    kubeconfig: "{{ kubeconfig_dest_path }}"
+    kubeconfig: '{{ kubeconfig_dest_path }}'
   register: tailscale_secret_result
   failed_when: tailscale_secret_result.failed
 
@@ -73,7 +73,7 @@
     api_version: v1
     kind: Namespace
     state: present
-    kubeconfig: "{{ kubeconfig_dest_path }}"
+    kubeconfig: '{{ kubeconfig_dest_path }}'
   register: flux_namespace_result
   failed_when: flux_namespace_result.failed
 
@@ -89,11 +89,11 @@
         labels:
           app.kubernetes.io/managed-by: ansible
       data:
-        DOMAIN: "{{ env_vars.TAILSCALE_DOMAIN }}"
-    kubeconfig: "{{ kubeconfig_dest_path }}"
+        DOMAIN: '{{ env_vars.TAILSCALE_DOMAIN }}'
+    kubeconfig: '{{ kubeconfig_dest_path }}'
   register: tailscale_configmap_result
   failed_when: tailscale_configmap_result.failed
-        
+
 - name: Display success message
   debug:
-    msg: "Successfully set up Tailscale configuration in Kubernetes."
+    msg: 'Successfully set up Tailscale configuration in Kubernetes.'

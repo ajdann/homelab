@@ -3,6 +3,7 @@
 ## Overview
 
 This deployment provides a complete logging and visualization stack using:
+
 - **Loki**: Log aggregation system inspired by Prometheus
 - **Grafana**: Visualization and analytics platform (pinned to latest version)
 - **Promtail**: Agent for collecting and forwarding logs to Loki
@@ -38,6 +39,7 @@ This Helm chart deploys the Loki Stack using FluxCD GitOps approach.
 The stack is automatically deployed via FluxCD when included in the overlay kustomization.
 
 To enable it for the homelab cluster:
+
 ```yaml
 # In kubernetes/monitoring/overlays/dev/kustomization.yaml
 resources:
@@ -51,33 +53,39 @@ resources:
 **Version**: 11.3.0 (pinned to latest stable)
 
 **Default Credentials**:
+
 - Username: `admin`
 - Password: `admin`
 
 ⚠️ **Important**: Change the default password after first login!
 
-**Ingress**: 
+**Ingress**:
+
 - Hostname: `grafana`
 - Access via: `https://grafana.${DOMAIN}` (Tailscale)
 - Ingress Class: `tailscale`
 - TLS: Automatically handled by Tailscale
 
-**Data Persistence**: 
+**Data Persistence**:
+
 - Volume size: 5Gi
 - Used for dashboards, plugins, and settings
 
 **Pre-configured Datasources**:
+
 - Loki datasource automatically configured and set as default
 
 ### Loki
 
 **Service Endpoint**: `http://loki-stack:3100`
 
-**Data Persistence**: 
+**Data Persistence**:
+
 - Volume size: 10Gi
 - Stores log data with 7-day retention by default
 
-**Log Ingestion**: 
+**Log Ingestion**:
+
 - Accepts logs from Promtail agents
 - HTTP API available at port 3100
 
@@ -86,6 +94,7 @@ resources:
 **Function**: Collects logs from Kubernetes pods and forwards to Loki
 
 **Configuration**:
+
 - Runs as DaemonSet on all nodes
 - Automatically discovers and tails container logs
 - Applies labels for pod, namespace, container metadata
@@ -93,6 +102,7 @@ resources:
 ## Security Features
 
 ### Grafana Security
+
 - Non-root user (UID 472)
 - Read-only root filesystem disabled (needs write for plugins)
 - Dropped all capabilities
@@ -101,6 +111,7 @@ resources:
 - Resource limits enforced
 
 ### Loki Security
+
 - Non-root user (UID 10001)
 - Read-only root filesystem
 - Dropped all capabilities
@@ -109,6 +120,7 @@ resources:
 - Resource limits enforced
 
 ### Promtail Security
+
 - Runs as root (required to read container logs)
 - Read-only root filesystem
 - Dropped all capabilities
@@ -121,6 +133,7 @@ resources:
 ### Via Tailscale
 
 Once deployed, access Grafana at:
+
 ```
 https://grafana.${DOMAIN}
 ```
@@ -155,8 +168,8 @@ To send Falco security events to Loki, update Falcosidekick configuration:
 ```yaml
 config:
   loki:
-    hostport: "http://loki-stack.monitoring.svc.cluster.local:3100"
-    minimumpriority: "debug"
+    hostport: 'http://loki-stack.monitoring.svc.cluster.local:3100'
+    minimumpriority: 'debug'
 ```
 
 ### Application Log Collection
@@ -164,9 +177,10 @@ config:
 Promtail automatically collects logs from all pods. To add custom labels or filters:
 
 1. Add annotations to your pods:
+
    ```yaml
    annotations:
-     promtail.io/collect: "true"
+     promtail.io/collect: 'true'
    ```
 
 2. Promtail will automatically discover and collect these logs
@@ -174,16 +188,19 @@ Promtail automatically collects logs from all pods. To add custom labels or filt
 ## Resource Requirements
 
 ### Grafana
+
 - **CPU**: 100m request, 500m limit
 - **Memory**: 256Mi request, 512Mi limit
 - **Storage**: 5Gi PVC
 
 ### Loki
+
 - **CPU**: 100m request, 500m limit
 - **Memory**: 512Mi request, 1Gi limit
 - **Storage**: 10Gi PVC
 
 ### Promtail (per node)
+
 - **CPU**: 100m request, 200m limit
 - **Memory**: 128Mi request, 256Mi limit
 
@@ -192,11 +209,13 @@ Promtail automatically collects logs from all pods. To add custom labels or filt
 ### Grafana Not Accessible
 
 1. Check ingress status:
+
    ```bash
    kubectl get ingress -n monitoring
    ```
 
 2. Verify Tailscale operator is running:
+
    ```bash
    kubectl get pods -n tailscale
    ```
@@ -209,11 +228,13 @@ Promtail automatically collects logs from all pods. To add custom labels or filt
 ### No Logs Appearing in Loki
 
 1. Check Promtail status:
+
    ```bash
    kubectl get pods -n monitoring -l app.kubernetes.io/name=promtail
    ```
 
 2. View Promtail logs:
+
    ```bash
    kubectl logs -n monitoring -l app.kubernetes.io/name=promtail
    ```
@@ -226,6 +247,7 @@ Promtail automatically collects logs from all pods. To add custom labels or filt
 ### Storage Issues
 
 1. Check PVC status:
+
    ```bash
    kubectl get pvc -n monitoring
    ```
@@ -244,7 +266,7 @@ To update Grafana to a different version, edit `helm-release.yaml`:
 ```yaml
 grafana:
   image:
-    tag: "11.4.0"  # Update to desired version
+    tag: '11.4.0' # Update to desired version
 ```
 
 ### Adjust Log Retention
@@ -256,7 +278,7 @@ loki:
   config:
     table_manager:
       retention_deletes_enabled: true
-      retention_period: 168h  # 7 days (default)
+      retention_period: 168h # 7 days (default)
 ```
 
 ### Add Additional Datasources
@@ -282,6 +304,7 @@ grafana:
 ### Grafana Dashboards
 
 Import pre-built dashboards:
+
 1. Go to **Dashboards** → **Import**
 2. Enter dashboard ID or upload JSON
 3. Recommended dashboards:
@@ -291,6 +314,7 @@ Import pre-built dashboards:
 ### Alerting
 
 Configure alerts in Grafana:
+
 1. Go to **Alerting** → **Alert rules**
 2. Create new alert rules based on LogQL queries
 3. Configure notification channels (Slack, Email, etc.)
@@ -300,6 +324,7 @@ Configure alerts in Grafana:
 ### Backup
 
 Important data to backup:
+
 - Grafana dashboards and settings: `/var/lib/grafana`
 - Loki logs: `/data/loki`
 
@@ -310,6 +335,7 @@ Use Velero or similar tools for automated backups.
 FluxCD automatically manages updates based on the version specified in `helm-release.yaml`.
 
 To update manually:
+
 1. Edit version in `helm-release.yaml`
 2. Commit and push changes
 3. FluxCD will reconcile and update the deployment
@@ -325,6 +351,7 @@ To update manually:
 ## Support
 
 For issues or questions:
+
 1. Check pod status: `kubectl get pods -n monitoring`
 2. Review logs: `kubectl logs -n monitoring <pod-name>`
 3. Verify configuration: `kubectl get helmrelease -n monitoring loki-stack -o yaml`

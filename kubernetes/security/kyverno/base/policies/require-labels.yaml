@@ -14,17 +14,17 @@ spec:
   validationFailureAction: audit
   background: true
   rules:
-  - name: check-labels
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    validate:
-      message: "Required labels are missing"
-      pattern:
-        metadata:
-          labels:
-            app: "?*"
-            environment: "?*"
-            team: "?*"
+    - name: check-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: 'Required labels are missing'
+        pattern:
+          metadata:
+            labels:
+              app: '?*'
+              environment: '?*'
+              team: '?*'
