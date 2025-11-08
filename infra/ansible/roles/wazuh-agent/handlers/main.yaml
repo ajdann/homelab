@@ -5,13 +5,13 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
-  listen: "restart_wazuh_agent"
+  listen: 'restart_wazuh_agent'
 
 - name: Restart auditd
   ansible.builtin.systemd:
     name: auditd
     state: restarted
-  
+
 - name: Reload systemd
   systemd:
     daemon_reload: yes

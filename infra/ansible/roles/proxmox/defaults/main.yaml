@@ -3,14 +3,14 @@ alpine_vmid: 9001
 alpine_vm_name: alpine-cloudinit
 alpine_ram: 512
 alpine_cores: 1
-alpine_cloud_image_url: "https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/cloud/generic_alpine-3.22.1-x86_64-bios-cloudinit-r0.qcow2"
-alpine_cloud_image_path: "/var/lib/vz/template/qcow/generic_alpine-3.22.1-x86_64-bios-cloudinit-r0.qcow2"
+alpine_cloud_image_url: 'https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/cloud/generic_alpine-3.22.1-x86_64-bios-cloudinit-r0.qcow2'
+alpine_cloud_image_path: '/var/lib/vz/template/qcow/generic_alpine-3.22.1-x86_64-bios-cloudinit-r0.qcow2'
 
 debian_vmid: 9000
 debian_vm_name: debian12-cloudinit
 debian_ram: 2048
 debian_cores: 1
-debian_cloud_image_url: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
-debian_cloud_image_path: "/var/lib/vz/template/qcow/debian-12-genericcloud-amd64.qcow2"
+debian_cloud_image_url: 'https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2'
+debian_cloud_image_path: '/var/lib/vz/template/qcow/debian-12-genericcloud-amd64.qcow2'
 
 alpine_lxc_template: alpine-3.22-default_20250617_amd64.tar.xz

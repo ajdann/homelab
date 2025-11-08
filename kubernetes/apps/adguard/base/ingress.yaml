@@ -4,27 +4,27 @@ metadata:
   name: adguard
   annotations:
     tailscale.com/tags: tag:k8s-operator
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/name: "AdGuard"
+    gethomepage.dev/enabled: 'true'
+    gethomepage.dev/name: 'AdGuard'
     gethomepage.dev/icon: adguard-home.png
-    gethomepage.dev/group: "Networking"
-    gethomepage.dev/description: "DNS Ad blocker"
+    gethomepage.dev/group: 'Networking'
+    gethomepage.dev/description: 'DNS Ad blocker'
     gethomepage.dev/href: 'https://adguard.${DOMAIN}'
     # gethomepage.dev/widget.type: 'kubernetes'
     # gethomepage.dev/widget.url: 'https://adguard.${DOMAIN}'
 spec:
   ingressClassName: tailscale
   rules:
-  - host: adguard
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: adguard
-            port:
-              number: 3000
+    - host: adguard
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: adguard
+                port:
+                  number: 3000
   tls:
     - hosts:
-      - adguard
+        - adguard

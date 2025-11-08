@@ -7,8 +7,8 @@ is_first_master: "{{ inventory_hostname == groups['k3s_masters'][0] }}"
 
 # Build the full K3s install command arguments
 k3s_install_args_base:
-  - "--token {{ k3s_cluster_token }}"
-  - "--tls-san {{ k3s_tls_san_list }}"
+  - '--token {{ k3s_cluster_token }}'
+  - '--tls-san {{ k3s_tls_san_list }}'
 
 k3s_first_master_args: "{{ k3s_install_args_base + ['--cluster-init'] }}"
 k3s_other_master_args: "{{ k3s_install_args_base + ['--server https://' + kubernetes_vip + ':6443'] }}"

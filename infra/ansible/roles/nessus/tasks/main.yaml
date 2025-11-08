@@ -16,12 +16,12 @@
 
 - name: Download Nessus package
   get_url:
-    url: "https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.9.3-ubuntu1604_i386.deb"
-    dest: "/tmp/nessus.deb"
+    url: 'https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.9.3-ubuntu1604_i386.deb'
+    dest: '/tmp/nessus.deb'
 
 - name: Install Nessus
   apt:
-    deb: "/tmp/nessus.deb"
+    deb: '/tmp/nessus.deb'
     state: present
 
 - name: Enable and start Nessus service
@@ -35,7 +35,7 @@
 ######################################################
 - name: Wait for Nessus to start
   uri:
-    url: "https://{{ nessus_host }}:8834"
+    url: 'https://{{ nessus_host }}:8834'
     method: GET
     validate_certs: no
   register: nessus_status
@@ -48,33 +48,33 @@
 ######################################################
 - name: Login to Nessus
   uri:
-    url: "https://{{ nessus_host }}:8834/session"
+    url: 'https://{{ nessus_host }}:8834/session'
     method: POST
     body_format: json
     body:
-      username: "{{ nessus_admin_user }}"
-      password: "{{ nessus_admin_password }}"
+      username: '{{ nessus_admin_user }}'
+      password: '{{ nessus_admin_password }}'
     validate_certs: no
   register: login_result
 
 - name: Set Nessus token
   set_fact:
-    nessus_token: "{{ login_result.json.token }}"
+    nessus_token: '{{ login_result.json.token }}'
 
 ######################################################
 # 4. Activate Nessus Essentials
 ######################################################
 - name: Activate Nessus Essentials
   uri:
-    url: "https://{{ nessus_host }}:8834/plugin/feed"
+    url: 'https://{{ nessus_host }}:8834/plugin/feed'
     method: POST
     headers:
-      X-Cookie: "token={{ nessus_token }}"
+      X-Cookie: 'token={{ nessus_token }}'
     body_format: json
     body:
       accept_software_agreement: True
-      feed_type: "essentials"
-      activation_code: "{{ nessus_activation_code }}"
+      feed_type: 'essentials'
+      activation_code: '{{ nessus_activation_code }}'
     validate_certs: no
   ignore_errors: yes
 
@@ -83,10 +83,10 @@
 ######################################################
 - name: Get list of scan policies
   uri:
-    url: "https://{{ nessus_host }}:8834/policies"
+    url: 'https://{{ nessus_host }}:8834/policies'
     method: GET
     headers:
-      X-Cookie: "token={{ nessus_token }}"
+      X-Cookie: 'token={{ nessus_token }}'
     validate_certs: no
   register: policies_result
 
@@ -96,24 +96,24 @@
 
 - name: Create a network scan
   uri:
-    url: "https://{{ nessus_host }}:8834/scans"
+    url: 'https://{{ nessus_host }}:8834/scans'
     method: POST
     headers:
-      X-Cookie: "token={{ nessus_token }}"
+      X-Cookie: 'token={{ nessus_token }}'
     body_format: json
     body:
-      uuid: "adf0b3da-xxxx-xxxx-xxxx-xxxxxxxxxxxx"  # Replace with actual Basic Network Scan template UUID if needed
+      uuid: 'adf0b3da-xxxx-xxxx-xxxx-xxxxxxxxxxxx' # Replace with actual Basic Network Scan template UUID if needed
       settings:
-        name: "{{ scan_name }}"
-        targets: "{{ scan_targets }}"
-        policy_id: "{{ basic_policy_id }}"
+        name: '{{ scan_name }}'
+        targets: '{{ scan_targets }}'
+        policy_id: '{{ basic_policy_id }}'
     validate_certs: no
   register: scan_creation
 
 - name: Launch the scan
   uri:
-    url: "https://{{ nessus_host }}:8834/scans/{{ scan_creation.json.scan.id }}/launch"
+    url: 'https://{{ nessus_host }}:8834/scans/{{ scan_creation.json.scan.id }}/launch'
     method: POST
     headers:
-      X-Cookie: "token={{ nessus_token }}"
+      X-Cookie: 'token={{ nessus_token }}'
     validate_certs: no

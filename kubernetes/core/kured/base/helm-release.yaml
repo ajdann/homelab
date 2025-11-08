@@ -9,19 +9,19 @@ spec:
   chart:
     spec:
       chart: kured
-      version: "5.x"
+      version: '5.x'
       sourceRef:
         kind: HelmRepository
         name: kured
         namespace: kured
   values:
     configuration:
-      startTime: "3:00"
-      endTime: "5:00"
-      timeZone: "UTC"
-      rebootMethod: "signal"
-      rebootSignal: "39"
-      period: "1h"
+      startTime: '3:00'
+      endTime: '5:00'
+      timeZone: 'UTC'
+      rebootMethod: 'signal'
+      rebootSignal: '39'
+      period: '1h'
     resources:
       limits:
         cpu: 100m
@@ -38,8 +38,8 @@ spec:
       runAsGroup: 1000
       capabilities:
         add:
-        - CAP_KILL
+          - CAP_KILL
         drop:
-        - ALL
+          - ALL
       seccompProfile:
         type: RuntimeDefault

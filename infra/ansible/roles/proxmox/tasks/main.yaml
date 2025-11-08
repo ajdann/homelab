@@ -8,10 +8,10 @@
     mode: '0755'
 
 - name: Include Debian tasks
-  ansible.builtin.include_tasks: "debian.yaml"
+  ansible.builtin.include_tasks: 'debian.yaml'
 
 - name: Include Alpine tasks
-  ansible.builtin.include_tasks: "alpine.yaml"
+  ansible.builtin.include_tasks: 'alpine.yaml'
 
 - name: Include LXC tasks
-  ansible.builtin.include_tasks: "lxc.yaml"
+  ansible.builtin.include_tasks: 'lxc.yaml'

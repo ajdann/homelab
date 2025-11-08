@@ -48,7 +48,7 @@ spec:
               memory: 512Mi
           securityContext:
             capabilities:
-              add: ["SYS_CHROOT"]
+              add: ['SYS_CHROOT']
           volumeMounts:
             - name: config
               mountPath: /wazuh-config-mount/etc/ossec.conf

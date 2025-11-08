@@ -14,15 +14,15 @@ spec:
   validationFailureAction: audit
   background: true
   rules:
-  - name: check-network-policy
-    match:
-      any:
-      - resources:
-          kinds:
-          - Namespace
-    validate:
-      message: "Network policies should be defined for this namespace"
-      pattern:
-        metadata:
-          labels:
-            network-policy: "?*"
+    - name: check-network-policy
+      match:
+        any:
+          - resources:
+              kinds:
+                - Namespace
+      validate:
+        message: 'Network policies should be defined for this namespace'
+        pattern:
+          metadata:
+            labels:
+              network-policy: '?*'

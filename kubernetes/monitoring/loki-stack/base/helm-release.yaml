@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: loki-stack
-      version: "2.10.2"
+      version: '2.10.2'
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -63,7 +63,7 @@ spec:
       # Security context
       podSecurityContext:
         runAsNonRoot: true
-        runAsUser: 0  # Needs root to read logs
+        runAsUser: 0 # Needs root to read logs
         runAsGroup: 0
         seccompProfile:
           type: RuntimeDefault
@@ -93,7 +93,7 @@ spec:
       # Pin Grafana to latest version
       image:
         repository: grafana/grafana
-        tag: "11.3.0"  # Latest stable version as of deployment
+        tag: '11.3.0' # Latest stable version as of deployment
         pullPolicy: IfNotPresent
 
       # Security context
@@ -111,7 +111,7 @@ spec:
         capabilities:
           drop:
             - ALL
-        readOnlyRootFilesystem: false  # Grafana needs write access for plugins
+        readOnlyRootFilesystem: false # Grafana needs write access for plugins
 
       # Resource limits
       resources:
@@ -148,7 +148,7 @@ spec:
       # Grafana.ini configuration
       grafana.ini:
         server:
-          root_url: "https://grafana.${DOMAIN}/"
+          root_url: 'https://grafana.${DOMAIN}/'
           serve_from_sub_path: false
         security:
           admin_user: admin

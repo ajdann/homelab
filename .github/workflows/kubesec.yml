@@ -1,27 +1,27 @@
 name: Kubesec Security Scan
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
     paths: ['kubernetes/**']
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
     paths: ['kubernetes/**']
 
 jobs:
   kubesec:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Run Kubesec
-      run: |
-        # Install kubesec
-        curl -sSL https://github.com/controlplaneio/kubesec/releases/download/v2.11.0/kubesec_linux_amd64.tar.gz | tar xz
-        chmod +x kubesec
-        
-        # Scan all YAML files in kubernetes directory
-        find kubernetes/ -name "*.yaml" -o -name "*.yml" | while read file; do
-          echo "Scanning $file..."
-          ./kubesec scan "$file" || true
-        done 
+      - name: Run Kubesec
+        run: |
+          # Install kubesec
+          curl -sSL https://github.com/controlplaneio/kubesec/releases/download/v2.11.0/kubesec_linux_amd64.tar.gz | tar xz
+          chmod +x kubesec
+
+          # Scan all YAML files in kubernetes directory
+          find kubernetes/ -name "*.yaml" -o -name "*.yml" | while read file; do
+            echo "Scanning $file..."
+            ./kubesec scan "$file" || true
+          done

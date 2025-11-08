@@ -14,19 +14,19 @@ spec:
   validationFailureAction: audit
   background: true
   rules:
-  - name: check-latest-tag
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    validate:
-      message: "Using 'latest' tag is not allowed. Please use a specific version tag."
-      pattern:
-        spec:
-          containers:
-          - image: "!*:latest"
-          =(ephemeralContainers):
-          - image: "!*:latest"
-          =(initContainers):
-          - image: "!*:latest"
+    - name: check-latest-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Using 'latest' tag is not allowed. Please use a specific version tag."
+        pattern:
+          spec:
+            containers:
+              - image: '!*:latest'
+            =(ephemeralContainers):
+              - image: '!*:latest'
+            =(initContainers):
+              - image: '!*:latest'

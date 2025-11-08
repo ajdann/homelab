@@ -5,11 +5,8 @@ proxmox_api_user: root@pam
 proxmox_api_password: 12345678
 proxmox_node: pve
 
-
-
 disk_storage: local-lvm
 disk_size: 32G
 
-net_bridge: "vmbr0"
-searchdomain: "homelab.local"
-
+net_bridge: 'vmbr0'
+searchdomain: 'homelab.local'

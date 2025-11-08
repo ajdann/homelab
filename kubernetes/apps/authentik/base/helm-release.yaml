@@ -21,14 +21,14 @@ spec:
   values:
     blueprints:
       configMaps:
-      - gitea-app
-      - gitea-property-mappings
-      - gitea-groups
-      - nextcloud-property-mappings
-      - nextcloud-app
+        - gitea-app
+        - gitea-property-mappings
+        - gitea-groups
+        - nextcloud-property-mappings
+        - nextcloud-app
       secrets:
-      - gitea-provider
-      - nextcloud-provider
+        - gitea-provider
+        - nextcloud-provider
     authentik:
       secret_key: 'PleaseGenerateASecureKey'
       postgresql:
@@ -53,14 +53,14 @@ spec:
         enabled: true
         https: true
         tls:
-        - hosts:
-          - authentik
+          - hosts:
+              - authentik
         hosts:
-        - authentik
+          - authentik
     postgresql:
       auth:
         username: authentik
-        password: 'LKz0EYm4iv' 
+        password: 'LKz0EYm4iv'
       enabled: true
     redis:
       enabled: true

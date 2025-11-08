@@ -22,8 +22,8 @@
     that:
       - agent_service_status.status.ActiveState == "active"
       - agent_service_status.status.SubState == "running"
-    fail_msg: "Wazuh agent service is not running properly"
-    success_msg: "Wazuh agent service is active and running"
+    fail_msg: 'Wazuh agent service is not running properly'
+    success_msg: 'Wazuh agent service is active and running'
 
 - name: Wait for agent to establish connection (allow time for startup)
   pause:
@@ -47,7 +47,7 @@
       echo "Agent process not running"
     fi
   register: agent_process_status
-  changed_when: false 
+  changed_when: false
 
 - name: Verify agent connectivity to manager
   assert:
@@ -55,8 +55,8 @@
       - connection_logs.stdout | length > 0
       - "'Connected to the server' in connection_logs.stdout"
       - "'Agent process running' in agent_process_status.stdout"
-    fail_msg: "Wazuh agent connectivity issues. Connection logs: {{ connection_logs.stdout }}, Process: {{ agent_process_status.stdout }}"
-    success_msg: "Wazuh agent successfully connected to manager"
+    fail_msg: 'Wazuh agent connectivity issues. Connection logs: {{ connection_logs.stdout }}, Process: {{ agent_process_status.stdout }}'
+    success_msg: 'Wazuh agent successfully connected to manager'
 
 - name: Check for recent critical errors (version mismatch only)
   shell: |
@@ -75,8 +75,8 @@
   assert:
     that:
       - version_error_check.stdout == "no_recent_version_errors"
-    fail_msg: "Wazuh agent has recent version compatibility issues"
-    success_msg: "No recent version compatibility errors found"
+    fail_msg: 'Wazuh agent has recent version compatibility issues'
+    success_msg: 'No recent version compatibility errors found'
 
 - name: Check agent processes are running
   shell: |
@@ -88,8 +88,8 @@
   assert:
     that:
       - agent_processes.stdout | int >= 5
-    fail_msg: "Not all Wazuh agent processes are running. Found {{ agent_processes.stdout }} processes"
-    success_msg: "All Wazuh agent processes are running ({{ agent_processes.stdout }} processes)"
+    fail_msg: 'Not all Wazuh agent processes are running. Found {{ agent_processes.stdout }} processes'
+    success_msg: 'All Wazuh agent processes are running ({{ agent_processes.stdout }} processes)'
 
 - name: Verify client keys file exists and is not empty
   stat:
@@ -101,16 +101,16 @@
     that:
       - client_keys_file.stat.exists
       - client_keys_file.stat.size > 0
-    fail_msg: "Agent client keys file is missing or empty"
-    success_msg: "Agent is properly registered (client.keys file exists and contains data)"
+    fail_msg: 'Agent client keys file is missing or empty'
+    success_msg: 'Agent is properly registered (client.keys file exists and contains data)'
 
 - name: Display final agent status summary
   debug:
     msg:
-      - "=== Wazuh Agent Status Summary ==="
-      - "Service Status: {{ agent_service_status.status.ActiveState }}/{{ agent_service_status.status.SubState }}"
-      - "Processes Running: {{ agent_processes.stdout }}"
+      - '=== Wazuh Agent Status Summary ==='
+      - 'Service Status: {{ agent_service_status.status.ActiveState }}/{{ agent_service_status.status.SubState }}'
+      - 'Processes Running: {{ agent_processes.stdout }}'
       - "Registration: {{ 'Registered' if client_keys_file.stat.size > 0 else 'Not Registered' }}"
-      - "Manager Connection: {{ wazuh_manager_ip }}:{{ wazuh_manager_port }}"
-      - "Auth Port: {{ wazuh_manager_auth_port }}"
-      - "Agent Name: {{ wazuh_agent_name }}"
+      - 'Manager Connection: {{ wazuh_manager_ip }}:{{ wazuh_manager_port }}'
+      - 'Auth Port: {{ wazuh_manager_auth_port }}'
+      - 'Agent Name: {{ wazuh_agent_name }}'

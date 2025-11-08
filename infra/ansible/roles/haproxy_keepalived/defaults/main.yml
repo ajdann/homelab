@@ -1,4 +1,4 @@
 ---
-kubernetes_vip: 
+kubernetes_vip:
 haproxy_interface: eth0
 haproxy_port: 6443

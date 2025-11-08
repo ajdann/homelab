@@ -3,7 +3,7 @@
 
 - name: Enable fail-fast behavior
   set_fact:
-    any_errors_fatal: "{{ k3s_any_errors_fatal }}"
+    any_errors_fatal: '{{ k3s_any_errors_fatal }}'
 
 - name: Validate required variables
   assert:
@@ -12,12 +12,12 @@
       - groups['k3s_masters'] | length > 0
       - kubernetes_vip is defined
       - kubeconfig_dest_path is defined
-    fail_msg: "Required variables are not properly defined"
-    success_msg: "All required variables are present"
+    fail_msg: 'Required variables are not properly defined'
+    success_msg: 'All required variables are present'
 
 - name: Validate kubeconfig destination directory
   file:
-    path: "{{ kubeconfig_dest_path | dirname }}"
+    path: '{{ kubeconfig_dest_path | dirname }}'
     state: directory
     mode: '0755'
   delegate_to: localhost

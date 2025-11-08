@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: falco
-      version: "5.x"
+      version: '5.x'
       sourceRef:
         kind: HelmRepository
         name: falco

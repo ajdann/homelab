@@ -1,9 +1,9 @@
 ---
 nessus_admin_user: admin
 # NOTE: Use Ansible Vault for sensitive variables like this password.
-nessus_admin_password: "YourStrongPassword"
-nessus_host: "127.0.0.1"
+nessus_admin_password: 'YourStrongPassword'
+nessus_host: '127.0.0.1'
 # NOTE: Use Ansible Vault for sensitive variables like this activation code.
-nessus_activation_code: "YOUR_NESSUS_ESSENTIALS_CODE"
-scan_name: "Homelab Scan"
-scan_targets: "192.168.222.0/24"
+nessus_activation_code: 'YOUR_NESSUS_ESSENTIALS_CODE'
+scan_name: 'Homelab Scan'
+scan_targets: '192.168.222.0/24'

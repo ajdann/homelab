@@ -12,6 +12,6 @@ spec:
     node-type: worker
   ports:
     - name: agents-events
-      port: 1514          # internal ClusterIP port
-      targetPort: 1514    # container port
-      nodePort: 31514     # external port accessible on <NodeIP>:31514
+      port: 1514 # internal ClusterIP port
+      targetPort: 1514 # container port
+      nodePort: 31514 # external port accessible on <NodeIP>:31514

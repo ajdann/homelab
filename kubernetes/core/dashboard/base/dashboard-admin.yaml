@@ -18,9 +18,9 @@ roleRef:
   kind: ClusterRole
   name: cluster-admin
 subjects:
-- kind: ServiceAccount
-  name: dashboard-admin
-  namespace: kubernetes-dashboard
+  - kind: ServiceAccount
+    name: dashboard-admin
+    namespace: kubernetes-dashboard
 ---
 apiVersion: v1
 kind: Secret
