@@ -1,5 +1,5 @@
 # locals {
-#   flux_instance_values = yamldecode(file("${path.module}/../kubernetes/flux/fluxInstance.yaml"))
+#   flux_instance_values = yamldecode(file("${path.module}/../kubernetes/clusters/homelab/flux-system/fluxInstance.yaml"))
 # }
 
 # resource "helm_release" "flux_operator" {
@@ -28,7 +28,7 @@
 #           interval = "1m0s"
 #           url      = "https://github.com/ajdann/homelab.git"
 #           ref      = "refs/heads/main"
-#           path     = "./kubernetes/overlays/dev"
+#           path     = "./kubernetes/clusters/homelab"
 #         }
 #       })
 #     })
