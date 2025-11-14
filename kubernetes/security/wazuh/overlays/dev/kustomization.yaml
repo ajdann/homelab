@@ -1,4 +1,27 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: wazuh
+secretGenerator:
+  - name: indexer-certs
+    files:
+      - secret-files/indexer-certs/root-ca.pem
+      - secret-files/indexer-certs/node.pem
+      - secret-files/indexer-certs/node-key.pem
+      - secret-files/indexer-certs/dashboard.pem
+      - secret-files/indexer-certs/dashboard-key.pem
+      - secret-files/indexer-certs/admin.pem
+      - secret-files/indexer-certs/admin-key.pem
+      - secret-files/indexer-certs/filebeat.pem
+      - secret-files/indexer-certs/filebeat-key.pem
+  - name: dashboard-certs
+    files:
+      - secret-files/dashboard-certs/cert.pem
+      - secret-files/dashboard-certs/key.pem
+      - secret-files/indexer-certs/root-ca.pem
 resources:
   - ../../base
+  - dashboard-cred.secret.yaml
+  - indexer-cred.secret.yaml
+  - wazuh-api-cred.secret.yaml
+  - wazuh-authd-pass.secret.yaml
+  - wazuh-cluster-key.secret.yaml

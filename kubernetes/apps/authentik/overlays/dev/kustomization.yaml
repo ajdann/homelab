@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ../../base
   - gitea-provider.secret.yaml
+  - nextcloud-provider.secret.yaml
 # Uncomment to apply value overrides generated from Flux substitutions
 # patchesStrategicMerge:
 #   - patches/authentik-values-patch.yaml
