@@ -1,3 +1,4 @@
 ---
 kubeconfig_dest_path: '{{ playbook_dir }}/../../../secrets/kubeconfig'
 flux_components_path: '{{ playbook_dir }}/../../../kubernetes/flux'
+remote_kubeconfig_path: /etc/rancher/k3s/k3s.yaml

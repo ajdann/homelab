@@ -1,5 +1,6 @@
 kubernetes_vip: 20.108.64.87
 kubernetes_tls_sans: 'localhost, 127.0.0.1'
+remote_kubeconfig_path: /etc/rancher/k3s/k3s.yaml
 
 # Default VM credentials
 vm_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"

@@ -33,7 +33,7 @@
 
 - name: Apply Flux Operator installation manifests
   kubernetes.core.k8s:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    {{ remote_kubeoncifg_path }}
     state: present
     src: 'https://github.com/controlplaneio-fluxcd/flux-operator/releases/latest/download/install.yaml'
   register: flux_operator_install_result
@@ -46,7 +46,7 @@
 
 
   kubernetes.core.k8s_info:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    {{ remote_kubeoncifg_path }}
     api_version: apps/v1
     kind: Deployment
     name: flux-operator
@@ -68,7 +68,7 @@
 
 - name: Wait for FluxInstance CRD to be available
   kubernetes.core.k8s_info:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    {{ remote_kubeoncifg_path }}
     api_version: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     name: fluxinstances.fluxcd.controlplane.io
@@ -95,7 +95,7 @@
 
 - name: Apply FluxInstance first
   kubernetes.core.k8s:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    {{ remote_kubeoncifg_path }}
     state: present
     src: '{{ item.path }}'
   loop: '{{ flux_manifests.files }}'
@@ -110,7 +110,7 @@
 
 - name: Wait for Flux controllers to be deployed by FluxInstance
   kubernetes.core.k8s_info:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    {{ remote_kubeoncifg_path }}
     api_version: apps/v1
     kind: Deployment
     namespace: flux-system
@@ -139,7 +139,7 @@
 
 - name: Wait for Flux Toolkit CRDs to be available
   kubernetes.core.k8s_info:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    {{ remote_kubeoncifg_path }}
     api_version: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     name: '{{ item }}'
@@ -165,7 +165,7 @@
 
 - name: Apply remaining Flux manifests
   kubernetes.core.k8s:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    {{ remote_kubeoncifg_path }}
     state: present
     src: '{{ item.path }}'
   loop: '{{ flux_manifests.files }}'
@@ -180,7 +180,7 @@
 
 - name: Verify all Flux components are healthy
   kubernetes.core.k8s_info:
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    {{ remote_kubeoncifg_path }}
     api_version: apps/v1
     kind: Deployment
     namespace: flux-system
