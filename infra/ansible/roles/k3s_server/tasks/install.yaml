@@ -8,12 +8,22 @@
     mode: '0755'
   register: k3s_download_result
   failed_when: k3s_download_result.failed
+  changed_when: "'downloaded' in k3s_download_result.msg or k3s_download_result.status_code | default(0) == 200"
+
+- name: Check if K3s cluster token already exists
+  stat:
+    path: /tmp/k3s_cluster_token
+  register: k3s_token_file
+  delegate_to: localhost
+  become: false
+  run_once: true
 
 - name: Generate K3s cluster token
   run_once: true
   shell: 'openssl rand -hex {{ k3s_cluster_token_length }}'
   register: k3s_cluster_token_raw
   delegate_to: localhost
+  become: false
 
 - name: Store K3s cluster token
   run_once: true

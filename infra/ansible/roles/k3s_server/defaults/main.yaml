@@ -20,7 +20,7 @@ k3s_tls_sans: []
 k3s_default_tls_san: '{{ kubernetes_vip | default(ansible_default_ipv4.address) }}'
 
 # Service verification
-k3s_service_start_timeout: 300
+k3s_service_start_timeout: 60
 k3s_api_check_retries: 10
 k3s_api_check_delay: 15
 

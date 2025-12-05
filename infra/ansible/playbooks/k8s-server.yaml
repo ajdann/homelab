@@ -4,6 +4,7 @@
   gather_facts: true
   become: true
   roles:
+    - ../roles/node_bootstrap
     - ../roles/k3s_server
   vars_files:
     - ../group_vars/all.yaml

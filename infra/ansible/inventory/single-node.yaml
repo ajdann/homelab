@@ -1,0 +1,21 @@
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+
+    k3s-master-1:
+      ansible_host: 20.108.64.87
+      ansible_user: "{{ lookup('file', playbook_dir + '/../../../secrets/vm_user') }}"
+      ansible_ssh_private_key_file: '{{ playbook_dir }}/../../../secrets/vm_ssh_private_key'
+
+  children:
+    k3s_masters:
+      hosts:
+        k3s-master-1:
+        # k3s-master-2:
+        # k3s-master-3:
+
+    haproxy_nodes:
+      hosts:
+        haproxy-1:
+        haproxy-2:

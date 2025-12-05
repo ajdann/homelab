@@ -33,15 +33,21 @@
 
 - name: Apply Flux Operator installation manifests
   kubernetes.core.k8s:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
     state: present
     src: 'https://github.com/controlplaneio-fluxcd/flux-operator/releases/latest/download/install.yaml'
   register: flux_operator_install_result
   failed_when: flux_operator_install_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
+
 
 - name: Wait for Flux Operator to be ready
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
     api_version: apps/v1
     kind: Deployment
     name: flux-operator
@@ -55,10 +61,15 @@
   failed_when:
     - flux_operator_ready_result.failed
     - flux_operator_ready_result.resources | length == 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Wait for FluxInstance CRD to be available
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
     api_version: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     name: fluxinstances.fluxcd.controlplane.io
@@ -71,6 +82,11 @@
   failed_when:
     - fluxinstance_crd_result.failed
     - fluxinstance_crd_result.resources | length == 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Find all manifest files in kubernetes/flux
   ansible.builtin.find:
@@ -80,17 +96,22 @@
 
 - name: Apply FluxInstance first
   kubernetes.core.k8s:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
     state: present
     src: '{{ item.path }}'
   loop: '{{ flux_manifests.files }}'
   when: "'fluxInstance' in item.path"
   register: flux_instance_result
   failed_when: flux_instance_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Wait for Flux controllers to be deployed by FluxInstance
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
     api_version: apps/v1
     kind: Deployment
     namespace: flux-system
@@ -108,14 +129,18 @@
     loop_var: controller_name
   vars:
     name: '{{ controller_name }}'
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
   register: flux_controllers_result
   failed_when:
     - flux_controllers_result.failed
     - flux_controllers_result.resources | length == 0
+  become: true
 
 - name: Wait for Flux Toolkit CRDs to be available
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
     api_version: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     name: '{{ item }}'
@@ -133,20 +158,30 @@
   failed_when:
     - flux_crds_result.failed
     - flux_crds_result.resources | length == 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Apply remaining Flux manifests
   kubernetes.core.k8s:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
     state: present
     src: '{{ item.path }}'
   loop: '{{ flux_manifests.files }}'
   when: "'fluxInstance' not in item.path"
   register: flux_resources_apply_result
   failed_when: flux_resources_apply_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Verify all Flux components are healthy
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
     api_version: apps/v1
     kind: Deployment
     namespace: flux-system
@@ -156,6 +191,11 @@
     flux_final_check.resources | 
     selectattr('status.readyReplicas', 'undefined') | 
     list | length > 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Display Flux deployment status
   debug:

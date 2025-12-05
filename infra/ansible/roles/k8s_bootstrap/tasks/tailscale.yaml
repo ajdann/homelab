@@ -4,20 +4,26 @@
   set_fact:
     any_errors_fatal: true
 
+- name: Copy .env file to remote server
+  copy:
+    src: '{{ local_env_file_path }}'
+    dest: '{{ remote_env_file_path }}'
+    mode: '0600'
+
 - name: Check if .env file exists
   stat:
-    path: '{{ env_file_path }}'
+    path: '{{ remote_env_file_path }}'
   register: env_file_stat
   failed_when: false # Don't fail here, we check in next task
 
 - name: Fail if .env file doesn't exist
   fail:
-    msg: '.env file not found at {{ env_file_path }}'
+    msg: '.env file not found at {{ remote_env_file_path }}'
   when: not env_file_stat.stat.exists
 
 - name: Read .env file
   slurp:
-    src: '{{ env_file_path }}'
+    src: '{{ remote_env_file_path }}'
   register: env_file_content
 
 - name: Parse environment variables
@@ -44,9 +50,14 @@
     api_version: v1
     kind: Namespace
     state: present
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
   register: tailscale_namespace_result
   failed_when: tailscale_namespace_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Create Tailscale operator OAuth secret
   kubernetes.core.k8s:
@@ -63,9 +74,14 @@
         client_id: '{{ env_vars.TAILSCALE_CLIENT_ID }}'
         client_secret: '{{ env_vars.TAILSCALE_CLIENT_SECRET }}'
     state: present
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
   register: tailscale_secret_result
   failed_when: tailscale_secret_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Create flux-system namespace
   kubernetes.core.k8s:
@@ -73,9 +89,14 @@
     api_version: v1
     kind: Namespace
     state: present
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
   register: flux_namespace_result
   failed_when: flux_namespace_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Create Tailscale Domain ConfigMap
   kubernetes.core.k8s:
@@ -90,9 +111,14 @@
           app.kubernetes.io/managed-by: ansible
       data:
         DOMAIN: '{{ env_vars.TAILSCALE_DOMAIN }}'
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
   register: tailscale_configmap_result
   failed_when: tailscale_configmap_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  environment:
+    ANSIBLE_PYTHON_INTERPRETER: /opt/pyenv/bin/python3
+  become: true
 
 - name: Display success message
   debug:

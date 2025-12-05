@@ -24,3 +24,8 @@ destroy:
 
 reload:
 	vagrant reload --provision
+
+vm:
+	ansible-playbook -i infra/ansible/inventory/single-node.yaml infra/ansible/playbooks/k8s-server.yaml
+	ansible-playbook -i infra/ansible/inventory/single-node.yaml infra/ansible/playbooks/k8s-bootstrap.yaml
+
