@@ -45,7 +45,6 @@
   become: true
 
 
-- name: Wait for Flux Operator to be ready
   kubernetes.core.k8s_info:
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     api_version: apps/v1
