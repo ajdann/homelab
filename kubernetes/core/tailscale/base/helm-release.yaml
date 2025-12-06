@@ -16,4 +16,5 @@ spec:
         namespace: tailscale
       interval: 1m
   values:
-    apiServerProxyConfig.allowImpersonation: "true"
+    apiServerProxyConfig:
+      mode: "noauth"
