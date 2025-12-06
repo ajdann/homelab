@@ -50,7 +50,7 @@
     api_version: v1
     kind: Namespace
     state: present
-    {{ remote_kubeoncifg_path }}
+    kubeconfig: '{{ remote_kubeconfig_path }}'
   register: tailscale_namespace_result
   failed_when: tailscale_namespace_result.failed
   vars:
@@ -72,7 +72,7 @@
         client_id: '{{ env_vars.TAILSCALE_CLIENT_ID }}'
         client_secret: '{{ env_vars.TAILSCALE_CLIENT_SECRET }}'
     state: present
-    {{ remote_kubeoncifg_path }}
+    kubeconfig: '{{ remote_kubeconfig_path }}'
   register: tailscale_secret_result
   failed_when: tailscale_secret_result.failed
   vars:
@@ -85,7 +85,7 @@
     api_version: v1
     kind: Namespace
     state: present
-    {{ remote_kubeoncifg_path }}
+    kubeconfig: '{{ remote_kubeconfig_path }}'
   register: flux_namespace_result
   failed_when: flux_namespace_result.failed
   vars:
@@ -105,7 +105,7 @@
           app.kubernetes.io/managed-by: ansible
       data:
         DOMAIN: '{{ env_vars.TAILSCALE_DOMAIN }}'
-    {{ remote_kubeoncifg_path }}
+    kubeconfig: '{{ remote_kubeconfig_path }}'
   register: tailscale_configmap_result
   failed_when: tailscale_configmap_result.failed
   vars:
