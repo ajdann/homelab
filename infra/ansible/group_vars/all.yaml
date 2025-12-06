@@ -9,4 +9,4 @@ vm_ssh_pub_key: "{{ lookup('file', playbook_dir + '/../../secrets/vm_ssh_pub_key
 local_env_file_path: '{{ playbook_dir }}/../../../secrets/.env'
 remote_env_file_path: '{{ ansible_user_dir }}/.env'
 kubeconfig_dest_path: '{{ playbook_dir }}/../../../secrets/kubeconfig'
-flux_components_path: '{{ playbook_dir }}/../../../kubernetes/flux'
+flux_components_path: '{{ playbook_dir }}/../../../kubernetes/clusters/homelab/flux-system'
