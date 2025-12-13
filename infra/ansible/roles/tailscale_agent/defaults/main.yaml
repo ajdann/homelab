@@ -1,0 +1,30 @@
+---
+# Tailscale Agent Role Defaults
+
+# Tailscale version (leave empty for latest)
+tailscale_version: ''
+
+# Authentication method: 'auth-key' or 'interactive'
+tailscale_auth_method: auth-key
+
+# Tailscale auth key (set this via group_vars, host_vars, or --extra-vars)
+# This should be an ephemeral or reusable key created in Tailscale admin panel
+tailscale_auth_key: ''
+
+# Tailscale up command options
+tailscale_up_options: ''
+
+# Hostname for the Tailscale node (defaults to ansible_hostname)
+tailscale_hostname: '{{ ansible_hostname }}'
+
+# Whether to accept routes from other nodes
+tailscale_accept_routes: false
+
+# Whether to use subnet routes
+tailscale_advertise_routes: false
+
+# Subnet routes to advertise (if tailscale_advertise_routes is true)
+tailscale_routes: []
+
+# Whether to use as an exit node
+tailscale_exit_node: false

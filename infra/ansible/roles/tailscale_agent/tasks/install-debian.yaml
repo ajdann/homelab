@@ -1,0 +1,17 @@
+---
+- name: Add Tailscale GPG key
+  apt_key:
+    url: https://pkgs.tailscale.com/stable/debian/tailscale.asc
+    state: present
+
+- name: Add Tailscale repository
+  apt_repository:
+    repo: deb https://pkgs.tailscale.com/stable/debian {{ ansible_distribution_release }} main
+    state: present
+    filename: tailscale
+
+- name: Install Tailscale package
+  apt:
+    name: tailscale
+    state: present
+    update_cache: yes
