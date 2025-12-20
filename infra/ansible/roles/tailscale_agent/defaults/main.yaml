@@ -4,12 +4,24 @@
 # Tailscale version (leave empty for latest)
 tailscale_version: ''
 
-# Authentication method: 'auth-key' or 'interactive'
-tailscale_auth_method: auth-key
+# Authentication method: 'oauth-api' (recommended) or 'pre-generated-key'
+# oauth-api: Creates auth keys dynamically from OAuth credentials
+# pre-generated-key: Uses a pre-generated auth key
+tailscale_auth_method: oauth-api
 
-# Tailscale auth key (set this via group_vars, host_vars, or --extra-vars)
-# This should be an ephemeral or reusable key created in Tailscale admin panel
+# Path to local .env file containing TAILSCALE_CLIENT_ID and TAILSCALE_CLIENT_SECRET
+# Only required when using oauth-api method
+local_env_file_path: "{{ playbook_dir }}/../../.env"
+
+# Remote path where .env file will be copied (temporary)
+remote_env_file_path: /tmp/.tailscale.env
+
+# Pre-generated Tailscale auth key (only used if tailscale_auth_method is 'pre-generated-key')
+# Set this via group_vars, host_vars, or --extra-vars
 tailscale_auth_key: ''
+
+# Tailscale API endpoint
+tailscale_api_endpoint: https://api.tailscale.com/api/v2
 
 # Tailscale up command options
 tailscale_up_options: ''

@@ -2,6 +2,10 @@
 - name: Include OS-specific installation tasks
   include_tasks: 'install-{{ ansible_os_family | lower }}.yaml'
 
+- name: Include OAuth API authentication tasks
+  include_tasks: authenticate-oauth-api.yaml
+  when: tailscale_auth_method == 'oauth-api'
+
 - name: Ensure Tailscale service is enabled
   systemd:
     name: tailscaled
@@ -14,11 +18,12 @@
   changed_when: false
   failed_when: false
 
-- name: Authenticate with Tailscale
-  command: '{{ tailscale_auth_command }}'
+- name: Authenticate with pre-generated key
+  command: "{{ tailscale_up_command }}"
   when:
     - not (tailscale_status.stdout | from_json).Self.ID
     - tailscale_auth_key is defined
+    - tailscale_auth_method == 'pre-generated-key'
   register: tailscale_auth_result
   changed_when: tailscale_auth_result.rc == 0
 
@@ -26,3 +31,4 @@
   command: tailscale status
   register: tailscale_verify
   changed_when: false
+

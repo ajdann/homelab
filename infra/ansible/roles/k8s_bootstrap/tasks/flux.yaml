@@ -37,12 +37,13 @@
 
 - name: Sync Flux manifests
   synchronize:
-    src: "{{ flux_components_path }}/"
-    dest: "{{ remote_flux_manifest_dir }}/"
+    src: '{{ flux_components_path }}/'
+    dest: '{{ remote_flux_manifest_dir }}/'
     delete: true
+    private_key: '{{ hostvars["k3s-master-1"].ansible_ssh_private_key_file }}'
     rsync_opts:
-      - "--exclude=.git"
-    ssh_args: "-i {{ hostvars['k3s-master-1'].ansible_ssh_private_key_file }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+      - '--exclude=.git'
+    set_remote_user: true
   delegate_to: localhost
 
 - name: Find Flux manifests on remote
@@ -152,6 +153,45 @@
   vars:
     ansible_python_interpreter: /opt/pyenv/bin/python3
   become: true
+
+- name: Wait for GitRepository to sync
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: source.toolkit.fluxcd.io/v1
+    kind: GitRepository
+    name: homelab-repo
+    namespace: flux-system
+    wait: true
+    wait_condition:
+      type: Ready
+      status: 'True'
+    wait_timeout: 120
+  register: git_repo_status
+  failed_when: git_repo_status.resources | length == 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+
+- name: Validate homelab Kustomization readiness
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    name: homelab
+    namespace: flux-system
+  register: flux_kustomization_status
+  failed_when: false
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+
+- name: Report homelab Kustomization status
+  debug:
+    msg:
+      - 'Kustomization found: {{ flux_kustomization_status.resources | length > 0 }}'
+      - "Kustomization Ready: {{ (flux_kustomization_status.resources[0].status.conditions | default([]) | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length) > 0 if flux_kustomization_status.resources | length > 0 else false }}"
+      - 'Managed objects: {{ (flux_kustomization_status.resources[0].status.inventory.entries | default([]) | length) if flux_kustomization_status.resources | length > 0 else 0 }}'
+      - "Last status message: {{ ((flux_kustomization_status.resources[0].status.conditions | last).message | default('n/a')) if (flux_kustomization_status.resources | length > 0 and (flux_kustomization_status.resources[0].status.conditions | default([]) | length) > 0) else 'n/a' }}"
 
 - name: Summary
   debug:

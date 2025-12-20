@@ -1,0 +1,94 @@
+---
+# Enable fail-fast behavior for this task file
+- name: Enable fail-fast behavior
+  set_fact:
+    any_errors_fatal: true
+
+- name: Copy .env file to remote server
+  copy:
+    src: '{{ local_env_file_path }}'
+    dest: '{{ remote_env_file_path }}'
+    mode: '0600'
+
+- name: Check if .env file exists
+  stat:
+    path: '{{ remote_env_file_path }}'
+  register: env_file_stat
+  failed_when: false
+
+- name: Fail if .env file doesn't exist
+  fail:
+    msg: '.env file not found at {{ remote_env_file_path }}'
+  when: not env_file_stat.stat.exists
+
+- name: Read .env file
+  slurp:
+    src: '{{ remote_env_file_path }}'
+  register: env_file_content
+
+- name: Parse environment variables
+  set_fact:
+    env_vars: "{{ env_vars | default({}) | combine({item.split('=')[0].strip(): item.split('=')[1:]|join('=')|trim}) }}"
+  loop: "{{ (env_file_content.content | b64decode).split('\n') }}"
+  when:
+    - item.strip() != ''
+    - "'=' in item"
+    - not item.strip().startswith('#')
+
+- name: Check for required Tailscale OAuth variables
+  fail:
+    msg: 'Missing {{ item }} in .env file'
+  when: item not in env_vars
+  loop:
+    - TAILSCALE_CLIENT_ID
+    - TAILSCALE_CLIENT_SECRET
+
+- name: Create auth key via Tailscale API
+  uri:
+    url: '{{ tailscale_api_endpoint }}/tailnet/-/keys'
+    method: POST
+    user: '{{ env_vars.TAILSCALE_CLIENT_ID }}'
+    password: '{{ env_vars.TAILSCALE_CLIENT_SECRET }}'
+    force_basic_auth: yes
+    body_format: json
+    body:
+      capabilities:
+        devices:
+          create:
+            autoApprove: true
+            preAuthorizationRequired: false
+      expirySeconds: 3600
+      description: "Auth key for {{ tailscale_hostname }} - {{ ansible_date_time.iso8601 }}"
+  register: tailscale_key_response
+  failed_when: tailscale_key_response.status != 200
+
+- name: Extract auth key from response
+  set_fact:
+    tailscale_auth_key: "{{ tailscale_key_response.json.key }}"
+
+- name: Check if already authenticated
+  command: tailscale status --json
+  register: tailscale_status_oauth
+  changed_when: false
+  failed_when: false
+
+- name: Authenticate with generated auth key
+  command: "tailscale up --authkey='{{ tailscale_auth_key }}' --hostname='{{ tailscale_hostname }}' {{ tailscale_up_options }}"
+  when: not (tailscale_status_oauth.stdout | from_json).Self.ID
+  register: tailscale_auth_result
+  changed_when: tailscale_auth_result.rc == 0
+
+- name: Wait for Tailscale to be ready
+  pause:
+    seconds: 2
+  when: tailscale_auth_result.changed
+
+- name: Clean up remote .env file
+  file:
+    path: '{{ remote_env_file_path }}'
+    state: absent
+  no_log: true
+
+- name: Display success message
+  debug:
+    msg: "Successfully authenticated {{ tailscale_hostname }} with Tailscale via OAuth API"

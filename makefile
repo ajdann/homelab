@@ -1,4 +1,4 @@
-.PHONY: up ssh bootstrap kubeconfig destroy
+.PHONY: up bootstrap
 
 vagrant-up:
 	vagrant up

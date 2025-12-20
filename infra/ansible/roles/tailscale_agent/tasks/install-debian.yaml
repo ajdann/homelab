@@ -1,17 +1,40 @@
----
-- name: Add Tailscale GPG key
+- name: Determine OS-specific variables
+  set_fact:
+    tailscale_os: "{{ 'ubuntu' if ansible_distribution == 'Ubuntu' else 'debian' }}"
+
+- name: Set Tailscale repository variables
+  set_fact:
+    tailscale_repo_base: "https://pkgs.tailscale.com/stable/{{ tailscale_os }}"
+    tailscale_release: "{{ ansible_distribution_release | lower }}"
+
+- name: Determine GPG key file extension
+  set_fact:
+    tailscale_key_ext: "{% if ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int < 21 %}noarmor.gpg{% else %}asc{% endif %}"
+
   apt_key:
-    url: https://pkgs.tailscale.com/stable/debian/tailscale.asc
+    url: "{{ tailscale_repo_base }}/{{ tailscale_release }}.{{ tailscale_key_ext }}"
     state: present
+  register: tailscale_key_result
+  until: tailscale_key_result is succeeded
+  retries: 3
+  delay: 5
 
 - name: Add Tailscale repository
   apt_repository:
-    repo: deb https://pkgs.tailscale.com/stable/debian {{ ansible_distribution_release }} main
+    repo: "deb {{ tailscale_repo_base }} {{ tailscale_release }} main"
     state: present
     filename: tailscale
+  register: tailscale_repo_result
+  until: tailscale_repo_result is succeeded
+  retries: 3
+  delay: 5
 
 - name: Install Tailscale package
   apt:
     name: tailscale
     state: present
     update_cache: yes
+  register: tailscale_install_result
+  until: tailscale_install_result is succeeded
+  retries: 3
+  delay: 5
