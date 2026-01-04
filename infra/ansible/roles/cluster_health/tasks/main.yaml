@@ -1,0 +1,21 @@
+---
+# Cluster health checks orchestrator
+
+- name: Enable non-fatal health check mode
+  set_fact:
+    any_errors_fatal: false
+
+- name: Flux status checks
+  include_tasks: flux.yaml
+
+- name: Pod health checks
+  include_tasks: pods.yaml
+
+- name: Node health checks
+  include_tasks: nodes.yaml
+
+- name: Host disk usage
+  include_tasks: host_disk.yaml
+
+- name: Summaries and failure handling
+  include_tasks: summary.yaml

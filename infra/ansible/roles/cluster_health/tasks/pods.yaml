@@ -1,0 +1,56 @@
+---
+# Pod health checks per namespace
+
+- name: Get namespaces
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: v1
+    kind: Namespace
+  register: ns_list
+  failed_when: false
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+  no_log: false
+
+- name: Collect pods per namespace
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: v1
+    kind: Pod
+    namespace: '{{ item.metadata.name }}'
+  loop: '{{ ns_list.resources | default([]) }}'
+  loop_control:
+    label: '{{ item.metadata.name }}'
+  register: pods_by_ns
+  failed_when: false
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+  no_log: false
+
+- name: Initialize problematic pods list
+  set_fact:
+    problematic_pods: []
+
+- name: Summarize failing/evicted pods
+  set_fact:
+    problematic_pods: >-
+      {{ problematic_pods + [ {
+        'ns': item.metadata.namespace,
+        'name': item.metadata.name,
+        'phase': item.status.phase,
+        'reason': item.status.reason | default(''),
+        'message': item.status.message | default('')
+      } ] }}
+  loop: "{{ pods_by_ns.results | default([]) | map(attribute='resources') | sum(start=[]) | selectattr('status.phase','!=','Running') | list }}"
+  loop_control:
+    label: "{{ item.metadata.namespace }}/{{ item.metadata.name }}"
+  no_log: false
+
+- name: Report pod issues
+  debug:
+    msg:
+      - 'Namespaces checked: {{ ns_list.resources | default([]) | length }}'
+      - 'Problematic pods: {{ problematic_pods | length }}'
+      - "Examples: {{ (problematic_pods | map(attribute='ns') | list)[:5] }} / {{ (problematic_pods | map(attribute='name') | list)[:5] }}"

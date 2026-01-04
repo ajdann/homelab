@@ -189,8 +189,8 @@
   debug:
     msg:
       - 'Kustomization found: {{ flux_kustomization_status.resources | length > 0 }}'
-      - "Kustomization Ready: {{ (flux_kustomization_status.resources[0].status.conditions | default([]) | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length) > 0 if flux_kustomization_status.resources | length > 0 else false }}"
-      - 'Managed objects: {{ (flux_kustomization_status.resources[0].status.inventory.entries | default([]) | length) if flux_kustomization_status.resources | length > 0 else 0 }}'
+      # - "Kustomization Ready: {{ (flux_kustomization_status.resources[0].status.conditions | default([]) | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length) > 0 if flux_kustomization_status.resources | length > 0 else false }}"
+      # - 'Managed objects: {{ (flux_kustomization_status.resources[0].status.inventory.entries | default([]) | length) if flux_kustomization_status.resources | length > 0 else 0 }}'
       - "Last status message: {{ ((flux_kustomization_status.resources[0].status.conditions | last).message | default('n/a')) if (flux_kustomization_status.resources | length > 0 and (flux_kustomization_status.resources[0].status.conditions | default([]) | length) > 0) else 'n/a' }}"
 
 - name: Summary

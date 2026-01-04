@@ -1,0 +1,37 @@
+---
+# Flux GitRepository and Kustomization status
+
+- name: Check GitRepository readiness
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: source.toolkit.fluxcd.io/v1
+    kind: GitRepository
+    name: homelab-repo
+    namespace: flux-system
+  register: git_repo_status
+  failed_when: false
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+  no_log: false
+
+- name: Check homelab Kustomization status
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    name: homelab
+    namespace: flux-system
+  register: kustomization_status
+  failed_when: false
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+  no_log: false
+
+- name: Report Flux sync and Kustomization
+  debug:
+    msg:
+      - "GitRepository Ready: {{ (git_repo_status.resources | length > 0) and ((git_repo_status.resources[0].status.conditions | default([]) | selectattr('type','equalto','Ready') | selectattr('status','equalto','True') | list | length) > 0) }}"
+      - "Kustomization Ready: {{ (kustomization_status.resources | length > 0) and ((kustomization_status.resources[0].status.conditions | default([]) | selectattr('type','equalto','Ready') | selectattr('status','equalto','True') | list | length) > 0) }}"
+      - "Kustomization message: {{ ((kustomization_status.resources[0].status.conditions | default([])) | length > 0) | ternary((kustomization_status.resources[0].status.conditions | last).message | default('n/a'), 'n/a') if (kustomization_status.resources | length > 0) else 'n/a' }}"

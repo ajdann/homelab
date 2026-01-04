@@ -1,0 +1,12 @@
+---
+# Host filesystem usage
+
+- name: Disk usage on host root filesystem
+  ansible.builtin.shell: df -h /
+  register: df_root
+  changed_when: false
+  become: true
+
+- name: Report disk usage
+  debug:
+    msg: '{{ df_root.stdout_lines | default([]) }}'
