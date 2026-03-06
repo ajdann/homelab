@@ -17,8 +17,13 @@ local_env_file_path: "{{ playbook_dir }}/../../.env"
 remote_env_file_path: /tmp/.tailscale.env
 
 # Pre-generated Tailscale auth key (only used if tailscale_auth_method is 'pre-generated-key')
-# Set this via group_vars, host_vars, or --extra-vars
+# For oauth-api: if set or loaded from file, we use it instead of creating a new key
 tailscale_auth_key: ''
+
+# Optional path to a file containing an auth key (control node path). If the file exists and
+# the machine is not authenticated, we use this key instead of creating a new one.
+# Useful to avoid creating multiple keys when a previous run created one but failed before 'tailscale up'.
+tailscale_auth_key_file: ''
 
 # Tailscale API endpoint
 tailscale_api_endpoint: https://api.tailscale.com/api/v2

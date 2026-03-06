@@ -50,9 +50,9 @@ graph TB
     KY --> APP2
 ```
 
-## Demo Setup: Local K3s Cluster with Flux via Vagrant & Ansible
+## Demo Setup: K3s Cluster with Flux (Cloud VM or Vagrant)
 
-This project sets up a local **Kubernetes (K3s)** cluster using **Vagrant**, **Ansible**, and a **Makefile**
+The main workflow uses a **cloud VM** as the target; inventory and secrets are in `infra/ansible/inventory/single-node.yaml` and `secrets/`. For a **local** demo, Vagrant can be used. Both use **Ansible** and a **Makefile**.
 
 ---
 
@@ -82,13 +82,12 @@ Make sure the following tools are installed on your host machine:
   - Tailscale Client Secret
   - Tailscale Domain
 
-#### 2. Start the VM
+#### 2. Start the VM (local only) or use your cloud VM
 
-```bash
-make up
-```
+- **Cloud VM:** Ensure the VM is running and that `secrets/` (vm_user, vm_ssh_private_key, etc.) and inventory (`ansible_host`) are set. Skip to step 3.
+- **Local (Vagrant):** Run `make up` (or `make vagrant-up`).
 
-#### 3. Bootstrap the VM
+#### 3. Bootstrap the cluster
 
 ```bash
 make bootstrap

@@ -1,36 +1,90 @@
 ---
-# Enable fail-fast behavior for this task file
-- name: Enable fail-fast behavior
-  set_fact:
-    any_errors_fatal: true
+# OAuth API auth: only create a key when the machine is not authenticated and we don't already have a key.
 
-- name: Copy .env file to remote server
+- name: Check if already authenticated (OAuth path)
+  command: tailscale status --json
+  register: tailscale_status_oauth
+  changed_when: false
+  failed_when: false
+
+- name: Set fact when authentication is needed
+  set_fact:
+    tailscale_needs_auth: true
+
+- name: Set fact when already authenticated (valid status with Self.ID)
+  set_fact:
+    tailscale_needs_auth: false
+  when:
+    - tailscale_status_oauth.rc == 0
+    - tailscale_status_oauth.stdout | length > 0
+    - ((tailscale_status_oauth.stdout | from_json).Self.ID | default(0) | int) > 0
+
+- name: Skip OAuth steps when already authenticated
+  debug:
+    msg: "Tailscale already authenticated (Self.ID present). Skipping key creation and auth."
+  when: not tailscale_needs_auth | default(true)
+
+- name: Check for existing auth key file on control node
+  stat:
+    path: "{{ tailscale_auth_key_file }}"
+  register: tailscale_auth_key_file_stat
+  delegate_to: localhost
+  become: false
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key_file | length > 0
+
+- name: Load existing auth key from file (control node)
+  set_fact:
+    tailscale_auth_key: "{{ lookup('file', tailscale_auth_key_file) | trim }}"
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key_file | length > 0
+    - tailscale_auth_key_file_stat.stat.exists | default(false)
+
+- name: Copy .env file to remote server (for API key creation)
   copy:
     src: '{{ local_env_file_path }}'
     dest: '{{ remote_env_file_path }}'
     mode: '0600'
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key | default('') | length == 0
 
 - name: Check if .env file exists
   stat:
     path: '{{ remote_env_file_path }}'
   register: env_file_stat
   failed_when: false
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key | default('') | length == 0
 
 - name: Fail if .env file doesn't exist
   fail:
     msg: '.env file not found at {{ remote_env_file_path }}'
-  when: not env_file_stat.stat.exists
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key | default('') | length == 0
+    - not env_file_stat.stat.exists
 
 - name: Read .env file
   slurp:
     src: '{{ remote_env_file_path }}'
   register: env_file_content
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key | default('') | length == 0
+    - env_file_stat.stat.exists | default(false)
 
 - name: Parse environment variables
   set_fact:
     env_vars: "{{ env_vars | default({}) | combine({item.split('=')[0].strip(): item.split('=')[1:]|join('=')|trim}) }}"
   loop: "{{ (env_file_content.content | b64decode).split('\n') }}"
   when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key | default('') | length == 0
+    - env_file_content is changed or env_file_content.content is defined
     - item.strip() != ''
     - "'=' in item"
     - not item.strip().startswith('#')
@@ -38,12 +92,15 @@
 - name: Check for required Tailscale OAuth variables
   fail:
     msg: 'Missing {{ item }} in .env file'
-  when: item not in env_vars
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key | default('') | length == 0
+    - item not in env_vars
   loop:
     - TAILSCALE_CLIENT_ID
     - TAILSCALE_CLIENT_SECRET
 
-- name: Create auth key via Tailscale API
+- name: Create auth key via Tailscale API (only when not authenticated and no existing key)
   uri:
     url: '{{ tailscale_api_endpoint }}/tailnet/-/keys'
     method: POST
@@ -61,34 +118,54 @@
       description: "Auth key for {{ tailscale_hostname }} - {{ ansible_date_time.iso8601 }}"
   register: tailscale_key_response
   failed_when: tailscale_key_response.status != 200
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key | default('') | length == 0
+    - env_vars is defined
 
-- name: Extract auth key from response
+- name: Set auth key from API response
   set_fact:
     tailscale_auth_key: "{{ tailscale_key_response.json.key }}"
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_key_response is defined
+    - tailscale_key_response.json.key is defined
 
-- name: Check if already authenticated
-  command: tailscale status --json
-  register: tailscale_status_oauth
-  changed_when: false
-  failed_when: false
+- name: Save newly created auth key to file for retries
+  copy:
+    content: "{{ tailscale_auth_key }}"
+    dest: "{{ tailscale_auth_key_file }}"
+    mode: '0600'
+  delegate_to: localhost
+  become: false
+  when:
+    - tailscale_auth_key_file | length > 0
+    - tailscale_key_response is defined
+    - tailscale_key_response.json.key is defined
 
-- name: Authenticate with generated auth key
+- name: Authenticate with auth key (existing or newly created)
   command: "tailscale up --authkey='{{ tailscale_auth_key }}' --hostname='{{ tailscale_hostname }}' {{ tailscale_up_options }}"
-  when: not (tailscale_status_oauth.stdout | from_json).Self.ID
+  when:
+    - tailscale_needs_auth | default(true)
+    - tailscale_auth_key | length > 0
   register: tailscale_auth_result
   changed_when: tailscale_auth_result.rc == 0
 
 - name: Wait for Tailscale to be ready
   pause:
     seconds: 2
-  when: tailscale_auth_result.changed
+  when: tailscale_auth_result is changed | default(false)
 
 - name: Clean up remote .env file
   file:
     path: '{{ remote_env_file_path }}'
     state: absent
   no_log: true
+  when:
+    - tailscale_needs_auth | default(true)
+    - env_file_stat.stat.exists | default(false)
 
 - name: Display success message
   debug:
     msg: "Successfully authenticated {{ tailscale_hostname }} with Tailscale via OAuth API"
+  when: tailscale_needs_auth | default(true) and tailscale_auth_result is defined and tailscale_auth_result.rc == 0

@@ -1,4 +1,6 @@
-.PHONY: up bootstrap
+.PHONY: up bootstrap vagrant-up healthcheck
+
+up: vagrant-up
 
 vagrant-up:
 	vagrant up
