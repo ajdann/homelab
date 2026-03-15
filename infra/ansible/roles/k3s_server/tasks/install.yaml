@@ -9,11 +9,14 @@
   register: k3s_download_result
   failed_when: k3s_download_result.failed
 
+
+
 - name: Generate K3s cluster token
   run_once: true
   shell: 'openssl rand -hex {{ k3s_cluster_token_length }}'
   register: k3s_cluster_token_raw
   delegate_to: localhost
+  become: false
 
 - name: Store K3s cluster token
   run_once: true

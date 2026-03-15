@@ -1,0 +1,8 @@
+---
+- name: Kubernetes Cluster Health Check
+  hosts: k3s-master-1
+  gather_facts: false
+  become: true
+
+  roles:
+    - ../roles/cluster_health

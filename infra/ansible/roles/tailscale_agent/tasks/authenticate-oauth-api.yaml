@@ -1,0 +1,169 @@
+---
+# OAuth API authentication: authenticate the machine with Tailscale.
+#
+# Flow:
+#   1. Already authenticated?            -> skip everything
+#   2. Saved key file exists & fresh?     -> reuse it
+#   3. Stale / missing key?              -> create via API, save to file
+#   4. Run `tailscale up --authkey=...`
+#
+# The key file prevents duplicate API key creation on retries.
+
+- name: Check if already authenticated
+  command: tailscale status --json
+  register: tailscale_status
+  changed_when: false
+  failed_when: false
+
+- name: Determine whether authentication is needed
+  set_fact:
+    tailscale_needs_auth: >-
+      {{
+        tailscale_status.rc != 0
+        or tailscale_status.stdout | length == 0
+        or (tailscale_status.stdout | from_json).BackendState | default('') != 'Running'
+      }}
+
+- name: Already authenticated — nothing to do
+  debug:
+    msg: "Tailscale is already authenticated (Self.ID present). Skipping."
+  when: not (tailscale_needs_auth | bool)
+
+# ── Authentication block (runs only when needed) ─────────────────────
+- when: tailscale_needs_auth | bool
+  block:
+    # ── 1. Try to reuse a previously saved key ───────────────────────
+    - name: Check for saved auth key on control node
+      stat:
+        path: "{{ tailscale_auth_key_file }}"
+      register: key_file_stat
+      delegate_to: localhost
+      become: false
+
+    - name: Remove stale key file (older than 50 minutes)
+      file:
+        path: "{{ tailscale_auth_key_file }}"
+        state: absent
+      delegate_to: localhost
+      become: false
+      when:
+        - key_file_stat.stat.exists | default(false)
+        - (ansible_date_time.epoch | int) - (key_file_stat.stat.mtime | int) > 3000
+
+    - name: Re-check key file after possible removal
+      stat:
+        path: "{{ tailscale_auth_key_file }}"
+      register: key_file_stat
+      delegate_to: localhost
+      become: false
+
+    - name: Load auth key from saved file
+      set_fact:
+        tailscale_auth_key: "{{ lookup('file', tailscale_auth_key_file) | trim }}"
+        tailscale_key_source: file
+      when: key_file_stat.stat.exists | default(false)
+
+    # ── 2. Create a new key via the Tailscale API ────────────────────
+    - when: tailscale_auth_key | default('') | length == 0
+      block:
+        - name: Read .env file from control node
+          set_fact:
+            env_file_raw: "{{ lookup('file', local_env_file_path) }}"
+
+        - name: Parse OAuth credentials from .env
+          set_fact:
+            env_vars: >-
+              {{ env_vars | default({}) | combine({
+                   item.split('=', 1)[0] | trim :
+                   item.split('=', 1)[1] | default('') | trim
+              }) }}
+          loop: "{{ env_file_raw.split('\n') }}"
+          when:
+            - item | trim | length > 0
+            - "'=' in item"
+            - not (item | trim) is match('^#')
+          no_log: true
+
+        - name: Validate required OAuth credentials
+          assert:
+            that:
+              - env_vars[item] is defined
+              - env_vars[item] | length > 0
+            fail_msg: "Missing or empty {{ item }} in {{ local_env_file_path }}"
+          loop:
+            - TAILSCALE_CLIENT_ID
+            - TAILSCALE_CLIENT_SECRET
+
+        - name: Exchange OAuth client credentials for access token
+          uri:
+            url: "{{ tailscale_api_endpoint }}/oauth/token"
+            method: POST
+            body_format: form-urlencoded
+            body:
+              client_id: "{{ env_vars.TAILSCALE_CLIENT_ID }}"
+              client_secret: "{{ env_vars.TAILSCALE_CLIENT_SECRET }}"
+              grant_type: client_credentials
+            status_code: 200
+          register: tailscale_oauth_token
+          delegate_to: localhost
+          become: false
+          no_log: true
+
+        - name: Create auth key via Tailscale API
+          uri:
+            url: "{{ tailscale_api_endpoint }}/tailnet/-/keys"
+            method: POST
+            headers:
+              Authorization: "Bearer {{ tailscale_oauth_token.json.access_token }}"
+            body_format: json
+            body:
+              capabilities:
+                devices:
+                  create:
+                    reusable: false
+                    ephemeral: false
+                    preauthorized: true
+                    tags: "{{ tailscale_tags }}"
+              expirySeconds: 3600
+              description: "ansible-{{ tailscale_hostname }}-{{ ansible_date_time.date }}"
+          register: tailscale_key_response
+          failed_when: tailscale_key_response.status != 200
+          delegate_to: localhost
+          become: false
+          no_log: true
+
+        - name: Save auth key to file for retries
+          copy:
+            content: "{{ tailscale_key_response.json.key }}"
+            dest: "{{ tailscale_auth_key_file }}"
+            mode: "0600"
+          delegate_to: localhost
+          become: false
+          no_log: true
+
+        - name: Set auth key from API response
+          set_fact:
+            tailscale_auth_key: "{{ tailscale_key_response.json.key }}"
+            tailscale_key_source: api
+
+    # ── 3. Authenticate with Tailscale ───────────────────────────────
+    - name: Run tailscale up
+      command: >-
+        tailscale up
+        --authkey={{ tailscale_auth_key }}
+        --hostname={{ tailscale_hostname }}
+        {{ tailscale_up_options }}
+      register: tailscale_auth_result
+      changed_when: tailscale_auth_result.rc == 0
+      no_log: true
+
+    - name: Wait for Tailscale to establish connection
+      pause:
+        seconds: 3
+      when: tailscale_auth_result is defined and tailscale_auth_result is changed
+
+    - name: Authentication succeeded
+      debug:
+        msg: >-
+          Tailscale node '{{ tailscale_hostname }}' authenticated
+          (key source: {{ tailscale_key_source | default('unknown') }})

@@ -62,7 +62,7 @@ spec:
 
       # Security context
       podSecurityContext:
-        runAsNonRoot: true
+        runAsNonRoot: false # Promtail needs to read host logs
         runAsUser: 0 # Needs root to read logs
         runAsGroup: 0
         seccompProfile:

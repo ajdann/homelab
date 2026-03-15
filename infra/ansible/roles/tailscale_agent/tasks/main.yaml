@@ -1,0 +1,17 @@
+---
+- name: Include OS-specific installation tasks
+  include_tasks: 'install-{{ ansible_os_family | lower }}.yaml'
+
+- name: Ensure Tailscale service is enabled and started
+  systemd:
+    name: tailscaled
+    enabled: yes
+    state: started
+
+- name: Authenticate via OAuth API
+  include_tasks: authenticate-oauth-api.yaml
+
+- name: Verify Tailscale is connected
+  command: tailscale status
+  register: tailscale_verify
+  changed_when: false

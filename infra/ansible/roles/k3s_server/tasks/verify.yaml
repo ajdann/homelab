@@ -13,7 +13,7 @@
 - name: Wait for K3s API to be ready
   wait_for:
     port: 6443
-    host: '{{ kubernetes_vip }}'
+    host: 127.0.0.1
     timeout: '{{ k3s_service_start_timeout }}'
   when: inventory_hostname == groups['k3s_masters'][0]
 
@@ -25,6 +25,7 @@
   retries: '{{ k3s_api_check_retries }}'
   delay: '{{ k3s_api_check_delay }}'
   become: true
+  changed_when: false
 
 - name: Verify K3s cluster has ready nodes
   command: k3s kubectl get nodes --no-headers
@@ -32,6 +33,7 @@
   failed_when: "'Ready' not in k3s_nodes_check.stdout"
   when: inventory_hostname == groups['k3s_masters'][0]
   become: true
+  changed_when: false
 
 - name: Display K3s cluster status
   debug:

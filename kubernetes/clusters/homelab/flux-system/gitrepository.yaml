@@ -7,4 +7,4 @@ spec:
   interval: 10s
   url: https://github.com/ajdann/homelab.git
   ref:
-    branch: main
+    branch: dev

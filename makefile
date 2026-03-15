@@ -1,26 +1,27 @@
-.PHONY: up ssh bootstrap kubeconfig destroy
+.PHONY: up bootstrap vagrant-up healthcheck vagrant-up-tailscale vagrant-full tailscale-vagrant
 
-up:
-	vagrant up
+up: vagrant-up
 
-ssh:
-	vagrant ssh
+# Bring up all enabled Vagrant VMs (Vagrantfile lives in infra/)
+vagrant-up:
+	cd infra && vagrant up
 
+# Bring up only k3s-master-1 with no provision (for testing Tailscale only)
+vagrant-up-tailscale:
+	cd infra && vagrant up k3s-master-1 --no-provision
+
+# Run only the Tailscale agent playbook against the Vagrant VM (VM must be up)
+tailscale-vagrant:
+	ansible-playbook -v -i infra/ansible/inventory/vagrant.yaml infra/ansible/playbooks/tailscale-agent.yaml
+
+# Full setup: bring up k3s-master-1 and run all provisioners (k8s-server, k8s-bootstrap, wazuh-agent)
+vagrant-full:
+	cd infra && vagrant up k3s-master-1
+
+# Cloud VM: bootstrap (K3s + Flux, etc.)
 bootstrap:
-	vagrant ssh -c "echo 'test'"
-	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/bootstrap.yaml"
-	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/k3s-single-node.yaml"
-	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/k8s-tailscale.yaml"
-	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/bootstrap-k8s.yaml"
-	vagrant ssh -c "cd /vagrant/ansible && ansible-playbook -i inventory/hosts.yaml playbooks/wazuh-agent.yaml"
-# 	vagrant ssh -c "cd /vagrant && ansible-playbook -i ansible/inventory/hosts.yaml ansible/playbooks/generate-wazuh-certs.yaml"
+	ansible-playbook -v -i infra/ansible/inventory/single-node.yaml infra/ansible/playbooks/k8s-server.yaml
+	ansible-playbook -v -i infra/ansible/inventory/single-node.yaml infra/ansible/playbooks/k8s-bootstrap.yaml
 
-kubeconfig:
-	vagrant ssh k3s-master -c "sudo cat /etc/rancher/k3s/k3s.yaml > /vagrant/kubeconfig"
-# 	vagrant ssh k3s-master -c "sudo cat /etc/rancher/k3s/k3s.yaml | sed 's/127.0.0.1/192.168.222.10/' > /vagrant/kubeconfig"
-
-destroy:
-	vagrant destroy -f
-
-reload:
-	vagrant reload --provision
+healthcheck:
+	ansible-playbook -v -i infra/ansible/inventory/single-node.yaml infra/ansible/playbooks/k8s-healthcheck.yaml

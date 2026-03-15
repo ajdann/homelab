@@ -1,0 +1,10 @@
+---
+# Run only the Tailscale agent role (install + authenticate).
+# Use: ansible-playbook -i ../inventory/single-node.yaml playbooks/tailscale-agent.yaml
+- name: Install and authenticate Tailscale
+  hosts: k3s_masters
+  gather_facts: true
+  roles:
+    - ../roles/tailscale_agent
+  vars_files:
+    - ../group_vars/all.yaml

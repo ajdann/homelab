@@ -1,0 +1,16 @@
+---
+description: Homelab project context and workflow
+alwaysApply: true
+---
+
+# Homelab Project Context
+
+This repo is a **Kubernetes homelab** (K3s + Tailscale + security stack: Wazuh, Falco, Kyverno, Nessus). Primary target is a **cloud VM**; Vagrant is optional for local demo.
+
+**Workflow:** Secrets live in **`secrets/`** (vm_user, vm_password, SSH keys, .env, kubeconfig). Bootstrap: **`make bootstrap`** runs Ansible playbook `infra/ansible/playbooks/k8s-bootstrap.yaml` against `infra/ansible/inventory/single-node.yaml`.
+
+**Layout:** `infra/ansible/` – playbooks, roles, inventory, group_vars. `kubernetes/` – Flux (clusters/homelab/flux-system), Kustomize bases/overlays for core, security, monitoring. `butane.yaml` – Flatcar/kubeadm path (alternative to K3s). Root: Makefile, README, CONTEXT.md, .env.example, pfsense-config.xml.
+
+**Tools:** Ansible, K3s, Flux (GitOps, dev branch), Tailscale (OAuth + tag k8s-operator). YAML for config; never commit secrets.
+
+**User preferences:** Clear, concise explanations; inform about changes. Full details in **CONTEXT.md** and **README.md**.

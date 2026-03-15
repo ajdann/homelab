@@ -1,0 +1,33 @@
+---
+# Consolidated summary and optional failure gate
+
+- name: Compute health summary facts
+  set_fact:
+    git_repo_ready: >-
+      {{ (git_repo_status.resources | length > 0) and ((git_repo_status.resources[0].status.conditions | default([]) | selectattr('type','equalto','Ready') | selectattr('status','equalto','True') | list | length) > 0) }}
+    kustomization_ready: >-
+      {{ (kustomization_status.resources | length > 0) and ((kustomization_status.resources[0].status.conditions | default([]) | selectattr('type','equalto','Ready') | selectattr('status','equalto','True') | list | length) > 0) }}
+    kustomization_status_message: >-
+      {{ ((kustomization_status.resources[0].status.conditions | default([])) | length > 0) | ternary((kustomization_status.resources[0].status.conditions | last).message | default('n/a'), 'n/a') if (kustomization_status.resources | length > 0) else 'n/a' }}
+
+- name: Decide whether to fail on issues
+  ansible.builtin.fail:
+    msg: >-
+      Health check detected issues.
+      Kustomization Ready={{ kustomization_ready }},
+      Problematic pods={{ problematic_pods | length }},
+      Node DiskPressure present={{ node_disk_pressure | default(false) }}
+  when: fail_on_issues | default(false)
+
+- name: Overall summary
+  debug:
+    msg:
+      - 'Overall OK: {{ (problematic_pods | length == 0) and kustomization_ready and (not (node_disk_pressure | default(false))) }}'
+      - 'Flux GitRepository Ready: {{ git_repo_ready }}'
+      - 'Kustomization Ready: {{ kustomization_ready }}'
+      - 'Kustomization status: {{ kustomization_status_message }}'
+      - 'Problematic pods: {{ problematic_pods | length }}'
+      - 'Node DiskPressure: {{ node_disk_pressure | default(false) }}'
+      - "Node CPU: {{ first_node_metrics_name | default('n/a') }} usage={{ first_node_metrics_cpu | default('n/a') }} (~{{ '%.1f' % first_node_cpu_pct if (first_node_cpu_pct | default('n/a')) != 'n/a' else 'n/a' }}%)"
+      - "Node Mem: {{ first_node_metrics_name | default('n/a') }} usage={{ first_node_metrics_mem | default('n/a') }} (~{{ '%.1f' % first_node_mem_pct if (first_node_mem_pct | default('n/a')) != 'n/a' else 'n/a' }}%)"
+      - "Disk usage root: {{ (df_root.stdout_lines | last | default('')) if df_root is defined else 'n/a' }}"

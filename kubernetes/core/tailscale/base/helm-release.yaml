@@ -9,13 +9,11 @@ spec:
   chart:
     spec:
       chart: tailscale-operator
-      version: '1.84.2'
+      version: '1.90.9'
       sourceRef:
         kind: HelmRepository
         name: tailscale
         namespace: tailscale
       interval: 1m
   values:
-    oauth:
-      clientId: 'keSoTxxXeb11CNTRL'
-      clientSecret: 'tskey-client-keSoTxxXeb11CNTRL-JbQd5vbjM15cCBJc9fof15iHe392QKnN'
+    apiServerProxyConfig:

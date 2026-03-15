@@ -5,8 +5,9 @@
     state: present
     update_cache: yes
   loop:
-    - python3
+    - python3-full
     - python3-pip
+    - python3.12-venv
     - curl
     - vim
     - net-tools
@@ -17,13 +18,19 @@
     - btop
     - htop
 
-- name: Install Python packages
+- name: Create venv
+  command: python3 -m venv /opt/pyenv
+  args:
+    creates: /opt/pyenv
+
+- name: Install Python packages in venv
   pip:
     name:
       - kubernetes
       - openshift
       - requests
-    executable: pip3
+    virtualenv: /opt/pyenv
+    virtualenv_command: python3 -m venv
   become: true
 
 - name: Download kubectl
@@ -43,3 +50,7 @@
     remote_src: true
   args:
     creates: /usr/local/bin/helm
+
+- name: Install Flux CLI
+  shell: curl -s https://fluxcd.io/install.sh | bash
+  become: yes

@@ -1,0 +1,21 @@
+# Inventory for Vagrant VM(s). Use when running playbooks from repo root against
+# a VM started with: cd infra && vagrant up k3s-master-1
+#
+# Get the SSH port: cd infra && vagrant ssh-config k3s-master-1
+# If port is not 2222, set ansible_port in host vars or pass -e ansible_port=...
+#
+# Run Tailscale only:  ansible-playbook -i infra/ansible/inventory/vagrant.yaml infra/ansible/playbooks/tailscale-agent.yaml
+# Run from repo root; private_key path is relative to cwd (repo root).
+
+all:
+  hosts:
+    k3s-master-1:
+      ansible_host: 127.0.0.1
+      ansible_port: 2222
+      ansible_user: vagrant
+      ansible_private_key_file: infra/.vagrant/machines/k3s-master-1/virtualbox/private_key
+      vagrant_run: true
+  children:
+    k3s_masters:
+      hosts:
+        k3s-master-1:

@@ -1,0 +1,7 @@
+---
+# Path to kubeconfig on the remote node
+remote_kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+
+# If true, the play will fail when issues are detected
+fail_on_issues: false
+

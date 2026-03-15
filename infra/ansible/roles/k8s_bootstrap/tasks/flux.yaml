@@ -4,44 +4,20 @@
   set_fact:
     any_errors_fatal: true
 
-### --- Helm-based installation (commented out) ---
-# - name: Download and install Helm
-#   shell: |
-#     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-#   args:
-#     creates: /usr/local/bin/helm
-#   become: true
-
-# - name: Install Flux Operator using Helm
-#   kubernetes.core.helm:
-#     name: flux-operator
-#     chart_ref: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
-#     namespace: flux-system
-#     create_namespace: true
-#     kubeconfig: "{{ kubeconfig_dest_path }}"
-#   register: flux_operator_result
-
-# - name: Create flux-system namespace
-#   kubernetes.core.k8s:
-#     kubeconfig: "{{ kubeconfig_dest_path }}"
-#     state: present
-#     definition:
-#       apiVersion: v1
-#       kind: Namespace
-#       metadata:
-#         name: flux-system
-
 - name: Apply Flux Operator installation manifests
   kubernetes.core.k8s:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: '{{ remote_kubeconfig_path }}'
     state: present
     src: 'https://github.com/controlplaneio-fluxcd/flux-operator/releases/latest/download/install.yaml'
   register: flux_operator_install_result
   failed_when: flux_operator_install_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
 
-- name: Wait for Flux Operator to be ready
+- name: Wait for Flux Operator deployment to be ready
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: '{{ remote_kubeconfig_path }}'
     api_version: apps/v1
     kind: Deployment
     name: flux-operator
@@ -50,49 +26,83 @@
     wait_condition:
       type: Available
       status: 'True'
-    wait_timeout: 30
+    wait_timeout: 60
   register: flux_operator_ready_result
   failed_when:
     - flux_operator_ready_result.failed
     - flux_operator_ready_result.resources | length == 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
 
-- name: Wait for FluxInstance CRD to be available
-  kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
-    api_version: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    name: fluxinstances.fluxcd.controlplane.io
-    wait: true
-    wait_condition:
-      type: Established
-      status: 'True'
-    wait_timeout: 120
-  register: fluxinstance_crd_result
-  failed_when:
-    - fluxinstance_crd_result.failed
-    - fluxinstance_crd_result.resources | length == 0
+- name: Sync Flux manifests
+  synchronize:
+    src: '{{ flux_components_path }}/'
+    dest: '{{ remote_flux_manifest_dir }}/'
+    delete: true
+    private_key: '{{ hostvars["k3s-master-1"].ansible_ssh_private_key_file }}'
+    rsync_opts:
+      - '--exclude=.git'
+    set_remote_user: true
+  delegate_to: localhost
 
-- name: Find all manifest files in kubernetes/flux
+- name: Find Flux manifests on remote
   ansible.builtin.find:
-    paths: '{{ flux_components_path}}'
+    paths: '{{ remote_flux_manifest_dir }}'
     patterns: '*.yaml'
+    recurse: true
   register: flux_manifests
 
-- name: Apply FluxInstance first
+- name: Apply FluxInstance
   kubernetes.core.k8s:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: '{{ remote_kubeconfig_path }}'
     state: present
     src: '{{ item.path }}'
   loop: '{{ flux_manifests.files }}'
-  when: "'fluxInstance' in item.path"
+  when: "'fluxInstance.yaml' in item.path"
   register: flux_instance_result
   failed_when: flux_instance_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
 
-- name: Wait for Flux controllers to be deployed by FluxInstance
+- name: Wait for FluxInstance to be Ready
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: fluxcd.controlplane.io/v1
+    kind: FluxInstance
+    name: flux
+    namespace: flux-system
+    wait: true
+    wait_condition:
+      type: Ready
+      status: 'True'
+    wait_timeout: 120
+  register: fluxinstance_status
+  failed_when: fluxinstance_status.resources | length == 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+
+- name: Apply remaining Flux manifests
+  kubernetes.core.k8s:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    state: present
+    src: '{{ item.path }}'
+  loop: '{{ flux_manifests.files }}'
+  when: "'fluxInstance.yaml' not in item.path"
+  register: flux_resources_apply_result
+  failed_when: flux_resources_apply_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+
+- name: Wait for Flux controllers
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
     api_version: apps/v1
     kind: Deployment
+    name: '{{ item }}'
     namespace: flux-system
     wait: true
     wait_condition:
@@ -104,18 +114,15 @@
     - kustomize-controller
     - helm-controller
     - notification-controller
-  loop_control:
-    loop_var: controller_name
-  vars:
-    name: '{{ controller_name }}'
   register: flux_controllers_result
-  failed_when:
-    - flux_controllers_result.failed
-    - flux_controllers_result.resources | length == 0
+  failed_when: flux_controllers_result.failed
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
 
-- name: Wait for Flux Toolkit CRDs to be available
+- name: Wait for Flux Toolkit CRDs
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: '{{ remote_kubeconfig_path }}'
     api_version: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     name: '{{ item }}'
@@ -123,43 +130,72 @@
     wait_condition:
       type: Established
       status: 'True'
-    wait_timeout: 180
+    wait_timeout: 120
   loop:
     - gitrepositories.source.toolkit.fluxcd.io
     - kustomizations.kustomize.toolkit.fluxcd.io
     - helmrepositories.source.toolkit.fluxcd.io
     - helmreleases.helm.toolkit.fluxcd.io
   register: flux_crds_result
-  failed_when:
-    - flux_crds_result.failed
-    - flux_crds_result.resources | length == 0
+  failed_when: flux_crds_result.resources | length == 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
 
-- name: Apply remaining Flux manifests
-  kubernetes.core.k8s:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
-    state: present
-    src: '{{ item.path }}'
-  loop: '{{ flux_manifests.files }}'
-  when: "'fluxInstance' not in item.path"
-  register: flux_resources_apply_result
-  failed_when: flux_resources_apply_result.failed
-
-- name: Verify all Flux components are healthy
+- name: Verify Flux deployments
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ kubeconfig_dest_path }}'
+    kubeconfig: '{{ remote_kubeconfig_path }}'
     api_version: apps/v1
     kind: Deployment
     namespace: flux-system
   register: flux_final_check
-  failed_when: >
-    flux_final_check.resources | length == 0 or
-    flux_final_check.resources | 
-    selectattr('status.readyReplicas', 'undefined') | 
-    list | length > 0
+  failed_when: flux_final_check.resources | length == 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
 
-- name: Display Flux deployment status
+- name: Wait for GitRepository to sync
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: source.toolkit.fluxcd.io/v1
+    kind: GitRepository
+    name: homelab-repo
+    namespace: flux-system
+    wait: true
+    wait_condition:
+      type: Ready
+      status: 'True'
+    wait_timeout: 120
+  register: git_repo_status
+  failed_when: git_repo_status.resources | length == 0
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+
+- name: Validate homelab Kustomization readiness
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    name: homelab
+    namespace: flux-system
+  register: flux_kustomization_status
+  failed_when: false
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+
+- name: Report homelab Kustomization status
   debug:
     msg:
-      - 'Flux deployments found: {{ flux_final_check.resources | length }}'
-      - "Ready deployments: {{ flux_final_check.resources | selectattr('status.readyReplicas', 'defined') | list | length }}"
-      - "Deployment names: {{ flux_final_check.resources | map(attribute='metadata.name') | list }}"
+      - 'Kustomization found: {{ flux_kustomization_status.resources | length > 0 }}'
+      # - "Kustomization Ready: {{ (flux_kustomization_status.resources[0].status.conditions | default([]) | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length) > 0 if flux_kustomization_status.resources | length > 0 else false }}"
+      # - 'Managed objects: {{ (flux_kustomization_status.resources[0].status.inventory.entries | default([]) | length) if flux_kustomization_status.resources | length > 0 else 0 }}'
+      - "Last status message: {{ ((flux_kustomization_status.resources[0].status.conditions | last).message | default('n/a')) if (flux_kustomization_status.resources | length > 0 and (flux_kustomization_status.resources[0].status.conditions | default([]) | length) > 0) else 'n/a' }}"
+
+- name: Summary
+  debug:
+    msg:
+      - 'FluxInstance ready: {{ fluxinstance_status.resources | length > 0 }}'
+      - "Controllers ready: {{ flux_controllers_result.results | selectattr('resources', 'defined') | list | length }}"
+      - "CRDs ready: {{ flux_crds_result.results | selectattr('resources', 'defined') | list | length }}"

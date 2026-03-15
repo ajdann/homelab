@@ -1,0 +1,25 @@
+---
+tailscale_version: ''
+
+local_env_file_path: "{{ playbook_dir }}/../../../secrets/.env"
+
+tailscale_auth_key: ''
+
+tailscale_auth_key_file: "{{ playbook_dir }}/../../../secrets/.tailscale_auth_key_{{ tailscale_hostname }}"
+
+tailscale_api_endpoint: https://api.tailscale.com/api/v2
+
+tailscale_tags:
+  - "tag:k8s-operator"
+
+tailscale_up_options: ''
+
+tailscale_hostname: '{{ ansible_hostname }}'
+
+tailscale_accept_routes: false
+
+tailscale_advertise_routes: false
+
+tailscale_routes: []
+
+tailscale_exit_node: false

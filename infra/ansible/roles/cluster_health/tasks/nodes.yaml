@@ -1,0 +1,86 @@
+---
+# Node health conditions and resource usage
+
+- name: Get nodes
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: v1
+    kind: Node
+  register: node_list
+  failed_when: false
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+  no_log: false
+
+- name: Report node conditions
+  debug:
+    msg: >-
+      {{ node_list.resources | default([]) | map(attribute='status') | list | length }} node(s) checked.
+  when: node_list.resources is defined
+
+- name: Per-node condition summary
+  debug:
+    msg: >-
+      Node {{ item.metadata.name }}: Ready={{ (item.status.conditions | selectattr('type','equalto','Ready') | selectattr('status','equalto','True') | list | length) > 0 }},
+      DiskPressure={{ (item.status.conditions | selectattr('type','equalto','DiskPressure') | selectattr('status','equalto','True') | list | length) > 0 }},
+      MemoryPressure={{ (item.status.conditions | selectattr('type','equalto','MemoryPressure') | selectattr('status','equalto','True') | list | length) > 0 }},
+      PIDPressure={{ (item.status.conditions | selectattr('type','equalto','PIDPressure') | selectattr('status','equalto','True') | list | length) > 0 }}
+  loop: '{{ node_list.resources | default([]) }}'
+  loop_control:
+    label: '{{ item.metadata.name }}'
+
+- name: Try NodeMetrics (if metrics-server installed)
+  kubernetes.core.k8s_info:
+    kubeconfig: '{{ remote_kubeconfig_path }}'
+    api_version: metrics.k8s.io/v1beta1
+    kind: NodeMetrics
+  register: node_metrics
+  failed_when: false
+  vars:
+    ansible_python_interpreter: /opt/pyenv/bin/python3
+  become: true
+
+- name: Report NodeMetrics usage
+  debug:
+    msg: "{{ item.metadata.name }} usage: cpu={{ item.usage.cpu | default('n/a') }}, mem={{ item.usage.memory | default('n/a') }}"
+  loop: '{{ node_metrics.resources | default([]) }}'
+  when: node_metrics.resources is defined
+
+- name: Compute node health facts
+  set_fact:
+    node_disk_pressure: >-
+      {{ (node_list.resources | default([]) | map(attribute='status.conditions') | sum(start=[]) | selectattr('type','equalto','DiskPressure') | selectattr('status','equalto','True') | list | length) > 0 }}
+    first_node_metrics_obj: >-
+      {{ (node_metrics.resources | default([]) | length > 0) | ternary(node_metrics.resources[0], {}) }}
+
+- name: Compute node metrics summary fields
+  set_fact:
+    first_node_metrics_name: >-
+      {{ first_node_metrics_obj.get('metadata', {}).get('name', 'n/a') }}
+    first_node_metrics_cpu: >-
+      {{ first_node_metrics_obj.get('usage', {}).get('cpu', 'n/a') }}
+    first_node_metrics_mem: >-
+      {{ first_node_metrics_obj.get('usage', {}).get('memory', 'n/a') }}
+
+- name: Compute node capacity
+  set_fact:
+    first_node_capacity_cpu: >-
+      {{ (node_list.resources[0].status.capacity.cpu | default('0')) if node_list.resources | default([]) | length > 0 else '0' }}
+    first_node_capacity_mem: >-
+      {{ (node_list.resources[0].status.capacity.memory | default('0')) if node_list.resources | default([]) | length > 0 else '0' }}
+
+- name: Compute node usage percentages
+  set_fact:
+    first_node_cpu_pct: >-
+      {{
+        ((first_node_metrics_cpu | regex_replace('n','') | float) / ((first_node_capacity_cpu | float | default(0)) * 1000000000)) * 100
+        if (first_node_metrics_cpu is string and 'n' in first_node_metrics_cpu and (first_node_capacity_cpu | float | default(0)) > 0)
+        else 'n/a'
+      }}
+    first_node_mem_pct: >-
+      {{
+        (((first_node_metrics_mem | regex_replace('Ki','') | float) * 1024) / ((first_node_capacity_mem | regex_replace('Ki','') | float | default(0)) * 1024)) * 100
+        if (first_node_metrics_mem is string and 'Ki' in first_node_metrics_mem and first_node_capacity_mem is string and 'Ki' in first_node_capacity_mem and (first_node_capacity_mem | regex_replace('Ki','') | float | default(0)) > 0)
+        else 'n/a'
+      }}
