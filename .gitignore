@@ -3,6 +3,7 @@
 *.swo
 .idea/
 .vscode/
+.venv/
 .env
 age.key
 .vagrant
