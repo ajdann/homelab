@@ -2,10 +2,11 @@ kubernetes_vip: 20.108.64.87
 kubernetes_tls_sans: 'localhost, 127.0.0.1'
 remote_kubeconfig_path: /etc/rancher/k3s/k3s.yaml
 
-# Default VM credentials
-vm_user: "{{ lookup('file', playbook_dir + '/../../secrets/vm_user') }}"
-vm_password: "{{ lookup('file', playbook_dir + '/../../../secrets/vm_password') }}"
-vm_ssh_pub_key: "{{ lookup('file', playbook_dir + '/../../secrets/vm_ssh_pub_key') }}"
+# Default VM credentials (paths relative to playbook dir: playbooks/ -> repo root = ../../../)
+# When using Vagrant (vagrant_run: true in inventory), these defaults are used instead of file lookups
+vm_user: "{{ 'vagrant' if vagrant_run | default(false) else lookup('file', playbook_dir + '/../../../secrets/vm_user') }}"
+vm_password: "{{ '' if vagrant_run | default(false) else lookup('file', playbook_dir + '/../../../secrets/vm_password') }}"
+vm_ssh_pub_key: "{{ '' if vagrant_run | default(false) else lookup('file', playbook_dir + '/../../../secrets/vm_ssh_pub_key') }}"
 local_env_file_path: '{{ playbook_dir }}/../../../secrets/.env'
 remote_env_file_path: '{{ ansible_user_dir }}/.env'
 kubeconfig_dest_path: '{{ playbook_dir }}/../../../secrets/kubeconfig'
