@@ -1,47 +1,25 @@
 ---
-# Tailscale Agent Role Defaults
-
-# Tailscale version (leave empty for latest)
 tailscale_version: ''
 
-# Authentication method: 'oauth-api' (recommended) or 'pre-generated-key'
-# oauth-api: Creates auth keys dynamically from OAuth credentials
-# pre-generated-key: Uses a pre-generated auth key
-tailscale_auth_method: oauth-api
+local_env_file_path: "{{ playbook_dir }}/../../../secrets/.env"
 
-# Path to local .env file containing TAILSCALE_CLIENT_ID and TAILSCALE_CLIENT_SECRET
-# Only required when using oauth-api method
-local_env_file_path: "{{ playbook_dir }}/../../.env"
-
-# Remote path where .env file will be copied (temporary)
-remote_env_file_path: /tmp/.tailscale.env
-
-# Pre-generated Tailscale auth key (only used if tailscale_auth_method is 'pre-generated-key')
-# For oauth-api: if set or loaded from file, we use it instead of creating a new key
 tailscale_auth_key: ''
 
-# Optional path to a file containing an auth key (control node path). If the file exists and
-# the machine is not authenticated, we use this key instead of creating a new one.
-# Useful to avoid creating multiple keys when a previous run created one but failed before 'tailscale up'.
-tailscale_auth_key_file: ''
+tailscale_auth_key_file: "{{ playbook_dir }}/../../../secrets/.tailscale_auth_key_{{ tailscale_hostname }}"
 
-# Tailscale API endpoint
 tailscale_api_endpoint: https://api.tailscale.com/api/v2
 
-# Tailscale up command options
+tailscale_tags:
+  - "tag:k8s-operator"
+
 tailscale_up_options: ''
 
-# Hostname for the Tailscale node (defaults to ansible_hostname)
 tailscale_hostname: '{{ ansible_hostname }}'
 
-# Whether to accept routes from other nodes
 tailscale_accept_routes: false
 
-# Whether to use subnet routes
 tailscale_advertise_routes: false
 
-# Subnet routes to advertise (if tailscale_advertise_routes is true)
 tailscale_routes: []
 
-# Whether to use as an exit node
 tailscale_exit_node: false

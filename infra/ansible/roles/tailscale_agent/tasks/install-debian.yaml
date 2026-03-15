@@ -11,6 +11,7 @@
   set_fact:
     tailscale_key_ext: "{% if ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int < 21 %}noarmor.gpg{% else %}asc{% endif %}"
 
+- name: Add Tailscale GPG key
   apt_key:
     url: "{{ tailscale_repo_base }}/{{ tailscale_release }}.{{ tailscale_key_ext }}"
     state: present

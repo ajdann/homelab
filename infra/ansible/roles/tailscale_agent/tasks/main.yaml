@@ -8,27 +8,10 @@
     enabled: yes
     state: started
 
-- name: Include OAuth API authentication tasks
+- name: Authenticate via OAuth API
   include_tasks: authenticate-oauth-api.yaml
-  when: tailscale_auth_method == 'oauth-api'
 
-- name: Check if already authenticated
-  command: tailscale status --json
-  register: tailscale_status
-  changed_when: false
-  failed_when: false
-
-- name: Authenticate with pre-generated key
-  command: "{{ tailscale_up_command }}"
-  when:
-    - not (tailscale_status.stdout | from_json).Self.ID
-    - tailscale_auth_key is defined
-    - tailscale_auth_method == 'pre-generated-key'
-  register: tailscale_auth_result
-  changed_when: tailscale_auth_result.rc == 0
-
-- name: Verify Tailscale installation
+- name: Verify Tailscale is connected
   command: tailscale status
   register: tailscale_verify
   changed_when: false
-
