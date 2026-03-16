@@ -20,7 +20,12 @@ infra/
 ├── vagrant/
 │   ├── config/vm_resources.rb  # VM specs: CPU, memory, IPs, enabled/disabled
 │   ├── lib/helpers.rb          # Netplan template + VirtualBox DHCP hack
+│   ├── powershell.ps1          # WSL→Windows sync helper script
 │   └── vms/              # 5 VM definitions (Ruby): pfsense, nessus, haproxy, k3s_master, k3s_workers
+├── flatcar/              # Alternative: Flatcar Linux + kubeadm (not K3s)
+│   └── butane.yaml
+├── pfsense/              # pfSense firewall export
+│   └── pfsense-config.xml
 └── Vagrantfile           # Loads vagrant/config + vagrant/vms/*.rb, mounts parent as /vagrant
 ```
 
@@ -44,9 +49,9 @@ infra/
 | `k8s_bootstrap` | Flux operator + Tailscale OAuth secret + flux-substitutions ConfigMap | `flux_components_path`, `.env` vars | — |
 | `tailscale_agent` | Install + OAuth-authenticate Tailscale client | `tailscale_tags`, `tailscale_hostname` | — |
 | `cluster_health` | Verify K8s nodes, pods, Flux, disk usage | `fail_on_issues: false` | — |
-| `wazuh-agent` | Install + register Wazuh agent on host | `wazuh_manager_ip`, `wazuh_manager_port` | `wazuh-agent.conf.j2`, `wazuh-agent.service.j2` |
+| `wazuh_agent` | Install + register Wazuh agent on host | `wazuh_manager_ip`, `wazuh_manager_port` | `wazuh-agent.conf.j2`, `wazuh-agent.service.j2` |
 | `wazuh_certs` | Generate Wazuh TLS certs, create K8s secrets | `certs_dir` | — |
-| `haproxy_keepalived` | HAProxy + Keepalived for K8s API HA | `kubernetes_vip` | `haproxy.cfg.j2`, `keepalived.conf.j2` |
+| `haproxy_keepalived` | HAProxy + Keepalived for K8s API HA | `kubernetes_vip` | `haproxy.cfg.j2`, `keepalived.conf.j2` (uses `.yaml` extensions) |
 | `proxmox` | Create Debian/Alpine cloud-init VM templates on Proxmox | `debian_vmid`, `alpine_vmid` | — |
 | `nessus` | Install Nessus, activate license, create+launch scan | `nessus_activation_code`, `scan_targets` | — |
 
@@ -57,7 +62,7 @@ node_bootstrap → k3s_server → k8s_bootstrap → cluster_health
                                     ├── tailscale (creates K8s Secret)
                                     └── flux (rsyncs manifests, applies)
 wazuh_certs (standalone, needs kubernetes.core)
-wazuh-agent (standalone)
+wazuh_agent (standalone)
 haproxy_keepalived (standalone, needs k3s_masters group)
 proxmox (standalone)
 nessus (standalone, runs on localhost)
@@ -71,7 +76,7 @@ nessus (standalone, runs on localhost)
 | `k8s-bootstrap.yaml` | k3s_masters | k8s_bootstrap |
 | `k8s-healthcheck.yaml` | k3s-master-1 | cluster_health |
 | `tailscale-agent.yaml` | k3s_masters | tailscale_agent |
-| `wazuh-agent.yaml` | all | wazuh-agent |
+| `wazuh-agent.yaml` | all | wazuh_agent |
 | `haproxy.yaml` | haproxy_nodes | haproxy_keepalived |
 | `nessus.yaml` | localhost | nessus |
 | `proxmox.yaml` | proxmox | proxmox |

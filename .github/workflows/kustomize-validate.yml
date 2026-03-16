@@ -16,11 +16,17 @@ jobs:
 
       - name: Validate Kustomize configurations
         run: |
-          echo "Validating prod overlay..."
-          kustomize build kubernetes/overlays/prod --dry-run
+          echo "Validating infrastructure prod overlay..."
+          kustomize build kubernetes/infrastructure/overlays/prod --dry-run
 
-          echo "Validating dev overlay..."
-          kustomize build kubernetes/overlays/dev --dry-run
+          echo "Validating infrastructure dev overlay..."
+          kustomize build kubernetes/infrastructure/overlays/dev --dry-run
+
+          echo "Validating apps prod overlay..."
+          kustomize build kubernetes/apps/overlays/prod --dry-run
+
+          echo "Validating apps dev overlay..."
+          kustomize build kubernetes/apps/overlays/dev --dry-run
 
           echo "✅ All Kustomize configurations are valid!"
 

@@ -9,17 +9,22 @@
 ```
 kubernetes/
 ├── clusters/
-│   └── homelab/
-│       ├── flux-system/          # GitRepository + Kustomization + FluxInstance
-│       ├── apps/kustomization.yaml       # → ../../../apps/overlays/dev
-│       ├── core/kustomization.yaml       # → ../../../core/overlays/dev
-│       ├── security/kustomization.yaml   # → ../../../security/overlays/dev
-│       ├── monitoring/kustomization.yaml # → ../../../monitoring/overlays/dev
-│       └── secrets/kustomization.yaml    # → ../../../secrets/dev
-├── core/           # Infrastructure services (10 components, 2 active)
-├── security/       # Security stack (7 components, all active)
-├── apps/           # Applications (6 components, 1 active)
-└── monitoring/     # Observability (1 component: loki-stack)
+│   ├── homelab/
+│   │   ├── flux-system/          # GitRepository + Kustomization + FluxInstance
+│   │   └── kustomization.yaml    # → ../../infrastructure/overlays/dev + ../../apps/overlays/dev
+│   └── production/               # INACTIVE — future production cluster scaffold
+├── infrastructure/   # Core infra + Security + Monitoring (17 components)
+│   ├── tailscale/, reloader/, dashboard/, ... (9 former core)
+│   ├── wazuh/, kyverno/, falco/, ... (7 former security)
+│   ├── loki-stack/ (1 former monitoring)
+│   └── overlays/
+│       ├── dev/kustomization.yaml  # Unified gate — controls what's active
+│       └── prod/                   # Placeholder for production
+└── apps/             # User-facing applications (6 components)
+    ├── homepage/, adguard/, gitea/, ...
+    └── overlays/
+        ├── dev/kustomization.yaml
+        └── prod/                   # Placeholder for production
 ```
 
 ## RECONCILIATION FLOW
@@ -28,7 +33,7 @@ kubernetes/
 GitRepository (dev branch, 10s poll)
   → Kustomization (homelab, 1m interval)
     → clusters/homelab/kustomization.yaml
-      → apps/overlays/dev, core/overlays/dev, security/overlays/dev, monitoring/overlays/dev
+      → infrastructure/overlays/dev + apps/overlays/dev
         → Each component's base/ (namespace + HelmRepository + HelmRelease or raw manifests)
 ```
 
@@ -38,12 +43,12 @@ PostBuild: `DOMAIN` variable substituted from `flux-substitutions` ConfigMap (cr
 
 | Task | Location | Notes |
 |------|----------|-------|
-| Add new component | `{category}/<name>/base/` + `{category}/<name>/overlays/dev/` | Follow Helm or raw manifest pattern below |
-| Enable/disable component | `{category}/overlays/dev/kustomization.yaml` | Comment/uncomment resource line |
-| Add Kyverno policy | `security/kyverno/base/policies/` | Add YAML, then reference in policies/kustomization.yaml |
+| Add new component | `infrastructure/<name>/base/` + `infrastructure/<name>/overlays/dev/` or `apps/<name>/base/` + `apps/<name>/overlays/dev/` | Follow Helm or raw manifest pattern below |
+| Enable/disable component | `infrastructure/overlays/dev/kustomization.yaml` or `apps/overlays/dev/kustomization.yaml` | Comment/uncomment resource line |
+| Add Kyverno policy | `infrastructure/kyverno/base/policies/` | Add YAML, then reference in policies/kustomization.yaml |
 | Flux bootstrap config | `clusters/homelab/flux-system/` | FluxInstance, GitRepository, Kustomization |
-| Wazuh certificates | `security/wazuh/overlays/dev/secret-files/` | indexer-certs/ and dashboard-certs/ |
-| Wazuh secrets | `security/wazuh/overlays/dev/*.secret.yaml` | 5 base64-encoded Secrets |
+| Wazuh certificates | `infrastructure/wazuh/overlays/dev/secret-files/` | indexer-certs/ and dashboard-certs/ |
+| Wazuh secrets | `infrastructure/wazuh/overlays/dev/*.secret.yaml` | 5 base64-encoded Secrets |
 | App secrets | `apps/<name>/overlays/dev/*.secret.yaml` | Per-app secret files |
 
 ## COMPONENT PATTERN (Helm-based)
@@ -80,7 +85,9 @@ Every Helm component follows this exact structure:
 
 ## ACTIVE COMPONENTS
 
-### Core (2 of 10)
+### Infrastructure (11 active of 17)
+
+#### Former Core (2 of 9 active)
 
 | Component | Type | Version | Status |
 |-----------|------|---------|--------|
@@ -94,7 +101,7 @@ Every Helm component follows this exact structure:
 | traefik | HelmRelease | — | Commented |
 | keda | HelmRelease | — | Commented |
 
-### Security (7 of 7 — all active)
+#### Former Security (7 of 7 — all active)
 
 | Component | Type | Version | Purpose |
 |-----------|------|---------|---------|
@@ -106,6 +113,12 @@ Every Helm component follows this exact structure:
 | **kubebench** | CronJob | — | CIS benchmark |
 | **policy-reporter** | HelmRelease | 2.21.0 | Policy violation UI |
 
+#### Former Monitoring (1 of 1 — active)
+
+| Component | Type | Status |
+|-----------|------|--------|
+| **loki-stack** | HelmRelease | Active |
+
 ### Apps (1 of 6)
 
 | Component | Type | Status |
@@ -116,12 +129,6 @@ Every Helm component follows this exact structure:
 | authentik | HelmRelease | Commented |
 | nextcloud | HelmRelease | Commented |
 | seafile | Raw manifests | Commented |
-
-### Monitoring (1)
-
-| Component | Type | Status |
-|-----------|------|--------|
-| **loki-stack** | HelmRelease | Active |
 
 ## KYVERNO POLICIES (16 available, 1 enabled)
 
@@ -143,16 +150,16 @@ Every Helm component follows this exact structure:
 | verify-flux-sources-in-cel | Audit | CEL-based source validation (requires Kyverno 1.11+) |
 | detect-non-flux-objects | Audit | Flags resources missing Flux management labels |
 
-Enable policies by uncommenting in `security/kyverno/base/policies/kustomization.yaml`.
+Enable policies by uncommenting in `infrastructure/kyverno/base/policies/kustomization.yaml`.
 
 ## SECRETS MANAGEMENT
 
 - **No encryption** — K8s Secrets are plain base64 YAML in `overlays/dev/`
 - **Tailscale OAuth** — created by Ansible (not in this directory)
-- **Wazuh certs** — stored in `security/wazuh/overlays/dev/secret-files/` (18 cert files)
-- **Wazuh credentials** — 5 Secret files in `security/wazuh/overlays/dev/`
+- **Wazuh certs** — stored in `infrastructure/wazuh/overlays/dev/secret-files/` (18 cert files)
+- **Wazuh credentials** — 5 Secret files in `infrastructure/wazuh/overlays/dev/`
 - **App secrets** — per-app `*.secret.yaml` in `apps/<name>/overlays/dev/`
-- **Gitleaks ignores** `kubernetes/overlays/dev/` for secret scanning
+- **Gitleaks ignores** `kubernetes/infrastructure/` and `kubernetes/apps/` overlays/dev paths for secret scanning
 
 ## ANTI-PATTERNS
 
@@ -164,7 +171,8 @@ Enable policies by uncommenting in `security/kyverno/base/policies/kustomization
 ## NOTES
 
 - **Flux uses FluxInstance CR** (Flux Operator pattern), not `flux bootstrap`
-- **`clusters/homelab/{apps,core,security,monitoring}/kustomization.yaml`** are thin redirects to `../../../{category}/overlays/dev` — the real content lives in the category directories
+- **`clusters/homelab/kustomization.yaml`** references `../../infrastructure/overlays/dev` and `../../apps/overlays/dev` — the real content lives in those directories
+- **`clusters/production/`** is scaffolded but INACTIVE — future production cluster placeholder
 - **Kustomize `force: true`** is set on root Kustomization — forces apply even on immutable field changes
 - **`prune: true`** — Flux garbage-collects resources removed from Git
 - **Wazuh is the most complex component** — has sub-directories for indexer_stack, wazuh_managers, certs, plus secretGenerator for TLS
