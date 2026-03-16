@@ -85,9 +85,14 @@ Make sure the following tools are installed on your host machine:
 #### 2. Start the VM (local only) or use your cloud VM
 
 - **Cloud VM:** Ensure the VM is running and that `secrets/` (vm_user, vm_ssh_private_key, etc.) and inventory (`ansible_host`) are set. Skip to step 3.
-- **Local (Vagrant):** Run `make up` (or `make vagrant-up`).
+- **Local (Vagrant):**
+  ```bash
+  make master       # Start k3s-master-1 with full provisioning (K3s + Flux + Wazuh)
+  # or
+  make up           # Start all enabled VMs (see infra/vagrant/config/vm_resources.rb)
+  ```
 
-#### 3. Bootstrap the cluster
+#### 3. Bootstrap the cluster (cloud VM only)
 
 ```bash
 make bootstrap
@@ -100,12 +105,19 @@ http://homepage.YOUR_DOMAIN
 
 > Replace `YOUR_DOMAIN` with the actual domain you configured in your `.env` file.
 
-#### 5. (Optional) Get the kubeconfig
+#### 5. Useful commands
 
-Run the following command to extract kubeconfig at project root
+Run `make` to see all available commands. Quick reference:
 
 ```bash
-make kubeconfig
+make status              # Show VM status
+make ssh                 # SSH into k3s-master-1
+make ssh VM=nessus       # SSH into a specific VM
+make provision           # Re-run provisioners on k3s-master-1
+make halt                # Stop all VMs
+make destroy VM=name     # Destroy a specific VM
+make healthcheck         # Run healthcheck (cloud VM)
+make healthcheck-vagrant # Run healthcheck (Vagrant VM)
 ```
 
 ### Tailscale Setup
