@@ -17,3 +17,4 @@ spec:
       interval: 1m
   values:
     apiServerProxyConfig:
+      mode: "true"
