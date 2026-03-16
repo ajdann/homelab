@@ -4,6 +4,16 @@
   set_fact:
     any_errors_fatal: true
 
+# kubernetes.core.k8s reads kubeconfig at parse time (before become escalation).
+# Copy it to a user-readable path so the module can access it.
+- name: Copy kubeconfig for kubernetes.core module access
+  copy:
+    src: '{{ remote_kubeconfig_path }}'
+    dest: '{{ bootstrap_kubeconfig_path }}'
+    remote_src: true
+    mode: '0644'
+  become: true
+
 - name: Tailscale configuration tasks
   ansible.builtin.import_tasks: tailscale.yaml
 
