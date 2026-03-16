@@ -1,0 +1,26 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # --- Core Infrastructure ---
+  - ../../tailscale/overlays/dev
+  - ../../reloader/overlays/dev
+  # - ../../dashboard/overlays/dev
+  # - ../../kured/overlays/dev
+  # - ../../netdata/overlays/dev
+  # - ../../nginx-ingress/overlays/dev
+  # - ../../prometheus/overlays/dev
+  # - ../../traefik/overlays/dev
+  # - ../../keda/overlays/dev
+
+  # --- Security ---
+  - ../../wazuh/overlays/dev
+  - ../../kubescape/overlays/dev
+  - ../../kubebench/overlays/dev
+  - ../../kyverno/overlays/dev
+  - ../../policy-reporter/overlays/dev
+  - ../../falco/overlays/dev
+  - ../../falcosidekick/overlays/dev
+
+  # --- Monitoring ---
+  - ../../loki-stack/overlays/dev
