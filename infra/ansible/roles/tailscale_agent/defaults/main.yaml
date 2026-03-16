@@ -12,7 +12,7 @@ tailscale_api_endpoint: https://api.tailscale.com/api/v2
 tailscale_tags:
   - "tag:k8s-operator"
 
-tailscale_up_options: ''
+tailscale_up_options: '--ssh'
 
 tailscale_hostname: '{{ ansible_hostname }}'
 
