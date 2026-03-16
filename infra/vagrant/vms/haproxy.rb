@@ -22,8 +22,8 @@ def configure_haproxy(config)
       SHELL
 
       haproxy.vm.provision "ansible_local" do |ansible|
-        ansible.playbook = "/vagrant/ansible/playbooks/haproxy.yaml"
-        ansible.inventory_path = "/vagrant/ansible/inventory/hosts.yaml"
+        ansible.playbook = "/vagrant/infra/ansible/playbooks/haproxy.yaml"
+        ansible.inventory_path = "/vagrant/infra/ansible/inventory/hosts.yaml"
         ansible.limit = "haproxy#{i+1}"
       end
     end
