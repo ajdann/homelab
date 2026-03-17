@@ -1,0 +1,11 @@
+# INACTIVE - Production cluster scaffold
+# Activate by:
+#   1. Creating infrastructure/overlays/prod/ and apps/overlays/prod/ with component lists
+#   2. Bootstrapping Flux on the production cluster pointing to this path
+#   3. Creating a GitRepository + Kustomization CR in a flux-system/ subdirectory here
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources: []
+# Uncomment when production overlays exist:
+#  - ../../infrastructure/overlays/prod
+#  - ../../apps/overlays/prod

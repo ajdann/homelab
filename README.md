@@ -85,9 +85,14 @@ Make sure the following tools are installed on your host machine:
 #### 2. Start the VM (local only) or use your cloud VM
 
 - **Cloud VM:** Ensure the VM is running and that `secrets/` (vm_user, vm_ssh_private_key, etc.) and inventory (`ansible_host`) are set. Skip to step 3.
-- **Local (Vagrant):** Run `make up` (or `make vagrant-up`).
+- **Local (Vagrant):**
+  ```bash
+  make master       # Start k3s-master-1 with full provisioning (K3s + Flux + Wazuh)
+  # or
+  make up           # Start all enabled VMs (see infra/vagrant/config/vm_resources.rb)
+  ```
 
-#### 3. Bootstrap the cluster
+#### 3. Bootstrap the cluster (cloud VM only)
 
 ```bash
 make bootstrap
@@ -100,35 +105,96 @@ http://homepage.YOUR_DOMAIN
 
 > Replace `YOUR_DOMAIN` with the actual domain you configured in your `.env` file.
 
-#### 5. (Optional) Get the kubeconfig
+#### 5. Useful commands
 
-Run the following command to extract kubeconfig at project root
+Run `make` to see all available commands. Quick reference:
 
 ```bash
-make kubeconfig
+make status              # Show VM status
+make ssh                 # SSH into k3s-master-1
+make ssh VM=nessus       # SSH into a specific VM
+make provision           # Re-run provisioners on k3s-master-1
+make halt                # Stop all VMs
+make destroy VM=name     # Destroy a specific VM
+make healthcheck         # Run healthcheck (cloud VM)
+make healthcheck-vagrant # Run healthcheck (Vagrant VM)
 ```
 
 ### Tailscale Setup
 
 The Tailscale operator requires OAuth credentials to function. These credentials need to be created manually as a Kubernetes secret. Follow these steps:
 
-1. Create a Tailscale OAuth client:
+#### 1. Create an OAuth Client
 
-   - Go to https://login.tailscale.com/admin/settings/oauth
-   - Click "Create OAuth Client"
-   - Copy the Client ID and Client Secret
-
-2. Set Up the Tailscale Tag
-
-- > ⚠️ This is required for the Tailscale K8s Operator to function.
-  - Go to https://login.tailscale.com/admin/acls/file
-  - Add the following to your ACL file:
-  ```json
-  "tagOwners": {
-  	"tag:k8s-operator": ["autogroup:admin"],
-  },
+- Go to https://login.tailscale.com/admin/settings/oauth
+- Click **"Create OAuth Client"**
+- Grant scopes: **Devices → Read**, **Auth Keys → Write**
+- Copy the Client ID and Client Secret into `secrets/.env`:
   ```
-  - Save and apply the ACL changes.
+  TAILSCALE_CLIENT_ID=<client_id>
+  TAILSCALE_CLIENT_SECRET=<client_secret>
+  TAILSCALE_DOMAIN=<tailnet-name>.ts.net
+  ```
+
+#### 2. Enable HTTPS Certificates
+
+> ⚠️ Required for the Kubernetes API server proxy to provision TLS certificates.
+
+- Go to https://login.tailscale.com/admin/dns
+- Scroll to **"HTTPS Certificates"** and click **Enable**
+
+#### 3. Configure ACL Tags and Grants
+
+Go to https://login.tailscale.com/admin/acls/file and ensure the following sections exist:
+
+**Tag owners** (devices the operator can tag):
+```json
+"tagOwners": {
+  "tag:k8s-operator": ["autogroup:admin"],
+  "tag:k8s":          ["autogroup:admin"],
+},
+```
+
+**Grants** (Kubernetes API access over Tailscale):
+```json
+"grants": [
+  {
+    "src": ["autogroup:admin"],
+    "dst": ["tag:k8s-operator"],
+    "ip":  ["tcp:443"],
+    "app": {
+      "tailscale.com/cap/kubernetes": [{
+        "impersonate": {
+          "groups": ["system:masters"],
+        },
+      }],
+    },
+  },
+],
+```
+
+> **Why one combined grant?** Tailscale requires the `ip` (network access) and `app` (impersonation capability) rules to be in the **same grant entry** to work correctly. Splitting them into two separate grants causes TLS handshake failures.
+
+> **Why `system:masters`?** This maps your Tailscale admin identity to the Kubernetes `cluster-admin` ClusterRole via the `ClusterRoleBinding` in `kubernetes/core/tailscale/base/rbac.yaml`. Adjust the group and binding if you want finer-grained access.
+
+#### 4. Access the Cluster via Tailscale
+
+After bootstrapping the cluster and the Tailscale operator pod is running:
+
+```bash
+# Generate a kubeconfig that routes through the Tailscale proxy
+tailscale configure kubeconfig tailscale-operator
+
+# Verify access
+kubectl get nodes
+```
+
+The kubeconfig points to `https://tailscale-operator.<tailnet>.ts.net` — accessible from any device on your tailnet with no port forwarding required.
+
+> **Troubleshooting:** If you see `TLS handshake timeout`, check that:
+> 1. HTTPS certificates are enabled (step 2 above)
+> 2. The `grants` section combines `ip` and `app` in a single entry (step 3 above)
+> 3. No stale `tailscale-operator` device exists in https://login.tailscale.com/admin/machines — if there is one (from a previous run), delete it, then restart the operator pod: `kubectl rollout restart deployment/operator -n tailscale`
 
 ## Storage
 

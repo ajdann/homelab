@@ -7,7 +7,7 @@
   loop:
     - python3-full
     - python3-pip
-    - python3.12-venv
+    - python3-venv
     - curl
     - vim
     - net-tools

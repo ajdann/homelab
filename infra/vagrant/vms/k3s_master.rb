@@ -44,24 +44,24 @@ def configure_k3s_master(config)
         ansible.playbook = "/vagrant/infra/ansible/playbooks/k8s-server.yaml"
         ansible.install_mode = "pip"
         ansible.pip_args = "-r /vagrant/infra/ansible/requirements.txt"
-        # ansible.verbose = true  # Enable verbose output for debugging
         ansible.groups = {
           "k3s_masters" => ["k3s-master-#{i+1}"]
         }
         ansible.extra_vars = {
-          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0],  # Use master IP as API endpoint
+          vagrant_run: true,
+          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0],
           kubernetes_tls_sans: [
-            VM_RESOURCES["k3s-master"][:ips][0],  # VM IP address
-            "localhost",                          # For port forwarding access
-            "127.0.0.1"                          # For port forwarding access
-          ].join(","),  # K3s expects comma-separated TLS SANs
-          kubeconfig_server: "localhost"        # Use localhost for port forwarding
+            VM_RESOURCES["k3s-master"][:ips][0],
+            "localhost",
+            "127.0.0.1"
+          ].join(","),
+          kubeconfig_server: "localhost"
         }
       end
 
       master.vm.provision "ansible_local" do |ansible|
         ansible.playbook = "/vagrant/infra/ansible/playbooks/k8s-bootstrap.yaml"
-        ansible.verbose = false  
+        ansible.verbose = false
         ansible.install_mode = "pip"
         ansible.galaxy_role_file = "/vagrant/infra/ansible/requirements.yaml"
         ansible.pip_args = "-r /vagrant/infra/ansible/requirements.txt"
@@ -69,13 +69,14 @@ def configure_k3s_master(config)
           "k3s_masters" => ["k3s-master-#{i+1}"]
         }
         ansible.extra_vars = {
-          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0],  # Use master IP as API endpoint
+          vagrant_run: true,
+          kubernetes_vip: VM_RESOURCES["k3s-master"][:ips][0],
           kubernetes_tls_sans: [
-            VM_RESOURCES["k3s-master"][:ips][0],  # VM IP address
-            "localhost",                          # For port forwarding access
-            "127.0.0.1"                          # For port forwarding access
-          ].join(","),  # K3s expects comma-separated TLS SANs
-          kubeconfig_server: "localhost"        # Use localhost for port forwarding
+            VM_RESOURCES["k3s-master"][:ips][0],
+            "localhost",
+            "127.0.0.1"
+          ].join(","),
+          kubeconfig_server: "localhost"
         }
       end
 

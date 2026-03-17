@@ -6,7 +6,7 @@
 
 - name: Apply Flux Operator installation manifests
   kubernetes.core.k8s:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     state: present
     src: 'https://github.com/controlplaneio-fluxcd/flux-operator/releases/latest/download/install.yaml'
   register: flux_operator_install_result
@@ -17,7 +17,7 @@
 
 - name: Wait for Flux Operator deployment to be ready
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     api_version: apps/v1
     kind: Deployment
     name: flux-operator
@@ -35,7 +35,13 @@
     ansible_python_interpreter: /opt/pyenv/bin/python3
   become: true
 
-- name: Sync Flux manifests
+- name: Sync Flux manifests (vagrant — local copy)
+  ansible.builtin.copy:
+    src: '{{ flux_components_path }}/'
+    dest: '{{ remote_flux_manifest_dir }}/'
+  when: vagrant_run | default(false)
+
+- name: Sync Flux manifests (cloud — rsync over SSH)
   synchronize:
     src: '{{ flux_components_path }}/'
     dest: '{{ remote_flux_manifest_dir }}/'
@@ -45,6 +51,7 @@
       - '--exclude=.git'
     set_remote_user: true
   delegate_to: localhost
+  when: not (vagrant_run | default(false))
 
 - name: Find Flux manifests on remote
   ansible.builtin.find:
@@ -55,7 +62,7 @@
 
 - name: Apply FluxInstance
   kubernetes.core.k8s:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     state: present
     src: '{{ item.path }}'
   loop: '{{ flux_manifests.files }}'
@@ -68,7 +75,7 @@
 
 - name: Wait for FluxInstance to be Ready
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     api_version: fluxcd.controlplane.io/v1
     kind: FluxInstance
     name: flux
@@ -86,7 +93,7 @@
 
 - name: Apply remaining Flux manifests
   kubernetes.core.k8s:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     state: present
     src: '{{ item.path }}'
   loop: '{{ flux_manifests.files }}'
@@ -99,7 +106,7 @@
 
 - name: Wait for Flux controllers
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     api_version: apps/v1
     kind: Deployment
     name: '{{ item }}'
@@ -122,7 +129,7 @@
 
 - name: Wait for Flux Toolkit CRDs
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     api_version: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     name: '{{ item }}'
@@ -144,7 +151,7 @@
 
 - name: Verify Flux deployments
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     api_version: apps/v1
     kind: Deployment
     namespace: flux-system
@@ -156,7 +163,7 @@
 
 - name: Wait for GitRepository to sync
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     api_version: source.toolkit.fluxcd.io/v1
     kind: GitRepository
     name: homelab-repo
@@ -174,7 +181,7 @@
 
 - name: Validate homelab Kustomization readiness
   kubernetes.core.k8s_info:
-    kubeconfig: '{{ remote_kubeconfig_path }}'
+    kubeconfig: '{{ bootstrap_kubeconfig_path }}'
     api_version: kustomize.toolkit.fluxcd.io/v1
     kind: Kustomization
     name: homelab

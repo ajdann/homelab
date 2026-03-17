@@ -2,4 +2,5 @@
 kubeconfig_dest_path: '{{ playbook_dir }}/../../../secrets/kubeconfig'
 flux_components_path: '{{ playbook_dir }}/../../../kubernetes/clusters/homelab/flux-system'
 remote_kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+bootstrap_kubeconfig_path: /tmp/k3s-kubeconfig.yaml
 remote_flux_manifest_dir: /tmp/flux-manifests
