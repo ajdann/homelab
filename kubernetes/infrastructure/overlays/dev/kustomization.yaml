@@ -14,13 +14,13 @@ resources:
   # - ../../keda/overlays/dev
 
   # --- Security ---
-  - ../../wazuh/overlays/dev
-  - ../../kubescape/overlays/dev
+  # - ../../wazuh/overlays/dev
+  # - ../../kubescape/overlays/dev
+  # - ../../falco/overlays/dev
+  # - ../../falcosidekick/overlays/dev
   - ../../kubebench/overlays/dev
   - ../../kyverno/overlays/dev
   - ../../policy-reporter/overlays/dev
-  - ../../falco/overlays/dev
-  - ../../falcosidekick/overlays/dev
 
   # --- Monitoring ---
   - ../../loki-stack/overlays/dev
